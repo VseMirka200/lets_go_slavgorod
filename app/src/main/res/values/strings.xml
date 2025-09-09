@@ -1,0 +1,101 @@
+<resources>
+
+    <!-- ===================================================================================== -->
+    <!--                                    ОБЩИЕ ДЛЯ ПРИЛОЖЕНИЯ                               -->
+    <!-- ===================================================================================== -->
+    <string name="app_name">Поехали! Славгород</string>
+    <string name="error_icon_description">Иконка ошибки загрузки</string>
+    <string name="empty_state_icon_description">Иконка пустого состояния или отсутствия результатов</string>
+    <string name="unknown_error">Произошла неизвестная ошибка.</string>
+    <string name="back_button_description">Назад</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                    ГЛАВНЫЙ ЭКРАН (Маршруты)                           -->
+    <!-- ===================================================================================== -->
+    <string name="app_name_actual">Маршруты</string> <!-- Используется как заголовок экрана -->
+
+    <!-- Поиск -->
+    <string name="search_icon_description">Поиск</string>
+    <string name="error_loading_routes">Ошибка загрузки маршрутов</string>
+    <string name="routes_not_found">Маршруты не найдены</string>
+    <string name="routes_unavailable">Маршруты недоступны</string>
+    <string name="try_changing_search_query">Попробуйте изменить поисковый запрос</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                    ЭКРАН "ДЕТАЛИ МАРШРУТА"                            -->
+    <!-- ===================================================================================== -->
+    <string name="route_details_title">Детали маршрута</string>
+    <string name="route_info_not_found">Информация о маршруте не найдена.</string>
+    <string name="detail_label_name">Название автобуса:</string>
+    <string name="detail_label_description">Описание:</string>
+    <string name="detail_label_travel_time">Время в пути:</string>
+    <string name="detail_label_detailedPrice">Цена:</string>
+    <string name="detail_label_price_paymentMethods">Способы оплаты:</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                    ЭКРАН "ИЗБРАННОЕ"                                  -->
+    <!-- ===================================================================================== -->
+    <string name="favorite_times_screen_title">Избранное время</string>
+    <string name="no_favorite_times_icon_desc">Иконка избранного</string>
+    <string name="empty_state_icon_description_favorites">Иконка пустого списка избранного</string>
+    <string name="no_favorite_times_title_updated">Избранное пока пусто</string>
+    <string name="no_favorite_times_description">Добавляйте расписания автобусов в избранное, чтобы они всегда были под рукой.</string>
+    <string name="expand_section">Развернуть</string>
+    <string name="collapse_section">Свернуть</string>
+    <string name="error_icon_description_favorites">Иконка ошибки загрузки избранного</string>
+    <string name="error_loading_favorites">Не удалось загрузить избранное</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                    ЭКРАН "НАСТРОЙКИ"                                  -->
+    <!-- ===================================================================================== -->
+    <string name="settings_screen_title">Настройки</string>
+    <string name="settings_icon_description">Настройки</string> <!-- Иконка для BottomBar/TopBar -->
+
+    <!-- Секция "Тема приложения" -->
+    <string name="settings_section_theme_title">Тема приложения</string>
+    <string name="settings_appearance_label">Внешний вид:</string>
+    <string name="settings_appearance_icon_desc">Иконка настроек внешнего вида</string>
+    <string name="settings_select_theme_desc">Выбрать тему</string>
+    <string name="theme_system">Как в системе</string>
+    <string name="theme_light">Светлая сторона</string>
+    <string name="theme_dark">Темная сторона</string>
+
+    <!-- Секция "Уведомления" -->
+    <string name="settings_section_notifications_title">Уведомления</string>
+    <string name="settings_notification_mode_label">Режим:</string>
+    <string name="settings_notification_icon_desc">Иконка настроек уведомлений</string>
+    <string name="settings_select_notification_mode_desc">Выбрать режим уведомлений</string>
+    <string name="notification_mode_weekdays">По будням</string>
+    <string name="notification_mode_all_days">Все дни</string>
+    <string name="notification_mode_selected_days">Выбранные дни</string>
+    <string name="notification_mode_disabled">Отключить</string>
+    <!-- Диалог выбора дней для уведомлений -->
+    <string name="dialog_select_days_title">Выберите дни для уведомлений</string>
+    <string name="dialog_button_confirm">ОК</string>
+    <string name="dialog_button_cancel">Отмена</string>
+    <!-- Секция "О приложении" (в Настройках) -->
+    <string name="settings_section_about_title">О приложении</string> <!-- Используется как заголовок секции -->
+    <string name="settings_about_icon_desc">Иконка информации о приложении</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                    ЭКРАН "О ПРОГРАММЕ"                                -->
+    <!-- ===================================================================================== -->
+    <string name="about_screen_title">О программе</string> <!-- Используется как заголовок секции -->
+    <string name="developer_section_title">Разработал: VseMirka200</string>
+    <string name="links_section_title">Ссылки:</string>
+    <string name="link_text_github">GitHub</string>
+    <string name="developer_github_url_value">https://github.com/VseMirka200/Lets-go-Slavgorod</string>
+    <string name="error_no_browser">Не удалось открыть ссылку. Проверьте, установлен ли браузер.</string>
+    <string name="feedback_section_title">Обратная связь</string>
+    <string name="feedback_link_text">Написать в Telegram</string>
+    <string name="feedback_telegram_bot_username">lets_go_slavgorod_bot</string>
+    <string name="error_no_telegram_app">Приложение Telegram не установлено.</string>
+    <string name="error_cant_open_link">Не удалось открыть ссылку.</string>
+    <string name="app_version_label">Версия: %1$s</string>
+
+</resources>

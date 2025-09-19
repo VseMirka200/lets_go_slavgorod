@@ -78,6 +78,16 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                 pricePrimary = "38₽ город / 55₽ межгород",
                 paymentMethods = "Нал. / Безнал.",
                 color = "#FF6200EE"
+            ),
+            BusRoute(
+                id = "1",
+                routeNumber = "1",
+                name = "Автобус №1",
+                description = "Маршрут Вокзал — Совхоз",
+                travelTime = "~24 минуты",
+                pricePrimary = "38₽ город",
+                paymentMethods = "Только нал.",
+                color = "#FF1976D2"
             )
         )
         _allRoutes.value = sampleRoutes
@@ -100,9 +110,10 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
             _allRoutes.value
         } else {
             val lowercaseQuery = query.lowercase()
-            _allRoutes.value.filter {
-                it.routeNumber.lowercase().contains(lowercaseQuery) ||
-                        it.name.lowercase().contains(lowercaseQuery)
+            _allRoutes.value.filter { route ->
+                route.routeNumber.lowercase().contains(lowercaseQuery) ||
+                        route.name.lowercase().contains(lowercaseQuery) ||
+                        route.description.lowercase().contains(lowercaseQuery)
             }
         }
         _uiState.update { currentState ->

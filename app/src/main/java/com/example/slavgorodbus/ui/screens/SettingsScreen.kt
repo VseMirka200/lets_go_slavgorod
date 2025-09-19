@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -25,6 +26,8 @@ import com.example.slavgorodbus.ui.viewmodel.AppTheme
 import com.example.slavgorodbus.ui.viewmodel.NotificationMode
 import com.example.slavgorodbus.ui.viewmodel.NotificationSettingsViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModel
+import com.example.slavgorodbus.updates.UpdateManager
+import com.example.slavgorodbus.updates.UpdateDialog
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.*
@@ -36,7 +39,8 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     themeViewModel: ThemeViewModel = viewModel(),
     notificationSettingsViewModel: NotificationSettingsViewModel = viewModel(),
-    onNavigateToAbout: () -> Unit
+    onNavigateToAbout: () -> Unit,
+    activity: androidx.activity.ComponentActivity
 ) {
     val currentAppTheme by themeViewModel.currentTheme.collectAsState()
     var showThemeDropdown by remember { mutableStateOf(false) }
@@ -48,6 +52,13 @@ fun SettingsScreen(
 
     var showSelectDaysDialog by remember { mutableStateOf(false) }
     val selectedDaysFromVM by notificationSettingsViewModel.selectedNotificationDays.collectAsState()
+
+    var updateAvailable by remember { mutableStateOf<UpdateManager.AppVersion?>(null) }
+    var isCheckingUpdates by remember { mutableStateOf(false) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
+    var updateError by remember { mutableStateOf<String?>(null) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var shouldCheckUpdates by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -110,6 +121,22 @@ fun SettingsScreen(
             Spacer(Modifier.height(24.dp))
 
             Text(
+                text = "Обновления",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            UpdateSettingsCard(
+                isCheckingUpdates = isCheckingUpdates,
+                onCheckForUpdates = {
+                    shouldCheckUpdates = true
+                    isCheckingUpdates = true
+                    updateError = null
+                }
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            Text(
                 text = stringResource(R.string.settings_section_about_title),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -117,6 +144,47 @@ fun SettingsScreen(
             AboutSettingsCard(
                 onNavigateToAbout = onNavigateToAbout
             )
+        }
+    }
+
+    // Проверка обновлений
+    LaunchedEffect(shouldCheckUpdates) {
+        if (shouldCheckUpdates) {
+            shouldCheckUpdates = false
+            try {
+                Log.d("SettingsScreen", "Начинаем проверку обновлений...")
+                val updateManager = UpdateManager(activity)
+                
+                // Тестируем подключение к GitHub
+                Log.d("SettingsScreen", "Тестируем подключение к GitHub...")
+                val connectionOk = updateManager.testConnection()
+                Log.d("SettingsScreen", "Подключение к GitHub: $connectionOk")
+                
+                val result = updateManager.checkForUpdatesWithResult()
+                
+                Log.d("SettingsScreen", "Результат проверки: success=${result.success}, error=${result.error}")
+                
+                if (result.success) {
+                    if (result.update != null) {
+                        Log.d("SettingsScreen", "Найдено обновление: ${result.update.versionName}")
+                        updateAvailable = result.update
+                        showUpdateDialog = true
+                    } else {
+                        Log.d("SettingsScreen", "Обновления не найдены")
+                    }
+                } else {
+                    Log.w("SettingsScreen", "Ошибка проверки обновлений: ${result.error}")
+                    updateError = result.error ?: "Неизвестная ошибка"
+                    showErrorDialog = true
+                }
+            } catch (e: Exception) {
+                Log.e("SettingsScreen", "Исключение при проверке обновлений", e)
+                updateError = "Ошибка: ${e.message}"
+                showErrorDialog = true
+            } finally {
+                isCheckingUpdates = false
+                Log.d("SettingsScreen", "Проверка обновлений завершена")
+            }
         }
     }
 
@@ -128,6 +196,41 @@ fun SettingsScreen(
                 showSelectDaysDialog = false
                 notificationSettingsViewModel.setSelectedNotificationDays(newSelectedDays)
                 Log.d("SettingsScreen", "Selected days confirmed: $newSelectedDays")
+            }
+        )
+    }
+
+    if (showUpdateDialog && updateAvailable != null) {
+        UpdateDialog(
+            version = updateAvailable!!,
+            onDismiss = { showUpdateDialog = false },
+            onDownload = {
+                showUpdateDialog = false
+                val updateManager = UpdateManager(activity)
+                updateManager.downloadUpdate(updateAvailable!!)
+            }
+        )
+    }
+
+    if (showErrorDialog && updateError != null) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = {
+                Text(
+                    text = "Ошибка проверки обновлений",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
+            text = {
+                Text(
+                    text = updateError!!,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(onClick = { showErrorDialog = false }) {
+                    Text("OK")
+                }
             }
         )
     }
@@ -306,6 +409,47 @@ fun NotificationSettingsCard(
                         }
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun UpdateSettingsCard(
+    isCheckingUpdates: Boolean,
+    onCheckForUpdates: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(enabled = !isCheckingUpdates) { onCheckForUpdates() }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Update,
+                    contentDescription = "Проверить обновления",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(16.dp))
+                Text(
+                    text = if (isCheckingUpdates) "Проверка обновлений..." else "Проверить обновления",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (isCheckingUpdates) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+                )
+            }
+            if (isCheckingUpdates) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
             }
         }
     }

@@ -111,18 +111,6 @@ class MainActivity : ComponentActivity() {
 
             SlavgorodBusTheme(darkTheme = useDarkTheme) {
                 BusScheduleApp(themeViewModel = themeViewModel)
-                
-                // Проверка обновлений
-                UpdateChecker(activity = this@MainActivity) { version ->
-                    UpdateDialog(
-                        version = version,
-                        onDismiss = { /* Игнорируем */ },
-                        onDownload = {
-                            val updateManager = UpdateManager(this@MainActivity)
-                            updateManager.downloadUpdate(version)
-                        }
-                    )
-                }
             }
         }
     }

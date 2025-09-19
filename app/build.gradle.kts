@@ -9,14 +9,14 @@ plugins {
 
 android {
     namespace = "com.example.slavgorodbus"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.slavgorodbus"
         minSdk = 24
         //noinspection OldTargetApi
         targetSdk = 35
-        versionCode = 1
+        versionCode = 10003
         versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -62,7 +62,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.accompanist.pager)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)

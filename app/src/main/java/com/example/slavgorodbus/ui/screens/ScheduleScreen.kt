@@ -32,6 +32,8 @@ import androidx.compose.runtime.collectAsState
 
 const val STOP_SLAVGORD_RYNOK = "Славгород (Рынок)"
 const val STOP_YAROVOE_MCHS = "Яровое (МЧС-128)"
+const val STOP_VOKZAL = "Вокзал"
+const val STOP_SOVHOZ = "Совхоз"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,17 +62,35 @@ fun ScheduleScreen(
             .sortedBy { it.departureTime }
     }
 
+    val schedulesVokzal = remember(allSchedulesForRoute) {
+        allSchedulesForRoute
+            .filter { it.departurePoint == STOP_VOKZAL }
+            .sortedBy { it.departureTime }
+    }
+
+    val schedulesSovhoz = remember(allSchedulesForRoute) {
+        allSchedulesForRoute
+            .filter { it.departurePoint == STOP_SOVHOZ }
+            .sortedBy { it.departureTime }
+    }
+
     var currentTime by remember { mutableStateOf(Calendar.getInstance()) }
     var nextUpcomingSlavgorodId by remember { mutableStateOf<String?>(null) }
     var nextUpcomingYarovoeId by remember { mutableStateOf<String?>(null) }
+    var nextUpcomingVokzalId by remember { mutableStateOf<String?>(null) }
+    var nextUpcomingSovhozId by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit, schedulesSlavgorod, schedulesYarovoe) {
+    LaunchedEffect(Unit, schedulesSlavgorod, schedulesYarovoe, schedulesVokzal, schedulesSovhoz) {
         while (true) {
             currentTime = Calendar.getInstance()
             val now = currentTime
             nextUpcomingSlavgorodId = schedulesSlavgorod
                 .firstOrNull { parseTimeSimple(it.departureTime).timeInMillis > now.timeInMillis }?.id
             nextUpcomingYarovoeId = schedulesYarovoe
+                .firstOrNull { parseTimeSimple(it.departureTime).timeInMillis > now.timeInMillis }?.id
+            nextUpcomingVokzalId = schedulesVokzal
+                .firstOrNull { parseTimeSimple(it.departureTime).timeInMillis > now.timeInMillis }?.id
+            nextUpcomingSovhozId = schedulesSovhoz
                 .firstOrNull { parseTimeSimple(it.departureTime).timeInMillis > now.timeInMillis }?.id
             delay(30000)
         }
@@ -110,8 +130,12 @@ fun ScheduleScreen(
                 route = route,
                 schedulesSlavgorod = schedulesSlavgorod,
                 schedulesYarovoe = schedulesYarovoe,
+                schedulesVokzal = schedulesVokzal,
+                schedulesSovhoz = schedulesSovhoz,
                 nextUpcomingSlavgorodId = nextUpcomingSlavgorodId,
                 nextUpcomingYarovoeId = nextUpcomingYarovoeId,
+                nextUpcomingVokzalId = nextUpcomingVokzalId,
+                nextUpcomingSovhozId = nextUpcomingSovhozId,
                 viewModel = viewModel
             )
         }
@@ -124,12 +148,18 @@ private fun ScheduleListContent(
     route: BusRoute,
     schedulesSlavgorod: List<BusSchedule>,
     schedulesYarovoe: List<BusSchedule>,
+    schedulesVokzal: List<BusSchedule>,
+    schedulesSovhoz: List<BusSchedule>,
     nextUpcomingSlavgorodId: String?,
     nextUpcomingYarovoeId: String?,
+    nextUpcomingVokzalId: String?,
+    nextUpcomingSovhozId: String?,
     viewModel: BusViewModel
 ) {
     var isSlavgorodSectionExpanded by remember { mutableStateOf(true) }
     var isYarovoeSectionExpanded by remember { mutableStateOf(true) }
+    var isVokzalSectionExpanded by remember { mutableStateOf(true) }
+    var isSovhozSectionExpanded by remember { mutableStateOf(true) }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -140,34 +170,67 @@ private fun ScheduleListContent(
             RouteDetailsSummaryCard(route = route)
         }
 
-        item {
-            ExpandableScheduleSection(
-                title = "Отправление из $STOP_SLAVGORD_RYNOK",
-                schedules = schedulesSlavgorod,
-                nextUpcomingScheduleId = nextUpcomingSlavgorodId,
-                isExpanded = isSlavgorodSectionExpanded,
-                onToggleExpand = { isSlavgorodSectionExpanded = !isSlavgorodSectionExpanded },
-                viewModel = viewModel,
-                route = route,
-                departurePointForCheck = STOP_SLAVGORD_RYNOK
-            )
+        // Секции для маршрута №102 (Славгород — Яровое)
+        if (route.id == "102") {
+            item {
+                ExpandableScheduleSection(
+                    title = "Отправление из $STOP_SLAVGORD_RYNOK",
+                    schedules = schedulesSlavgorod,
+                    nextUpcomingScheduleId = nextUpcomingSlavgorodId,
+                    isExpanded = isSlavgorodSectionExpanded,
+                    onToggleExpand = { isSlavgorodSectionExpanded = !isSlavgorodSectionExpanded },
+                    viewModel = viewModel,
+                    route = route,
+                    departurePointForCheck = STOP_SLAVGORD_RYNOK
+                )
+            }
+
+            item {
+                ExpandableScheduleSection(
+                    title = "Отправление из $STOP_YAROVOE_MCHS",
+                    schedules = schedulesYarovoe,
+                    nextUpcomingScheduleId = nextUpcomingYarovoeId,
+                    isExpanded = isYarovoeSectionExpanded,
+                    onToggleExpand = { isYarovoeSectionExpanded = !isYarovoeSectionExpanded },
+                    viewModel = viewModel,
+                    route = route,
+                    departurePointForCheck = STOP_YAROVOE_MCHS
+                )
+            }
         }
 
-        item {
-            ExpandableScheduleSection(
-                title = "Отправление из $STOP_YAROVOE_MCHS",
-                schedules = schedulesYarovoe,
-                nextUpcomingScheduleId = nextUpcomingYarovoeId,
-                isExpanded = isYarovoeSectionExpanded,
-                onToggleExpand = { isYarovoeSectionExpanded = !isYarovoeSectionExpanded },
-                viewModel = viewModel,
-                route = route,
-                departurePointForCheck = STOP_YAROVOE_MCHS
-            )
+        // Секции для маршрута №1 (Вокзал — Совхоз)
+        if (route.id == "1") {
+            item {
+                ExpandableScheduleSection(
+                    title = "Отправление из $STOP_VOKZAL",
+                    schedules = schedulesVokzal,
+                    nextUpcomingScheduleId = nextUpcomingVokzalId,
+                    isExpanded = isVokzalSectionExpanded,
+                    onToggleExpand = { isVokzalSectionExpanded = !isVokzalSectionExpanded },
+                    viewModel = viewModel,
+                    route = route,
+                    departurePointForCheck = STOP_VOKZAL
+                )
+            }
+
+            item {
+                ExpandableScheduleSection(
+                    title = "Отправление из $STOP_SOVHOZ",
+                    schedules = schedulesSovhoz,
+                    nextUpcomingScheduleId = nextUpcomingSovhozId,
+                    isExpanded = isSovhozSectionExpanded,
+                    onToggleExpand = { isSovhozSectionExpanded = !isSovhozSectionExpanded },
+                    viewModel = viewModel,
+                    route = route,
+                    departurePointForCheck = STOP_SOVHOZ
+                )
+            }
         }
 
-        if (schedulesSlavgorod.isEmpty() && schedulesYarovoe.isEmpty() &&
-            (route.id == "102") ) {
+        if (schedulesSlavgorod.isEmpty() && schedulesYarovoe.isEmpty() && 
+            schedulesVokzal.isEmpty() && schedulesSovhoz.isEmpty() &&
+            (route.id == "102" || route.id == "1") ) {
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -381,13 +444,107 @@ private fun parseTimeSimple(timeString: String): Calendar {
 }
 
 private fun shouldShowNoScheduleMessage(route: BusRoute): Boolean {
-    return route.id == "102"
+    return route.id == "102" || route.id == "1"
 }
 
 private fun generateSampleSchedules(routeId: String): List<BusSchedule> {
     val currentDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
     
     return when (routeId) {
+        "1" -> listOf(
+            // Расписание маршрута №1 - 1 выход (Вокзал → Совхоз)
+            BusSchedule("1_vokzal_1", "1", STOP_VOKZAL, "07:00", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_2", "1", STOP_VOKZAL, "07:48", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_3", "1", STOP_VOKZAL, "08:36", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_4", "1", STOP_VOKZAL, "09:24", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_5", "1", STOP_VOKZAL, "10:12", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_6", "1", STOP_VOKZAL, "11:00", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_7", "1", STOP_VOKZAL, "11:48", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_8", "1", STOP_VOKZAL, "12:36", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_9", "1", STOP_VOKZAL, "13:24", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_10", "1", STOP_VOKZAL, "14:12", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_11", "1", STOP_VOKZAL, "15:00", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_12", "1", STOP_VOKZAL, "15:48", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_13", "1", STOP_VOKZAL, "16:36", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_14", "1", STOP_VOKZAL, "17:24", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_15", "1", STOP_VOKZAL, "18:12", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_16", "1", STOP_VOKZAL, "19:00", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_VOKZAL),
+
+            // Расписание маршрута №1 - 2 выход (Вокзал → Совхоз)
+            BusSchedule("1_vokzal_17", "1", STOP_VOKZAL, "07:15", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_18", "1", STOP_VOKZAL, "08:03", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_19", "1", STOP_VOKZAL, "08:51", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_20", "1", STOP_VOKZAL, "09:39", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_21", "1", STOP_VOKZAL, "10:27", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_22", "1", STOP_VOKZAL, "11:15", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_23", "1", STOP_VOKZAL, "12:03", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_24", "1", STOP_VOKZAL, "12:51", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_25", "1", STOP_VOKZAL, "13:39", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_26", "1", STOP_VOKZAL, "14:27", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_27", "1", STOP_VOKZAL, "15:15", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_28", "1", STOP_VOKZAL, "16:03", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_29", "1", STOP_VOKZAL, "16:51", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_30", "1", STOP_VOKZAL, "17:39", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_VOKZAL),
+
+            // Расписание маршрута №1 - 3 выход (Вокзал → Совхоз)
+            BusSchedule("1_vokzal_31", "1", STOP_VOKZAL, "07:30", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_32", "1", STOP_VOKZAL, "08:18", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_33", "1", STOP_VOKZAL, "09:06", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_34", "1", STOP_VOKZAL, "09:54", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_35", "1", STOP_VOKZAL, "10:42", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_36", "1", STOP_VOKZAL, "11:30", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_37", "1", STOP_VOKZAL, "12:18", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_38", "1", STOP_VOKZAL, "13:06", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_39", "1", STOP_VOKZAL, "13:54", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_40", "1", STOP_VOKZAL, "14:42", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_41", "1", STOP_VOKZAL, "15:30", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+            BusSchedule("1_vokzal_42", "1", STOP_VOKZAL, "16:18", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_VOKZAL),
+
+            // Расписание маршрута №1 - 1 выход (Совхоз → Вокзал)
+            BusSchedule("1_sovhoz_1", "1", STOP_SOVHOZ, "07:24", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_2", "1", STOP_SOVHOZ, "08:12", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_3", "1", STOP_SOVHOZ, "09:00", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_4", "1", STOP_SOVHOZ, "09:48", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_5", "1", STOP_SOVHOZ, "10:36", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_6", "1", STOP_SOVHOZ, "11:24", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_7", "1", STOP_SOVHOZ, "12:12", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_8", "1", STOP_SOVHOZ, "13:48", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_9", "1", STOP_SOVHOZ, "14:36", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_10", "1", STOP_SOVHOZ, "15:24", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_11", "1", STOP_SOVHOZ, "16:12", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_12", "1", STOP_SOVHOZ, "17:00", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_13", "1", STOP_SOVHOZ, "17:48", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_14", "1", STOP_SOVHOZ, "18:36", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_15", "1", STOP_SOVHOZ, "19:24", currentDayOfWeek, notes = "1 выход", departurePoint = STOP_SOVHOZ),
+
+            // Расписание маршрута №1 - 2 выход (Совхоз → Вокзал)
+            BusSchedule("1_sovhoz_16", "1", STOP_SOVHOZ, "07:39", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_17", "1", STOP_SOVHOZ, "08:27", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_18", "1", STOP_SOVHOZ, "09:15", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_19", "1", STOP_SOVHOZ, "10:03", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_20", "1", STOP_SOVHOZ, "10:51", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_21", "1", STOP_SOVHOZ, "11:39", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_22", "1", STOP_SOVHOZ, "12:27", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_23", "1", STOP_SOVHOZ, "13:15", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_24", "1", STOP_SOVHOZ, "14:51", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_25", "1", STOP_SOVHOZ, "15:39", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_26", "1", STOP_SOVHOZ, "16:27", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_27", "1", STOP_SOVHOZ, "17:15", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_28", "1", STOP_SOVHOZ, "18:03", currentDayOfWeek, notes = "2 выход", departurePoint = STOP_SOVHOZ),
+
+            // Расписание маршрута №1 - 3 выход (Совхоз → Вокзал)
+            BusSchedule("1_sovhoz_29", "1", STOP_SOVHOZ, "07:54", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_30", "1", STOP_SOVHOZ, "08:42", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_31", "1", STOP_SOVHOZ, "09:30", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_32", "1", STOP_SOVHOZ, "10:18", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_33", "1", STOP_SOVHOZ, "11:06", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_34", "1", STOP_SOVHOZ, "12:42", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_35", "1", STOP_SOVHOZ, "13:30", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_36", "1", STOP_SOVHOZ, "14:18", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_37", "1", STOP_SOVHOZ, "15:06", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_38", "1", STOP_SOVHOZ, "15:54", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ),
+            BusSchedule("1_sovhoz_39", "1", STOP_SOVHOZ, "16:42", currentDayOfWeek, notes = "3 выход", departurePoint = STOP_SOVHOZ)
+        )
         "102" -> listOf(
             // Расписание отправлении Славгород (Рынок)
             BusSchedule("102_slav_1", "102", STOP_SLAVGORD_RYNOK, "06:25", currentDayOfWeek, notes = null, departurePoint = STOP_SLAVGORD_RYNOK),

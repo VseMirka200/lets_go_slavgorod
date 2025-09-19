@@ -1,11 +1,13 @@
 package com.example.slavgorodbus.ui.screens
 
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -68,12 +70,16 @@ fun SwipeableMainScreen(
             1 -> FavoriteTimesScreen(
                 viewModel = busViewModel
             )
-            2 -> SettingsScreen(
-                themeViewModel = themeViewModel,
-                onNavigateToAbout = {
-                    navController.navigate(Screen.About.route)
-                }
-            )
+            2 -> {
+                val activity = LocalContext.current as ComponentActivity
+                SettingsScreen(
+                    themeViewModel = themeViewModel,
+                    onNavigateToAbout = {
+                        navController.navigate(Screen.About.route)
+                    },
+                    activity = activity
+                )
+            }
         }
     }
 }

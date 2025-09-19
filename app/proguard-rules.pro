@@ -5,17 +5,51 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep line numbers for debugging stack traces
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Room database
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# DataStore
+-keep class androidx.datastore.** { *; }
+
+# Compose
+-keep class androidx.compose.** { *; }
+-dontwarn androidx.compose.**
+
+# Glance widgets
+-keep class androidx.glance.** { *; }
+
+# Keep data classes and entities
+-keep class com.example.slavgorodbus.data.model.** { *; }
+-keep class com.example.slavgorodbus.data.local.entity.** { *; }
+
+# Keep ViewModels
+-keep class com.example.slavgorodbus.ui.viewmodel.** { *; }
+
+# Keep notification classes
+-keep class com.example.slavgorodbus.notifications.** { *; }
+
+# Keep BroadcastReceiver classes
+-keep class * extends android.content.BroadcastReceiver { *; }
+
+# Keep AlarmManager related classes
+-keep class android.app.AlarmManager { *; }
+-keep class android.app.PendingIntent { *; }
+
+# Serialization (if using)
+-keepattributes *Annotation*
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Remove logging in release builds
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+}

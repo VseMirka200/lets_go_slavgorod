@@ -2,11 +2,13 @@
 agp = "8.13.0"
 coreKtxVersion = "1.17.0"
 datastorePreferencesVersion = "1.1.7"
+desugar_jdk_libs = "2.1.5" # Ключ версии с подчеркиванием
 kotlin = "2.0.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 androidxJunit = "1.1.5"
 espressoCore = "3.5.1"
+kotlinxCoroutines = "1.10.2"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.8.2"
 composeBom = "2024.04.00"
@@ -27,6 +29,8 @@ androidx-datastore-preferences-v117 = { module = "androidx.datastore:datastore-p
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+# Первая запись для desugar_jdk_libs удалена, чтобы избежать дублирования.
+# desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" } # Удалено или закомментировано
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -47,6 +51,10 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
 androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+# Оставляем один канонический алиас для desugar-jdk-libs, ссылающийся на правильную версию
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

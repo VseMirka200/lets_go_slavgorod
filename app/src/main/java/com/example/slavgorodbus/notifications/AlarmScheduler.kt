@@ -8,16 +8,94 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import com.example.slavgorodbus.data.model.FavoriteTime
+import com.example.slavgorodbus.data.local.dataStore
+import com.example.slavgorodbus.ui.viewmodel.NotificationMode
+import kotlinx.coroutines.runBlocking
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
+import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.time.DayOfWeek
 
 object AlarmScheduler {
 
     private const val ALARM_REQUEST_CODE_PREFIX = "fav_alarm_"
     private const val FIVE_MINUTES_IN_MILLIS = 5 * 60 * 1000L
 
+    /**
+     * Проверяет, должны ли отправляться уведомления в соответствии с настройками пользователя
+     */
+    private fun shouldSendNotification(context: Context, favoriteTime: FavoriteTime): Boolean {
+        return try {
+            val preferences = runBlocking { context.dataStore.data.first() }
+            
+            val notificationModeString = preferences[stringPreferencesKey("notification_mode")] 
+                ?: NotificationMode.ALL_DAYS.name
+            
+            val notificationMode = try {
+                NotificationMode.valueOf(notificationModeString)
+            } catch (e: IllegalArgumentException) {
+                Log.w("AlarmScheduler", "Invalid notification mode: $notificationModeString, defaulting to ALL_DAYS")
+                NotificationMode.ALL_DAYS
+            }
+
+            when (notificationMode) {
+                NotificationMode.DISABLED -> {
+                    Log.d("AlarmScheduler", "Notifications disabled by user settings")
+                    false
+                }
+                NotificationMode.ALL_DAYS -> {
+                    Log.d("AlarmScheduler", "Notifications enabled for all days")
+                    true
+                }
+                NotificationMode.WEEKDAYS -> {
+                    val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+                    val isWeekday = currentDay in Calendar.MONDAY..Calendar.FRIDAY
+                    Log.d("AlarmScheduler", "Weekdays only mode: current day $currentDay, is weekday: $isWeekday")
+                    isWeekday
+                }
+                NotificationMode.SELECTED_DAYS -> {
+                    val selectedDaysString = preferences[stringSetPreferencesKey("selected_notification_days")] ?: emptySet()
+                    val selectedDays = selectedDaysString.mapNotNull { dayName ->
+                        try {
+                            DayOfWeek.valueOf(dayName)
+                        } catch (e: IllegalArgumentException) {
+                            Log.w("AlarmScheduler", "Invalid day name in settings: $dayName")
+                            null
+                        }
+                    }.toSet()
+                    
+                    val currentDayOfWeek = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+                        Calendar.SUNDAY -> DayOfWeek.SUNDAY
+                        Calendar.MONDAY -> DayOfWeek.MONDAY
+                        Calendar.TUESDAY -> DayOfWeek.TUESDAY
+                        Calendar.WEDNESDAY -> DayOfWeek.WEDNESDAY
+                        Calendar.THURSDAY -> DayOfWeek.THURSDAY
+                        Calendar.FRIDAY -> DayOfWeek.FRIDAY
+                        Calendar.SATURDAY -> DayOfWeek.SATURDAY
+                        else -> null
+                    }
+                    
+                    val isSelectedDay = currentDayOfWeek != null && currentDayOfWeek in selectedDays
+                    Log.d("AlarmScheduler", "Selected days mode: selected days $selectedDays, current day $currentDayOfWeek, is selected: $isSelectedDay")
+                    isSelectedDay
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AlarmScheduler", "Error checking notification settings, defaulting to enabled", e)
+            true // По умолчанию разрешаем уведомления
+        }
+    }
+
     fun scheduleAlarm(context: Context, favoriteTime: FavoriteTime) {
+        // Проверяем настройки уведомлений пользователя
+        if (!shouldSendNotification(context, favoriteTime)) {
+            Log.d("AlarmScheduler", "Notification skipped for ${favoriteTime.id} due to user settings")
+            return
+        }
+
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
         if (alarmManager == null) {
             Log.e("AlarmScheduler", "AlarmManager is null. Cannot schedule alarm for ID ${favoriteTime.id}.")
@@ -75,10 +153,15 @@ object AlarmScheduler {
             context.applicationContext,
             requestCode,
             intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
         )
 
         Log.d("AlarmScheduler", "Attempting to schedule alarm for ID ${favoriteTime.id} at ${formatMillis(triggerAtMillis)} (requestCode: $requestCode, action: ${intent.action})")
+        Log.d("AlarmScheduler", "Current time: ${formatMillis(System.currentTimeMillis())}, Target departure: ${formatMillis(calculatedDepartureTime)}")
 
         try {
             when {
@@ -205,6 +288,30 @@ object AlarmScheduler {
 
         Log.e("AlarmScheduler", "Could not find a suitable future departure day within a week for ${favoriteTime.id}")
         return -1L
+    }
+
+    /**
+     * Обновляет все активные уведомления в соответствии с текущими настройками
+     */
+    fun updateAllAlarmsBasedOnSettings(context: Context, favoriteTimes: List<FavoriteTime>) {
+        Log.d("AlarmScheduler", "Updating all alarms based on current notification settings")
+        
+        favoriteTimes.forEach { favoriteTime ->
+            try {
+                // Сначала отменяем старое уведомление
+                cancelAlarm(context, favoriteTime.id)
+                
+                // Затем планируем новое (если настройки позволяют)
+                if (shouldSendNotification(context, favoriteTime)) {
+                    scheduleAlarm(context, favoriteTime)
+                    Log.d("AlarmScheduler", "Rescheduled alarm for ${favoriteTime.id} based on settings")
+                } else {
+                    Log.d("AlarmScheduler", "Alarm for ${favoriteTime.id} cancelled due to settings")
+                }
+            } catch (e: Exception) {
+                Log.e("AlarmScheduler", "Error updating alarm for ${favoriteTime.id}", e)
+            }
+        }
     }
 
     private fun formatMillis(millis: Long): String {

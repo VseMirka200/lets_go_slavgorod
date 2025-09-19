@@ -8,7 +8,6 @@ import androidx.room.PrimaryKey
 data class FavoriteTimeEntity(
     @PrimaryKey
     val id: String,
-    val someNewProperty: String = "",
 
     @ColumnInfo(name = "route_id")
     val routeId: String,

@@ -1,6 +1,8 @@
 package com.example.slavgorodbus
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -63,12 +65,30 @@ class MainActivity : ComponentActivity() {
                 PackageManager.PERMISSION_GRANTED
             ) {
                 Log.d("MainActivity", "Notification permission already granted.")
+                // Check for exact alarm permission on Android 12+
+                checkExactAlarmPermission()
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 Log.i("MainActivity", "Showing rationale for notification permission. Launching permission request again.")
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
                 Log.d("MainActivity", "Requesting notification permission.")
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            // For older versions, check exact alarm permission
+            checkExactAlarmPermission()
+        }
+    }
+    
+    private fun checkExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+            val canScheduleExact = alarmManager?.canScheduleExactAlarms() ?: false
+            Log.i("MainActivity", "Can schedule exact alarms: $canScheduleExact")
+            
+            if (!canScheduleExact) {
+                Log.w("MainActivity", "Exact alarm permission not granted. User needs to enable it in settings.")
+                // You could show a dialog here to guide the user to settings
             }
         }
     }

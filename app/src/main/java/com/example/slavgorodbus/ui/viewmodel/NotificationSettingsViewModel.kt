@@ -8,10 +8,14 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.example.slavgorodbus.data.local.dataStore
+import com.example.slavgorodbus.data.local.AppDatabase
+import com.example.slavgorodbus.data.model.FavoriteTime
+import com.example.slavgorodbus.notifications.AlarmScheduler
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 
@@ -77,6 +81,9 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                     }
                 }
                 Log.d(TAG, "Notification mode set to: ${mode.name} and saved.")
+                
+                // Обновляем все активные уведомления
+                updateAllActiveAlarms()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to save notification mode or clear days", e)
             }
@@ -93,9 +100,50 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                 Log.d(TAG, "Selected notification days saved: $dayNames")
                 if (currentNotificationMode.value != NotificationMode.SELECTED_DAYS) {
                     setNotificationMode(NotificationMode.SELECTED_DAYS)
+                } else {
+                    // Обновляем все активные уведомления
+                    updateAllActiveAlarms()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to save selected notification days", e)
+            }
+        }
+    }
+
+    /**
+     * Обновляет все активные уведомления в соответствии с текущими настройками
+     */
+    private fun updateAllActiveAlarms() {
+        viewModelScope.launch {
+            try {
+                Log.d(TAG, "Updating all active alarms based on notification settings")
+                
+                val database = AppDatabase.getDatabase(getApplication())
+                val favoriteTimeDao = database.favoriteTimeDao()
+                
+                val favoriteTimeEntities = favoriteTimeDao.getAllFavoriteTimes().firstOrNull() ?: emptyList()
+                
+                val activeFavoriteTimes = favoriteTimeEntities
+                    .filter { it.isActive }
+                    .map { entity ->
+                        FavoriteTime(
+                            id = entity.id,
+                            routeId = entity.routeId,
+                            routeNumber = "N/A", // Упрощенная версия для обновления
+                            routeName = "Маршрут",
+                            stopName = entity.stopName,
+                            departureTime = entity.departureTime,
+                            dayOfWeek = entity.dayOfWeek,
+                            departurePoint = entity.departurePoint,
+                            isActive = entity.isActive
+                        )
+                    }
+                
+                AlarmScheduler.updateAllAlarmsBasedOnSettings(getApplication(), activeFavoriteTimes)
+                Log.d(TAG, "Updated ${activeFavoriteTimes.size} active alarms")
+                
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating active alarms", e)
             }
         }
     }

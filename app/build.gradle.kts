@@ -61,7 +61,8 @@ android {
 }
 
 dependencies {
-    // Core Android dependencies
+    implementation(libs.accompanist.pager)
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.36.0")
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)
@@ -69,15 +70,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
 
-    // Room database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    // Compose BOM and UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -85,26 +83,20 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.extended)
 
-    // Navigation
     implementation(libs.androidx.navigation.compose)
 
-    // Image loading
     implementation(libs.coil.compose)
 
-    // Widget support
     implementation(libs.androidx.glance.appwidget)
 
-    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
-    // Debug tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Core library desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

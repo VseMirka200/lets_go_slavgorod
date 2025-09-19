@@ -66,23 +66,24 @@ fun BottomNavigation(navController: NavController) {
                     onClick = {
                         val isCurrentlyOnAboutAndSettingsClicked = navigationItem.route == Screen.Settings.route && currentRoute == Screen.About.route
 
-                        if (isCurrentlyOnAboutAndSettingsClicked) {
-                        } else if (currentRoute != navigationItem.route) {
-                            if (navigationItem.route == Screen.Settings.route) {
-                                navController.navigate(Screen.Settings.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                        if (!isCurrentlyOnAboutAndSettingsClicked) {
+                            if (currentRoute != navigationItem.route) {
+                                if (navigationItem.route == Screen.Settings.route) {
+                                    navController.navigate(Screen.Settings.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = false
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            } else {
-                                navController.navigate(navigationItem.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                                } else {
+                                    navController.navigate(navigationItem.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
                         }

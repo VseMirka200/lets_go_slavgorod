@@ -25,10 +25,8 @@ import androidx.core.net.toUri
 fun AboutScreen(
     modifier: Modifier = Modifier
 ) {
-    // Удаляем val developerName, так как R.string.developer_name_value больше не существует
-    // val developerName = stringResource(id = R.string.developer_name_value)
 
-    val developerSectionTitleText = stringResource(id = R.string.developer_section_title) // Теперь это "Разработал: VseMirka200"
+    val developerSectionTitleText = stringResource(id = R.string.developer_section_title) // "Разработал: VseMirka200"
 
     val developerGitHubUrl = stringResource(id = R.string.developer_github_url_value)
     val linkTextGitHub = stringResource(id = R.string.link_text_github)
@@ -71,17 +69,11 @@ fun AboutScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Раздел Разработчик
-                // Теперь используем developerSectionTitleText, который уже содержит имя
                 Text(
-                    text = developerSectionTitleText, // Это будет "Разработал: VseMirka200"
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold) // Можно оставить titleMedium или bodyLarge
+                    text = developerSectionTitleText,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
-                // Удаляем отдельный Text для developerName
-                // Spacer(modifier = Modifier.height(4.dp))
-                // Text(
-                // text = developerName,
-                // style = MaterialTheme.typography.bodyLarge
-                // )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Раздел Ссылки

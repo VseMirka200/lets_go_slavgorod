@@ -43,19 +43,15 @@ class BootReceiver : BroadcastReceiver() {
             try {
                 Log.d("BootReceiver", "Starting alarm rescheduling process")
                 
-                // Create notification channel first
                 NotificationHelper.createNotificationChannel(context)
                 
-                // Get database instance
                 val database = AppDatabase.getDatabase(context)
                 val favoriteTimeDao = database.favoriteTimeDao()
                 
-                // Get all active favorite times
                 val favoriteTimeEntities = favoriteTimeDao.getAllFavoriteTimes().firstOrNull() ?: emptyList()
                 
                 Log.d("BootReceiver", "Found ${favoriteTimeEntities.size} favorite times in database")
                 
-                // Reschedule alarms for active favorite times
                 var rescheduledCount = 0
                 favoriteTimeEntities
                     .filter { it.isActive }
@@ -91,8 +87,6 @@ class BootReceiver : BroadcastReceiver() {
     }
     
     private suspend fun getRouteById(context: Context, routeId: String): com.example.slavgorodbus.data.model.BusRoute? {
-        // This is a simplified version - in a real app, you might want to store routes in database too
-        // For now, we'll return a basic route object
         return try {
             com.example.slavgorodbus.data.model.BusRoute(
                 id = routeId,

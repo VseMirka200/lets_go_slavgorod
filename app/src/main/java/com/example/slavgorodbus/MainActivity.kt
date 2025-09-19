@@ -2,7 +2,6 @@ package com.example.slavgorodbus
 
 import android.Manifest
 import android.app.AlarmManager
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -16,8 +15,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -79,13 +78,13 @@ class MainActivity : ComponentActivity() {
             checkExactAlarmPermission()
         }
     }
-    
+
     private fun checkExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+            val alarmManager = getSystemService(ALARM_SERVICE) as? AlarmManager
             val canScheduleExact = alarmManager?.canScheduleExactAlarms() ?: false
             Log.i("MainActivity", "Can schedule exact alarms: $canScheduleExact")
-            
+
             if (!canScheduleExact) {
                 Log.w("MainActivity", "Exact alarm permission not granted. User needs to enable it in settings.")
                 // You could show a dialog here to guide the user to settings
@@ -159,10 +158,7 @@ fun AppNavHost(
 
         composable(Screen.FavoriteTimes.route) {
             FavoriteTimesScreen(
-                viewModel = busViewModel,
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
+                viewModel = busViewModel
             )
         }
 

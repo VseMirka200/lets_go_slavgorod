@@ -85,12 +85,11 @@ object AlarmScheduler {
             }
         } catch (e: Exception) {
             Log.e("AlarmScheduler", "Error checking notification settings, defaulting to enabled", e)
-            true // По умолчанию разрешаем уведомления
+            true
         }
     }
 
     fun scheduleAlarm(context: Context, favoriteTime: FavoriteTime) {
-        // Проверяем настройки уведомлений пользователя
         if (!shouldSendNotification(context, favoriteTime)) {
             Log.d("AlarmScheduler", "Notification skipped for ${favoriteTime.id} due to user settings")
             return
@@ -298,10 +297,8 @@ object AlarmScheduler {
         
         favoriteTimes.forEach { favoriteTime ->
             try {
-                // Сначала отменяем старое уведомление
                 cancelAlarm(context, favoriteTime.id)
                 
-                // Затем планируем новое (если настройки позволяют)
                 if (shouldSendNotification(context, favoriteTime)) {
                     scheduleAlarm(context, favoriteTime)
                     Log.d("AlarmScheduler", "Rescheduled alarm for ${favoriteTime.id} based on settings")

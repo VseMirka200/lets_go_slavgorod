@@ -17,10 +17,8 @@ class BusApplication : Application() {
         super.onCreate()
         Log.d("BusApplication", "Application onCreate() called")
         
-        // Initialize notification channel
         NotificationHelper.createNotificationChannel(this)
         
-        // Reschedule alarms for active favorite times
         rescheduleAlarmsOnStartup()
     }
     
@@ -71,7 +69,6 @@ class BusApplication : Application() {
     }
     
     private fun getRouteById(routeId: String): com.example.slavgorodbus.data.model.BusRoute? {
-        // This is a simplified version - in a real app, you might want to store routes in database too
         return try {
             com.example.slavgorodbus.data.model.BusRoute(
                 id = routeId,

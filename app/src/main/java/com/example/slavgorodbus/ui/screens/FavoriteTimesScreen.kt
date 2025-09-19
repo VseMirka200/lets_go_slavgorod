@@ -27,7 +27,6 @@ import com.example.slavgorodbus.ui.viewmodel.BusViewModel
 @Composable
 fun FavoriteTimesScreen(
     viewModel: BusViewModel,
-    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val favoriteTimesList by viewModel.favoriteTimes.collectAsState()

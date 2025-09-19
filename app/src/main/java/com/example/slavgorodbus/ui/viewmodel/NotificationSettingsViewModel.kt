@@ -129,7 +129,7 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                         FavoriteTime(
                             id = entity.id,
                             routeId = entity.routeId,
-                            routeNumber = "N/A", // Упрощенная версия для обновления
+                            routeNumber = "N/A",
                             routeName = "Маршрут",
                             stopName = entity.stopName,
                             departureTime = entity.departureTime,

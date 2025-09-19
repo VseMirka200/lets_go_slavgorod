@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import com.example.slavgorodbus.data.model.BusRoute
-// MaterialTheme уже импортируется через androidx.compose.material3.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +27,6 @@ fun BusRouteCard(
     onInfoClick: (BusRoute) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // 1. Извлекаем значения из MaterialTheme в начале функции
     val currentColorScheme = MaterialTheme.colorScheme
     val currentTypography = MaterialTheme.typography
 
@@ -46,7 +44,7 @@ fun BusRouteCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = surfaceVariantColor // Используем извлеченное значение
+            containerColor = surfaceVariantColor
         )
     ) {
         Row(
@@ -59,12 +57,11 @@ fun BusRouteCard(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 2. Вычисляем цвет фона, передавая извлеченный primaryColorFromTheme
                 val boxBackgroundColor = remember(route.color, primaryColorFromTheme) {
                     try {
                         Color(route.color.toColorInt()).copy(alpha = 0.9f)
                     } catch (_: IllegalArgumentException) {
-                        primaryColorFromTheme.copy(alpha = 0.9f) // Теперь используем локальную переменную
+                        primaryColorFromTheme.copy(alpha = 0.9f)
                     }
                 }
 
@@ -72,13 +69,13 @@ fun BusRouteCard(
                     modifier = Modifier
                         .size(52.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(boxBackgroundColor), // Используем вычисленный цвет
+                        .background(boxBackgroundColor),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = route.routeNumber,
                         color = Color.White,
-                        style = titleLargeStyle.copy( // Используем извлеченный стиль
+                        style = titleLargeStyle.copy(
                             fontWeight = FontWeight.Bold
                         )
                     )
@@ -88,9 +85,9 @@ fun BusRouteCard(
 
                 Text(
                     text = route.name,
-                    style = titleMediumStyle, // Используем извлеченный стиль
+                    style = titleMediumStyle,
                     fontWeight = FontWeight.SemiBold,
-                    color = onSurfaceVariantColor, // Используем извлеченное значение
+                    color = onSurfaceVariantColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(end = 8.dp)
@@ -101,7 +98,7 @@ fun BusRouteCard(
                 Icon(
                     imageVector = Icons.Filled.Info,
                     contentDescription = "Подробная информация о маршруте ${route.name}",
-                    tint = primaryColorFromTheme // Используем извлеченное значение
+                    tint = primaryColorFromTheme
                 )
             }
         }

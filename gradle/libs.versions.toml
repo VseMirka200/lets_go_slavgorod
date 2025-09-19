@@ -1,4 +1,5 @@
 [versions]
+accompanistPager = "0.36.0"
 agp = "8.13.0"
 coreKtxVersion = "1.17.0"
 datastorePreferencesVersion = "1.1.7"
@@ -23,6 +24,7 @@ roomCompiler = "2.6.1"
 composeCompilerVersion = "1.5.14"
 
 [libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-ktx-v1170 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-datastore-preferences-v117 = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }

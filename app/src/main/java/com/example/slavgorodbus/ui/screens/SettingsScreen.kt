@@ -147,7 +147,7 @@ fun SettingsScreen(
         }
     }
 
-    // Проверка обновлений
+    // Проверка обновлений - запускается при изменении shouldCheckUpdates
     LaunchedEffect(shouldCheckUpdates) {
         if (shouldCheckUpdates) {
             shouldCheckUpdates = false
@@ -155,33 +155,40 @@ fun SettingsScreen(
                 Log.d("SettingsScreen", "Начинаем проверку обновлений...")
                 val updateManager = UpdateManager(activity)
                 
-                // Тестируем подключение к GitHub
+                // Сначала тестируем подключение к GitHub для диагностики
                 Log.d("SettingsScreen", "Тестируем подключение к GitHub...")
                 val connectionOk = updateManager.testConnection()
                 Log.d("SettingsScreen", "Подключение к GitHub: $connectionOk")
                 
+                // Выполняем основную проверку обновлений
                 val result = updateManager.checkForUpdatesWithResult()
                 
                 Log.d("SettingsScreen", "Результат проверки: success=${result.success}, error=${result.error}")
                 
+                // Обрабатываем результат проверки
                 if (result.success) {
                     if (result.update != null) {
+                        // Найдено обновление - показываем диалог
                         Log.d("SettingsScreen", "Найдено обновление: ${result.update.versionName}")
                         updateAvailable = result.update
                         showUpdateDialog = true
                     } else {
+                        // Обновлений нет
                         Log.d("SettingsScreen", "Обновления не найдены")
                     }
                 } else {
+                    // Произошла ошибка - показываем диалог с ошибкой
                     Log.w("SettingsScreen", "Ошибка проверки обновлений: ${result.error}")
                     updateError = result.error ?: "Неизвестная ошибка"
                     showErrorDialog = true
                 }
             } catch (e: Exception) {
+                // Обрабатываем неожиданные исключения
                 Log.e("SettingsScreen", "Исключение при проверке обновлений", e)
                 updateError = "Ошибка: ${e.message}"
                 showErrorDialog = true
             } finally {
+                // Всегда сбрасываем флаг загрузки
                 isCheckingUpdates = false
                 Log.d("SettingsScreen", "Проверка обновлений завершена")
             }
@@ -414,6 +421,12 @@ fun NotificationSettingsCard(
     }
 }
 
+/**
+ * Карточка настроек для проверки обновлений
+ * Отображает кнопку для ручной проверки обновлений с индикатором загрузки
+ * @param isCheckingUpdates флаг, указывающий на то, что проверка обновлений в процессе
+ * @param onCheckForUpdates колбэк, вызываемый при нажатии на кнопку проверки
+ */
 @Composable
 fun UpdateSettingsCard(
     isCheckingUpdates: Boolean,
@@ -431,6 +444,7 @@ fun UpdateSettingsCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Левая часть: иконка и текст
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Filled.Update,
@@ -445,6 +459,7 @@ fun UpdateSettingsCard(
                     color = if (isCheckingUpdates) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
                 )
             }
+            // Правая часть: индикатор загрузки (показывается только во время проверки)
             if (isCheckingUpdates) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),

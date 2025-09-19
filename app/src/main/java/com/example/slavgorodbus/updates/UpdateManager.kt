@@ -24,15 +24,33 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * Менеджер для проверки и загрузки обновлений приложения
+ * 
+ * Основные функции:
+ * - Проверка доступности интернет-соединения
+ * - Запрос к GitHub API для получения информации о последнем релизе
+ * - Сравнение версий приложения
+ * - Запуск загрузки обновления через браузер
+ */
+
 class UpdateManager(private val context: Context) {
     
     companion object {
         private const val TAG = "UpdateManager"
+        // URL для получения информации о последнем релизе из GitHub API
         private const val GITHUB_API_URL = "https://api.github.com/repos/VseMirka200/Lets_go_Slavgorod/releases/latest"
-        private const val REQUEST_TIMEOUT = 10000L // 10 секунд
-        private const val USER_AGENT = "SlavgorodBus/1.0.3"
+        private const val REQUEST_TIMEOUT = 10000L // 10 секунд таймаут для запроса
+        private const val USER_AGENT = "SlavgorodBus/1.0.3" // User-Agent для запросов к GitHub
     }
     
+    /**
+     * Данные о версии приложения
+     * @param versionName название версии (например, "1.0.3")
+     * @param versionCode код версии для сравнения (например, 10003)
+     * @param downloadUrl URL для скачивания APK файла
+     * @param releaseNotes описание изменений в релизе
+     */
     data class AppVersion(
         val versionName: String,
         val versionCode: Int,
@@ -40,23 +58,37 @@ class UpdateManager(private val context: Context) {
         val releaseNotes: String
     )
     
+    /**
+     * Результат проверки обновлений
+     * @param success успешность операции
+     * @param update информация об обновлении (null если обновлений нет)
+     * @param error описание ошибки (null если операция успешна)
+     */
     data class UpdateResult(
         val success: Boolean,
         val update: AppVersion? = null,
         val error: String? = null
     )
     
+    /**
+     * Проверяет наличие обновлений (упрощенная версия)
+     * @return информация об обновлении или null, если обновлений нет
+     */
     suspend fun checkForUpdates(): AppVersion? {
         val result = checkForUpdatesWithResult()
         return if (result.success) result.update else null
     }
     
+    /**
+     * Проверяет наличие обновлений с детальной информацией об ошибках
+     * @return UpdateResult с информацией об успехе операции и возможных ошибках
+     */
     suspend fun checkForUpdatesWithResult(): UpdateResult {
         return withContext(Dispatchers.IO) {
             try {
                 Log.d(TAG, "Начинаем проверку обновлений с GitHub...")
                 
-                // Проверяем интернет-соединение
+                // Проверяем доступность интернета перед отправкой запроса
                 if (!isInternetAvailable()) {
                     Log.w(TAG, "Нет интернет-соединения")
                     return@withContext UpdateResult(
@@ -65,18 +97,20 @@ class UpdateManager(private val context: Context) {
                     )
                 }
                 
-                // Получаем текущую версию приложения
+                // Получаем текущую версию приложения из PackageManager
                 val currentVersion = context.packageManager
                     .getPackageInfo(context.packageName, 0).versionCode
                 
                 Log.d(TAG, "Текущая версия приложения: $currentVersion")
                 
-                // Выполняем запрос с таймаутом
+                // Выполняем HTTP запрос к GitHub API с таймаутом
                 val result = withTimeoutOrNull(REQUEST_TIMEOUT) {
                     try {
+                        // Создаем HTTP соединение с GitHub API
                         val url = URL(GITHUB_API_URL)
                         val connection = url.openConnection() as HttpURLConnection
                         
+                        // Настраиваем параметры запроса
                         connection.requestMethod = "GET"
                         connection.setRequestProperty("Accept", "application/vnd.github.v3+json")
                         connection.setRequestProperty("User-Agent", USER_AGENT)
@@ -85,42 +119,48 @@ class UpdateManager(private val context: Context) {
                         
                         Log.d(TAG, "Отправляем запрос к GitHub API: $GITHUB_API_URL")
                         
+                        // Обрабатываем ответ от GitHub API в зависимости от HTTP статуса
                         when (connection.responseCode) {
                             HttpURLConnection.HTTP_OK -> {
+                                // Успешный ответ - парсим JSON
                                 val response = connection.inputStream.bufferedReader().use { it.readText() }
                                 Log.d(TAG, "Получен ответ от GitHub API")
                                 
                                 try {
                                     val json = JSONObject(response)
                                     
+                                    // Извлекаем название версии (убираем префикс "v")
                                     val latestVersion = json.getString("tag_name").removePrefix("v")
                                     
-                                    // Проверяем наличие assets
+                                    // Проверяем наличие файлов для скачивания в релизе
                                     val assetsArray = json.getJSONArray("assets")
                                     if (assetsArray.length() == 0) {
                                         Log.w(TAG, "Нет файлов для скачивания в релизе")
                                         return@withTimeoutOrNull UpdateResult(success = false, error = "Нет файлов для скачивания")
                                     }
                                     
+                                    // Получаем URL для скачивания и описание изменений
                                     val downloadUrl = assetsArray.getJSONObject(0).getString("browser_download_url")
                                     val releaseNotes = json.optString("body", "Нет описания изменений")
                                     
                                     Log.d(TAG, "Последняя версия на GitHub: $latestVersion")
                                     
-                                    // Парсим версию (предполагаем формат типа "1.0.0")
+                                    // Конвертируем строковую версию в числовой код для сравнения
+                                    // Формат версии: major.minor.patch (например, "1.0.3" -> 10003)
                                     val versionParts = latestVersion.split(".")
                                     val versionCode = if (versionParts.size >= 3) {
                                         versionParts[0].toInt() * 10000 + 
                                         versionParts[1].toInt() * 100 + 
                                         versionParts[2].toInt()
                                     } else {
-                                        // Fallback для версий без patch номера
+                                        // Fallback для версий без patch номера (например, "1.0" -> 10000)
                                         versionParts[0].toInt() * 10000 + 
                                         versionParts[1].toInt() * 100
                                     }
                                     
                                     Log.d(TAG, "Код версии GitHub: $versionCode, текущий код: $currentVersion")
                                     
+                                    // Сравниваем версии и возвращаем результат
                                     if (versionCode > currentVersion) {
                                         val update = AppVersion(
                                             versionName = latestVersion,
@@ -179,19 +219,26 @@ class UpdateManager(private val context: Context) {
         }
     }
     
+    /**
+     * Проверяет доступность интернет-соединения
+     * Поддерживает как новые (API 23+), так и старые версии Android
+     * @return true если интернет доступен, false в противном случае
+     */
     private fun isInternetAvailable(): Boolean {
         return try {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                // Для Android 6.0+ используем современный API
                 val network = connectivityManager.activeNetwork ?: return false
                 val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
                 
+                // Проверяем доступность Wi-Fi, мобильного интернета или Ethernet
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
             } else {
-                // Для старых версий Android
+                // Для старых версий Android используем устаревший API
                 @Suppress("DEPRECATION")
                 val networkInfo = connectivityManager.activeNetworkInfo
                 networkInfo?.isConnectedOrConnecting == true
@@ -202,14 +249,24 @@ class UpdateManager(private val context: Context) {
         }
     }
     
+    /**
+     * Запускает загрузку обновления через браузер
+     * @param version информация об обновлении
+     */
     fun downloadUpdate(version: AppVersion) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(version.downloadUrl))
         context.startActivity(intent)
     }
     
+    /**
+     * Тестирует подключение к GitHub API
+     * Используется для диагностики проблем с сетью
+     * @return true если GitHub доступен, false в противном случае
+     */
     suspend fun testConnection(): Boolean {
         return withContext(Dispatchers.IO) {
             try {
+                // Простой GET запрос к основному API GitHub
                 val url = URL("https://api.github.com")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
@@ -227,6 +284,11 @@ class UpdateManager(private val context: Context) {
     }
 }
 
+/**
+ * Composable компонент для автоматической проверки обновлений при запуске
+ * @param activity Activity для создания UpdateManager
+ * @param onUpdateAvailable колбэк, вызываемый при обнаружении обновления
+ */
 @Composable
 fun UpdateChecker(
     activity: Activity,
@@ -234,16 +296,24 @@ fun UpdateChecker(
 ) {
     var updateAvailable by remember { mutableStateOf<UpdateManager.AppVersion?>(null) }
     
+    // Запускаем проверку обновлений при первом создании компонента
     LaunchedEffect(Unit) {
         val updateManager = UpdateManager(activity)
         updateAvailable = updateManager.checkForUpdates()
     }
     
+    // Если найдено обновление, уведомляем родительский компонент
     updateAvailable?.let { version ->
         onUpdateAvailable(version)
     }
 }
 
+/**
+ * Диалог для отображения информации об обновлении
+ * @param version информация о новой версии
+ * @param onDismiss колбэк при закрытии диалога
+ * @param onDownload колбэк при нажатии кнопки скачивания
+ */
 @Composable
 fun UpdateDialog(
     version: UpdateManager.AppVersion,

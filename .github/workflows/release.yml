@@ -1,63 +1,74 @@
+# GitHub Actions workflow для автоматической сборки и релиза Android приложения
+# Запускается при создании тега версии (например, v1.0.3) или вручную
+
 name: Build and Release
 
+# Триггеры запуска workflow
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
+      - 'v*'  # Запуск при создании тега, начинающегося с 'v'
+  workflow_dispatch:  # Возможность запуска вручную из GitHub UI
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-latest  # Используем Ubuntu для сборки
+
     steps:
+    # Шаг 1: Получение исходного кода
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
+    # Шаг 2: Настройка Java Development Kit 17
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        distribution: 'temurin'
-        
+        distribution: 'temurin'  # Используем Temurin JDK (бывший AdoptOpenJDK)
+
+    # Шаг 3: Настройка Android SDK
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-      
+
+    # Шаг 4: Кэширование Gradle зависимостей для ускорения сборки
     - name: Cache Gradle packages
       uses: actions/cache@v3
       with:
         path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
+          ~/.gradle/caches      # Кэш Gradle
+          ~/.gradle/wrapper     # Gradle Wrapper
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-          
+
+    # Шаг 5: Предоставление прав на выполнение gradlew
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
+
+    # Шаг 6: Сборка релизной версии APK
     - name: Build APK
       run: ./gradlew assembleRelease
-      
+
+    # Шаг 7: Создание GitHub Release и загрузка APK файла
     - name: Create Release and Upload APK
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_name }}
-        name: Release ${{ github.ref_name }}
+        tag_name: ${{ github.ref_name }}  # Название тега (например, v1.0.3)
+        name: Release ${{ github.ref_name }}  # Название релиза
         body: |
           Автоматический релиз версии ${{ github.ref_name }}
-          
+
           ## Что нового:
           - Обновления и улучшения
           - Исправления ошибок
-          
+
           ## Установка:
           1. Скачайте APK файл
           2. Разрешите установку из неизвестных источников
           3. Установите приложение
         files: |
-          app/build/outputs/apk/release/app-release.apk
-        draft: false
-        prerelease: false
+          app/build/outputs/apk/release/app-release.apk  # Путь к собранному APK
+        draft: false      # Не создавать как черновик
+        prerelease: false # Не помечать как pre-release
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Токен для работы с GitHub API

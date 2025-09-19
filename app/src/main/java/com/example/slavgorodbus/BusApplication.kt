@@ -6,12 +6,18 @@ import com.example.slavgorodbus.notifications.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class BusApplication : Application() {
     
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    
+    override fun onTerminate() {
+        super.onTerminate()
+        applicationScope.cancel()
+    }
     
     override fun onCreate() {
         super.onCreate()

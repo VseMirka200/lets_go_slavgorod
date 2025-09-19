@@ -9,12 +9,13 @@ import com.example.slavgorodbus.data.model.FavoriteTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class BootReceiver : BroadcastReceiver() {
     
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var coroutineScope: CoroutineScope? = null
     
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.d("BootReceiver", "BootReceiver triggered with action: ${intent?.action}")
@@ -39,7 +40,8 @@ class BootReceiver : BroadcastReceiver() {
     }
     
     private fun rescheduleAllAlarms(context: Context) {
-        coroutineScope.launch {
+        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        coroutineScope?.launch {
             try {
                 Log.d("BootReceiver", "Starting alarm rescheduling process")
                 
@@ -82,6 +84,8 @@ class BootReceiver : BroadcastReceiver() {
                 
             } catch (e: Exception) {
                 Log.e("BootReceiver", "Error during alarm rescheduling", e)
+            } finally {
+                coroutineScope?.cancel()
             }
         }
     }

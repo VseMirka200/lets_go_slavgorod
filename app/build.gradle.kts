@@ -14,9 +14,10 @@ android {
     defaultConfig {
         applicationId = "com.example.slavgorodbus"
         minSdk = 24
-        targetSdk = 36
+        //noinspection OldTargetApi
+        targetSdk = 35
         versionCode = 1
-        versionName = "1.0.1"
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -62,7 +63,6 @@ android {
 
 dependencies {
     implementation(libs.accompanist.pager)
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.36.0")
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)

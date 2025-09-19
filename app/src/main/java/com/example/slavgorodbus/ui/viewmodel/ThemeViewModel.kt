@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-private val Context.themeDataStore: DataStore<Preferences> by preferencesDataStore(name = "theme_preferences")
+private val Context.themeDataStore by preferencesDataStore(name = "theme_preferences")
 
 enum class AppTheme {
     SYSTEM, LIGHT, DARK

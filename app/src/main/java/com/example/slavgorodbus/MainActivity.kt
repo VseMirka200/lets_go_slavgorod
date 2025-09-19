@@ -29,19 +29,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.slavgorodbus.ui.animations.NavigationAnimations
 import com.example.slavgorodbus.ui.navigation.BottomNavigation
 import com.example.slavgorodbus.ui.navigation.Screen
 import com.example.slavgorodbus.ui.screens.AboutScreen
-import com.example.slavgorodbus.ui.screens.FavoriteTimesScreen
-import com.example.slavgorodbus.ui.screens.HomeScreen
 import com.example.slavgorodbus.ui.screens.RouteDetailsScreen
 import com.example.slavgorodbus.ui.screens.ScheduleScreen
-import com.example.slavgorodbus.ui.screens.SettingsScreen
+import com.example.slavgorodbus.ui.screens.SwipeableMainScreen
 import com.example.slavgorodbus.ui.theme.SlavgorodBusTheme
 import com.example.slavgorodbus.ui.viewmodel.AppTheme
 import com.example.slavgorodbus.ui.viewmodel.BusViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModelFactory
+import com.example.slavgorodbus.updates.UpdateChecker
+import com.example.slavgorodbus.updates.UpdateDialog
+import com.example.slavgorodbus.updates.UpdateManager
 
 class MainActivity : ComponentActivity() {
 
@@ -109,6 +111,18 @@ class MainActivity : ComponentActivity() {
 
             SlavgorodBusTheme(darkTheme = useDarkTheme) {
                 BusScheduleApp(themeViewModel = themeViewModel)
+                
+                // Проверка обновлений
+                UpdateChecker(activity = this@MainActivity) { version ->
+                    UpdateDialog(
+                        version = version,
+                        onDismiss = { /* Игнорируем */ },
+                        onDownload = {
+                            val updateManager = UpdateManager(this@MainActivity)
+                            updateManager.downloadUpdate(version)
+                        }
+                    )
+                }
             }
         }
     }
@@ -149,16 +163,27 @@ fun AppNavHost(
         startDestination = Screen.Home.route,
         modifier = modifier
     ) {
-        composable(Screen.Home.route) {
-            HomeScreen(
+        composable(
+            route = Screen.Home.route,
+            enterTransition = { NavigationAnimations.slideInFromRight },
+            exitTransition = { NavigationAnimations.slideOutToLeft }
+        ) {
+            SwipeableMainScreen(
                 navController = navController,
-                viewModel = busViewModel
+                busViewModel = busViewModel,
+                themeViewModel = themeViewModel
             )
         }
 
-        composable(Screen.FavoriteTimes.route) {
-            FavoriteTimesScreen(
-                viewModel = busViewModel
+        composable(
+            route = Screen.FavoriteTimes.route,
+            enterTransition = { NavigationAnimations.slideInFromRight },
+            exitTransition = { NavigationAnimations.slideOutToLeft }
+        ) {
+            SwipeableMainScreen(
+                navController = navController,
+                busViewModel = busViewModel,
+                themeViewModel = themeViewModel
             )
         }
 
@@ -166,7 +191,9 @@ fun AppNavHost(
             route = "schedule/{routeId}",
             arguments = listOf(
                 navArgument("routeId") { type = NavType.StringType }
-            )
+            ),
+            enterTransition = { NavigationAnimations.slideInFromBottomSchedule },
+            exitTransition = { NavigationAnimations.slideOutToBottomSchedule }
         ) { backStackEntry ->
             val routeId = backStackEntry.arguments?.getString("routeId")
             val route = busViewModel.getRouteById(routeId)
@@ -179,7 +206,9 @@ fun AppNavHost(
 
         composable(
             route = "routeDetails/{routeId}",
-            arguments = listOf(navArgument("routeId") { type = NavType.StringType })
+            arguments = listOf(navArgument("routeId") { type = NavType.StringType }),
+            enterTransition = { NavigationAnimations.slideInFromBottom },
+            exitTransition = { NavigationAnimations.slideOutToBottom }
         ) { backStackEntry ->
             val routeId = backStackEntry.arguments?.getString("routeId")
             val route = busViewModel.getRouteById(routeId)
@@ -189,17 +218,23 @@ fun AppNavHost(
             )
         }
 
-        composable(Screen.Settings.route) {
-            SettingsScreen(
-                themeViewModel = themeViewModel,
-                onNavigateToAbout = {
-                    Log.d("AppNavHost", "Attempting to navigate to About: route='${Screen.About.route}'")
-                    navController.navigate(Screen.About.route)
-                }
+        composable(
+            route = Screen.Settings.route,
+            enterTransition = { NavigationAnimations.slideInFromRight },
+            exitTransition = { NavigationAnimations.slideOutToLeft }
+        ) {
+            SwipeableMainScreen(
+                navController = navController,
+                busViewModel = busViewModel,
+                themeViewModel = themeViewModel
             )
         }
 
-        composable(Screen.About.route) {
+        composable(
+            route = Screen.About.route,
+            enterTransition = { NavigationAnimations.scaleIn },
+            exitTransition = { NavigationAnimations.scaleOut }
+        ) {
             Log.d("AppNavHost", "Displaying AboutScreen for route: ${Screen.About.route}")
             AboutScreen(
             )

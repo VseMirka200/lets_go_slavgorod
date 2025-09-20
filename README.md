@@ -12,7 +12,7 @@
 - Любимые маршруты: Возможность сохранять часто используемые маршруты для быстрого доступа
 
 ## 📱 Скриншоты приложения ##
-<img width="680" height="600" alt="image" src="https://github.com/VseMirka200/Lets_go_Slavgorod/blob/main/materials/screenshot/screenshot.jpg"/>
+<img width="600" height="680" alt="image" src="https://github.com/VseMirka200/Lets_go_Slavgorod/blob/main/materials/screenshot/screenshot.jpg"/>
 
 ## 🤝 Обратная связь ##
 Нашли ошибку или баг? Есть идеи для улучшения? Пишите сюда: [Telegram](https://t.me/lets_go_slavgorod_bot)

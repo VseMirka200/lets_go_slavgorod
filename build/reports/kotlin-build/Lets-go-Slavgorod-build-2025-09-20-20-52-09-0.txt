@@ -1,0 +1,514 @@
+Gradle start parameters:
+  tasks = [:app:assembleDebug]
+  excluded tasks = []
+  current dir = C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod
+  project properties args = [android.studio.version: 251.26094.121.2513.14007798, android.injected.attribution.file.location: C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\.gradle, android.injected.invoked.from.ide: true]
+  system properties args = [idea.active: true, user.variant: , file.encoding: UTF-8, idea.version: 2025.1, user.language: ru, user.country: RU, idea.vendor.name: Google]
+
+Time metrics:
+  Total Gradle task time: 3,16 s
+  Spent time before task action: 0,04 s
+  Task action before worker execution: 0,17 s
+  Run compilation in Gradle worker: 1,73 s
+    Clear jar cache: 0,01 s
+    Clear output: 0,00 s
+    Precise backup output: 0,02 s
+    Cleaning up the backup stash: 0,01 s
+    Connect to Kotlin daemon: 0,01 s
+    Calculate output size: 0,01 s
+    Run compilation: 1,29 s
+      Non incremental compilation in daemon: 0,42 s
+      Incremental compilation in daemon: 1,28 s
+        Store build info: 0,00 s
+        Calculate initial dirty sources set: 0,01 s
+          Detect removed classes: 0,01 s
+        Update caches: 0,01 s
+        Sources compilation round: 0,89 s
+          Compiler initialization time: 0,03 s
+          Compiler code analysis: 0,32 s
+          Compiler IR translation: 0,23 s
+          Compiler code generation: 0,30 s
+            Compiler IR lowering: 0,08 s
+            Compiler IR generation: 0,22 s
+        Write history file: 0,00 s
+        Shrink and save current classpath snapshot after compilation: 0,04 s
+          Shrink current classpath snapshot incrementally: 0,04 s
+            Load current classpath snapshot: 0,01 s
+            Load shrunk current classpath snapshot against previous lookups: 0,00 s
+          Save shrunk current classpath snapshot: 0,00 s
+  Start gradle worker: 0,00 s
+
+Size metrics:
+  Total size of the cache directory: 1,1 MB
+    ABI snapshot size: 2,5 KB
+  Increase memory usage: -945887016 B
+  Total memory usage at the end of build: 595,1 MB
+  Total compiler iteration: 1
+    Number of lines analyzed: 744
+    Number of lines for code generation: 744
+    Analysis lines per second: 2296
+    Code generation lines per second: 2488
+    Compiler IR translation line number: 744
+    Compiler IR lowering line number: 744
+    Compiler IR generation line number: 744
+  Number of times classpath snapshot is shrunk and saved after compilation: 1
+    Number of classpath entries: 69
+    Size of classpath snapshot: 7,7 MB
+    Size of shrunk classpath snapshot: 105,4 KB
+  Number of times classpath snapshot is loaded: 1
+    Number of cache hits when loading classpath entry snapshots: 69
+  Start time of task action: 2081-06-10T03:44:12
+
+Build attributes:
+  REBUILD_REASON: Incremental compilation is not enabled
+
+Total time for Kotlin tasks: 1,49 s (47,1 % of all tasks time)
+Time  |% of Kotlin time|Task                   
+1,49 s|100,0 %         |:app:compileDebugKotlin
+
+Task ':app:compileDebugKotlin' finished in 1,49 s
+Task info:
+  Kotlin language version: 2.1
+Compilation log for task ':app:compileDebugKotlin':
+  Classpath changes info passed from Gradle task: NoChanges
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.NotificationSettingsCard.1.1.4.1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.SelectDaysDialog.1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.SettingsScreen.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.EntriesMappings)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.NotificationSettingsCard.1.1.4)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.clearAvailableUpdate.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.NotificationSettingsCard.1.WhenMappings)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.ThemeSettingsCard.1.1.4.1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.ThemeSettingsCard.1.1.4.1.1.WhenMappings)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.NotificationSettingsCard.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.ThemeSettingsCard.1.WhenMappings)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.NotificationSettingsCard.1.1.4.1.1.WhenMappings)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.SelectDaysDialog.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.SelectDaysDialog.3)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.SelectDaysDialog.4)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.checkForUpdates.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.UpdateSettingsCard.1.2.1.1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-3.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-4.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-5.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.ThemeSettingsCard.1)
+  Process SignatureChanged(fqName = .kotlin_module)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-6.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-7.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.ThemeSettingsCard.1.1.4)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.ComposableSingletons.SettingsScreenKt.lambda-8.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.UpdateSettingsCard.1.2.1.3.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.UpdateSettingsCard.1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.setAutoUpdateCheckEnabled.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.SettingsScreen.updateSettingsVM.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SettingsScreenKt.UpdateSettingsCard.1.2)
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\0.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setAutoUpdateCheckEnabled$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setAutoUpdateCheckEnabled$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\1.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$checkForUpdates$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$checkForUpdates$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\2.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$clearAvailableUpdate$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$clearAvailableUpdate$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\3.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\4.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\5.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\6.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\7.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-3$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-3$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\8.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-4$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-4$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\9.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-5$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-5$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\10.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-6$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-6$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\11.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-7$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-7$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\12.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-8$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\ComposableSingletons$SettingsScreenKt$lambda-8$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\13.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\14.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SettingsScreen$updateSettingsVM$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SettingsScreen$updateSettingsVM$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\15.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SettingsScreen$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SettingsScreen$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\16.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\17.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$1$4.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$1$4.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\18.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$1$4$1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$1$4$1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\19.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$1$4$1$1$WhenMappings.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$1$4$1$1$WhenMappings.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\20.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$WhenMappings.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$ThemeSettingsCard$1$WhenMappings.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\21.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\22.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$1$4.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$1$4.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\23.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$1$4$1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$1$4$1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\24.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$1$4$1$1$WhenMappings.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$1$4$1$1$WhenMappings.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\25.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$WhenMappings.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$NotificationSettingsCard$1$WhenMappings.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\26.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\27.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\28.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$3.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$3.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\29.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$4.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$SelectDaysDialog$4.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\30.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\31.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\32.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$2$1$1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$2$1$1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\33.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$2$1$3$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$UpdateSettingsCard$1$2$1$3$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\34.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$EntriesMappings.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SettingsScreenKt$EntriesMappings.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\35.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateMode.class file as newly added
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1.class file as newly added
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1$2.class file as newly added
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1$2$1.class file as newly added
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setUpdateMode$1.class file as newly added
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setUpdateMode$1$WhenMappings.class file as newly added
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\dirty-sources.txt file as newly added
+  Compile iteration:
+    app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateMode.kt <- was modified since last time
+    app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt <- was modified since last time
+    app\src\main\java\com\example\slavgorodbus\ui\screens\SettingsScreen.kt <- was modified since last time
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\dirty-sources.txt
+  Process MembersChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel, names = [setUpdateMode, currentUpdateMode])
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateMode)
+  Process ParentsChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateMode)
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\last-build.bin to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\36.backup
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\local-state\build-history.bin to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\37.backup
+  [ClasspathSnapshot] Shrunk current classpath snapshot after compilation (shrink mode = ChangedLookupsUnchangedClasspath), retained 437 / 25024 classes
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\caches-jvm\lookups\counters.tab to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups4899072974928699344\38.backup
+  Cleaning up stash
+  Incremental compilation completed
+Time metrics:
+  Total Gradle task time: 1,49 s
+  Spent time before task action: 0,01 s
+  Task action before worker execution: 0,05 s
+  Run compilation in Gradle worker: 1,30 s
+    Clear jar cache: 0,01 s
+    Precise backup output: 0,02 s
+    Cleaning up the backup stash: 0,01 s
+    Connect to Kotlin daemon: 0,01 s
+    Calculate output size: 0,01 s
+    Run compilation: 1,29 s
+      Incremental compilation in daemon: 1,28 s
+        Store build info: 0,00 s
+        Calculate initial dirty sources set: 0,01 s
+          Detect removed classes: 0,01 s
+        Update caches: 0,01 s
+        Sources compilation round: 0,89 s
+          Compiler initialization time: 0,03 s
+          Compiler code analysis: 0,32 s
+          Compiler IR translation: 0,23 s
+          Compiler code generation: 0,30 s
+            Compiler IR lowering: 0,08 s
+            Compiler IR generation: 0,22 s
+        Write history file: 0,00 s
+        Shrink and save current classpath snapshot after compilation: 0,04 s
+          Shrink current classpath snapshot incrementally: 0,04 s
+            Load current classpath snapshot: 0,01 s
+            Load shrunk current classpath snapshot against previous lookups: 0,00 s
+          Save shrunk current classpath snapshot: 0,00 s
+  Start gradle worker: 0,00 s
+Size metrics:
+  Total size of the cache directory: 1,1 MB
+    ABI snapshot size: 2,5 KB
+  Increase memory usage: -484639736 B
+  Total memory usage at the end of build: 67,1 MB
+  Total compiler iteration: 1
+    Number of lines analyzed: 744
+    Number of lines for code generation: 744
+    Analysis lines per second: 2296
+    Code generation lines per second: 2488
+    Compiler IR translation line number: 744
+    Compiler IR lowering line number: 744
+    Compiler IR generation line number: 744
+  Number of times classpath snapshot is shrunk and saved after compilation: 1
+    Number of classpath entries: 69
+    Size of classpath snapshot: 7,7 MB
+    Size of shrunk classpath snapshot: 105,4 KB
+  Number of times classpath snapshot is loaded: 1
+    Number of cache hits when loading classpath entry snapshots: 69
+  Start time of task action: 2025-09-20T13:52:06
+GC metrics:
+  PS MarkSweep:
+    GC count: 1
+    GC time: 0,23 s
+  PS Scavenge:
+    GC count: 2
+    GC time: 0,01 s
+
+Task ':app:kspDebugKotlin' finished in 0,60 s
+Task info:
+  Kotlin language version: 1.9
+Compilation log for task ':app:kspDebugKotlin':
+  Compiler perf stats:
+  INIT: Compiler initialized in 58 ms
+          ANALYZE     358 ms   14374,302 loc/s
+  Find Java class performed 14 times, total time 65 ms
+  Type info performed 58 times, total time 124 ms
+  Call resolve performed 70 times, total time 212 ms
+  Binary class from Kotlin file performed 158294 times, total time 3622 ms
+  Find Java class performed 3 times, total time 53 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 3 ms
+  Find Java class performed 3 times, total time 3 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 3 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 5 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 2 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 9 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 9 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 14 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 12 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 3 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 12 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+Time metrics:
+  Total Gradle task time: 0,60 s
+  Spent time before task action: 0,04 s
+  Task action before worker execution: 0,12 s
+  Run compilation in Gradle worker: 0,43 s
+    Clear output: 0,00 s
+    Connect to Kotlin daemon: 0,00 s
+    Non incremental compilation in daemon: 0,42 s
+  Start gradle worker: 0,00 s
+Size metrics:
+  Increase memory usage: -461247280 B
+  Total memory usage at the end of build: 528,0 MB
+  Start time of task action: 2025-09-20T13:52:05
+Build attributes:
+  REBUILD_REASON: Incremental compilation is not enabled
+
+Task ':app:packageDebug' finished in 0,54 s
+Time metrics:
+  Total Gradle task time: 0,54 s
+
+Task ':app:dexBuilderDebug' finished in 0,28 s
+Time metrics:
+  Total Gradle task time: 0,28 s
+
+Task ':app:mergeProjectDexDebug' finished in 0,10 s
+Time metrics:
+  Total Gradle task time: 0,10 s
+
+Task ':app:compileDebugJavaWithJavac' finished in 0,07 s
+Time metrics:
+  Total Gradle task time: 0,07 s
+
+Task ':app:processDebugResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:checkDebugDuplicateClasses' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugNativeLibs' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:processDebugMainManifest' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:checkDebugAarMetadata' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugAssets' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mapDebugSourceSetPaths' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:packageDebugResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeExtDexDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugJavaResource' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:createDebugApkListingFileRedirect' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:processDebugNavigationResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:l8DexDesugarLibDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugResValues' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:compressDebugAssets' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:processDebugJavaRes' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugNativeDebugMetadata' was skipped: NO-SOURCE
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugBuildConfig' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:createDebugCompatibleScreenManifests' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugShaders' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugJniLibFolders' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:desugarDebugFileDependencies' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:writeDebugSigningConfigVersions' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:compileDebugNavigationResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:extractDeepLinksDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:parseDebugLocalResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:checkKotlinGradlePluginConfigurationErrors' was skipped: SKIPPED
+
+Task ':app:preBuild' finished in 0,00 s
+
+Task ':app:preDebugBuild' finished in 0,00 s
+
+Task ':app:javaPreCompileDebug' finished in 0,00 s
+
+Task ':app:compileDebugShaders' was skipped: NO-SOURCE
+
+Task ':app:generateDebugAssets' finished in 0,00 s
+
+Task ':app:validateSigningDebug' finished in 0,00 s
+
+Task ':app:writeDebugAppMetadata' finished in 0,00 s
+
+Task ':app:generateDebugResources' finished in 0,00 s
+
+Task ':app:stripDebugDebugSymbols' finished in 0,00 s
+
+Task ':app:mergeLibDexDebug' finished in 0,00 s
+
+Task ':app:processDebugManifest' finished in 0,00 s
+
+Task ':app:processDebugManifestForPackage' finished in 0,00 s
+
+Task ':app:assembleDebug' finished in 0,00 s
+

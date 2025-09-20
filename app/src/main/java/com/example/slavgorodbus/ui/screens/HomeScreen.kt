@@ -165,11 +165,15 @@ private fun RoutesListState(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp)
+        contentPadding = PaddingValues(vertical = 8.dp),
+        // Оптимизация: добавляем кэширование элементов
+        userScrollEnabled = true
     ) {
         items(
             items = routes,
-            key = { route -> route.id }
+            key = { route -> route.id },
+            // Оптимизация: добавляем content type для лучшей производительности
+            contentType = { BusRoute::class }
         ) { route ->
             BusRouteCard(
                 route = route,

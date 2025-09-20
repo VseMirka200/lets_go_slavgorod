@@ -1,5 +1,6 @@
 package com.example.slavgorodbus.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.compose.foundation.clickable
@@ -7,9 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import android.util.Log
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import com.example.slavgorodbus.BuildConfig
 import com.example.slavgorodbus.R
 import androidx.core.net.toUri
@@ -26,8 +27,9 @@ import androidx.core.net.toUri
 @Composable
 fun AboutScreen(
     onBackClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
 
     val developerSectionTitleText = stringResource(id = R.string.developer_section_title) // "Разработал: VseMirka200"
 
@@ -53,7 +55,7 @@ fun AboutScreen(
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Назад"
                     )
                 }

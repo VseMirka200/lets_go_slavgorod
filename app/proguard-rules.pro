@@ -9,9 +9,14 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
+# Keep all annotations
+-keepattributes *Annotation*
+
 # Room database
 -keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class *
+-keep @androidx.room.Dao class *
+-keep class androidx.room.** { *; }
 -dontwarn androidx.room.paging.**
 
 # DataStore
@@ -20,9 +25,6 @@
 # Compose
 -keep class androidx.compose.** { *; }
 -dontwarn androidx.compose.**
-
-# Glance widgets
--keep class androidx.glance.** { *; }
 
 # Keep data classes and entities
 -keep class com.example.slavgorodbus.data.model.** { *; }
@@ -41,17 +43,35 @@
 -keep class android.app.AlarmManager { *; }
 -keep class android.app.PendingIntent { *; }
 
-# Serialization (if using)
--keepattributes *Annotation*
--keepclassmembers class * {
-    @com.google.gson.annotations.SerializedName <fields>;
-}
+# Keep Application class
+-keep class com.example.slavgorodbus.BusApplication { *; }
 
-# Remove logging in release builds
+# Keep MainActivity
+-keep class com.example.slavgorodbus.MainActivity { *; }
+
+# Optimize: Remove logging in release builds
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);
     public static *** i(...);
     public static *** w(...);
     public static *** e(...);
+}
+
+# Optimize: Remove debug code
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    static void checkParameterIsNotNull(...);
+    static void checkNotNullParameter(...);
+    static void checkReturnedValueIsNotNull(...);
+    static void checkNotNullReturnValue(...);
+    static void checkFieldIsNotNull(...);
+    static void checkNotNullField(...);
+    static void checkExpressionValueIsNotNull(...);
+    static void checkNotNullExpressionValue(...);
+}
+
+# Optimize: Remove Kotlin metadata
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepclassmembers class ** {
+    @kotlin.Metadata *;
 }

@@ -1,0 +1,315 @@
+Gradle start parameters:
+  tasks = [:app:assembleDebug]
+  excluded tasks = []
+  current dir = C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod
+  project properties args = [android.studio.version: 251.26094.121.2513.14007798, android.injected.enableStableIds: true, android.injected.attribution.file.location: C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\.gradle, android.injected.build.api: 31, android.injected.build.abi: arm64-v8a,armeabi-v7a,armeabi, android.injected.invoked.from.ide: true]
+  system properties args = [idea.active: true, user.variant: , file.encoding: UTF-8, idea.version: 2025.1, user.language: ru, user.country: RU, idea.vendor.name: Google]
+
+Build failed: [Execution failed for task ':app:compileDebugKotlin'.]
+
+Time metrics:
+  Total Gradle task time: 1,49 s
+  Spent time before task action: 0,07 s
+  Task action before worker execution: 0,28 s
+  Run compilation in Gradle worker: 1,01 s
+    Clear output: 0,01 s
+    Precise backup output: 0,01 s
+    Restore output: 0,01 s
+    Cleaning up the backup stash: 0,01 s
+    Connect to Kotlin daemon: 0,01 s
+    Calculate output size: 0,01 s
+    Run compilation: 0,36 s
+      Non incremental compilation in daemon: 0,63 s
+      Incremental compilation in daemon: 0,35 s
+        Calculate initial dirty sources set: 0,02 s
+          Detect removed classes: 0,01 s
+        Sources compilation round: 0,27 s
+          Compiler initialization time: 0,04 s
+          Compiler code analysis: 0,23 s
+        Write history file: 0,00 s
+  Start gradle worker: 0,01 s
+
+Size metrics:
+  Total size of the cache directory: 918,3 KB
+    ABI snapshot size: 49 B
+  Increase memory usage: 259,8 MB
+  Total memory usage at the end of build: 1,1 GB
+  Total compiler iteration: 1
+    Number of lines analyzed: 153
+    Analysis lines per second: 656
+  Start time of task action: 2081-06-10T02:47:07
+
+Build attributes:
+  REBUILD_REASON: Incremental compilation is not enabled
+
+Total time for Kotlin tasks: 0,48 s (32,1 % of all tasks time)
+Time  |% of Kotlin time|Task                   
+0,48 s|100,0 %         |:app:compileDebugKotlin
+
+Task ':app:kspDebugKotlin' finished in 0,91 s
+Task info:
+  Kotlin language version: 1.9
+Compilation log for task ':app:kspDebugKotlin':
+  Compiler perf stats:
+  INIT: Compiler initialized in 82 ms
+          ANALYZE     542 ms    8612,546 loc/s
+  Find Java class performed 14 times, total time 65 ms
+  Type info performed 56 times, total time 124 ms
+  Call resolve performed 68 times, total time 210 ms
+  Binary class from Kotlin file performed 113117 times, total time 2580 ms
+  Find Java class performed 3 times, total time 53 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 3 ms
+  Find Java class performed 3 times, total time 3 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 3 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 5 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 2 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 9 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 9 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 14 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 3 times, total time 1 ms
+  Find Java class performed 10 times, total time 0 ms
+Time metrics:
+  Total Gradle task time: 0,91 s
+  Spent time before task action: 0,06 s
+  Task action before worker execution: 0,19 s
+  Run compilation in Gradle worker: 0,64 s
+    Clear output: 0,01 s
+    Connect to Kotlin daemon: 0,01 s
+    Non incremental compilation in daemon: 0,63 s
+  Start gradle worker: 0,00 s
+Size metrics:
+  Increase memory usage: 124,0 MB
+  Total memory usage at the end of build: 486,1 MB
+  Start time of task action: 2025-09-20T13:23:33
+Build attributes:
+  REBUILD_REASON: Incremental compilation is not enabled
+
+Task ':app:compileDebugKotlin' finished in 0,48 s
+Task info:
+  Kotlin language version: 2.1
+Compilation log for task ':app:compileDebugKotlin':
+  Classpath changes info passed from Gradle task: NoChanges
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SwipeableMainScreenKt.SwipeableMainScreen.4)
+  Process SignatureChanged(fqName = .kotlin_module)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SwipeableMainScreenKt)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.navigation.BottomNavigationKt.BottomNavigation.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.navigation.BottomNavigationKt)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.screens.SwipeableMainScreenKt.SwipeableMainScreen.1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.navigation.BottomNavigationKt.BottomNavigation.1.1.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.navigation.BottomNavigationKt.BottomNavigation.1.1.3)
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SwipeableMainScreenKt.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SwipeableMainScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SwipeableMainScreenKt.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\0.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SwipeableMainScreenKt$SwipeableMainScreen$1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SwipeableMainScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SwipeableMainScreenKt$SwipeableMainScreen$1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\1.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SwipeableMainScreenKt$SwipeableMainScreen$4.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SwipeableMainScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\screens\SwipeableMainScreenKt$SwipeableMainScreen$4.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\2.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\screens\SwipeableMainScreen.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\3.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\navigation\BottomNavigation.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\4.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt$BottomNavigation$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\navigation\BottomNavigation.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt$BottomNavigation$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\5.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt$BottomNavigation$1$1$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\navigation\BottomNavigation.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt$BottomNavigation$1$1$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\6.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt$BottomNavigation$1$1$3.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\navigation\BottomNavigation.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\navigation\BottomNavigationKt$BottomNavigation$1$1$3.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\7.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\navigation\BottomNavigation.kt
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\dirty-sources.txt file as newly added
+  Compile iteration:
+    app\src\main\java\com\example\slavgorodbus\ui\screens\SwipeableMainScreen.kt <- was modified since last time
+    app\src\main\java\com\example\slavgorodbus\ui\navigation\BottomNavigation.kt <- was modified since last time
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\local-state\build-history.bin to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups17787101847437170538\8.backup
+  Reverting changes
+  Cleaning up stash
+  Incremental compilation completed
+Time metrics:
+  Total Gradle task time: 0,48 s
+  Spent time before task action: 0,01 s
+  Task action before worker execution: 0,09 s
+  Run compilation in Gradle worker: 0,37 s
+    Precise backup output: 0,01 s
+    Restore output: 0,01 s
+    Cleaning up the backup stash: 0,01 s
+    Connect to Kotlin daemon: 0,01 s
+    Calculate output size: 0,01 s
+    Run compilation: 0,36 s
+      Incremental compilation in daemon: 0,35 s
+        Calculate initial dirty sources set: 0,02 s
+          Detect removed classes: 0,01 s
+        Sources compilation round: 0,27 s
+          Compiler initialization time: 0,04 s
+          Compiler code analysis: 0,23 s
+        Write history file: 0,00 s
+  Start gradle worker: 0,01 s
+Size metrics:
+  Total size of the cache directory: 918,3 KB
+    ABI snapshot size: 49 B
+  Increase memory usage: 135,8 MB
+  Total memory usage at the end of build: 623,6 MB
+  Total compiler iteration: 1
+    Number of lines analyzed: 153
+    Analysis lines per second: 656
+  Start time of task action: 2025-09-20T13:23:34
+GC metrics:
+  PS MarkSweep:
+    GC count: 0
+    GC time: 0,00 s
+  PS Scavenge:
+    GC count: 0
+    GC time: 0,00 s
+
+Task ':app:processDebugResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:l8DexDesugarLibDebug' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:processDebugMainManifest' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeExtDexDebug' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:checkDebugDuplicateClasses' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:processDebugNavigationResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mapDebugSourceSetPaths' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugNativeLibs' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:checkDebugAarMetadata' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:packageDebugResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugAssets' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:javaPreCompileDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:validateSigningDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:compileDebugNavigationResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:writeDebugAppMetadata' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugResValues' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugNativeDebugMetadata' was skipped: NO-SOURCE
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugBuildConfig' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugShaders' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:extractDeepLinksDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugJniLibFolders' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:desugarDebugFileDependencies' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:createDebugCompatibleScreenManifests' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugAssets' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:writeDebugSigningConfigVersions' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeLibDexDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:parseDebugLocalResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:processDebugManifest' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:preBuild' finished in 0,00 s
+
+Task ':app:checkKotlinGradlePluginConfigurationErrors' was skipped: SKIPPED
+
+Task ':app:preDebugBuild' finished in 0,00 s
+
+Task ':app:compileDebugShaders' was skipped: NO-SOURCE
+
+Task ':app:compressDebugAssets' finished in 0,00 s
+
+Task ':app:stripDebugDebugSymbols' finished in 0,00 s
+
+Task ':app:processDebugManifestForPackage' finished in 0,00 s
+

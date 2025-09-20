@@ -1,9 +1,12 @@
 package com.example.slavgorodbus.ui.navigation
 
-import androidx.compose.material3.*
+import android.util.Log
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -29,6 +32,7 @@ fun BottomNavigation(navController: NavController) {
                 label = { Text(screen.title) },
                 selected = currentScreenRoute == screen.route,
                 onClick = {
+                    Log.d("BottomNavigation", "Navigating to: ${screen.route}")
                     navController.navigate(screen.route) {
                         // Очищаем стек навигации при переходе к основным экранам
                         popUpTo(navController.graph.findStartDestination().id) {

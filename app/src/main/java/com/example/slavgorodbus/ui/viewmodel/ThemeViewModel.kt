@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-private val Context.themeDataStore by preferencesDataStore(name = "theme_preferences")
+val Context.themeDataStore by preferencesDataStore(name = "theme_preferences")
 
 enum class AppTheme {
     SYSTEM, LIGHT, DARK
@@ -42,15 +42,5 @@ class ThemeViewModel(private val dataStore: DataStore<Preferences>) : ViewModel(
                 preferences[PreferencesKeys.APP_THEME] = theme.name
             }
         }
-    }
-}
-
-class ThemeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ThemeViewModel::class.java)) {
-            return ThemeViewModel(context.applicationContext.themeDataStore) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

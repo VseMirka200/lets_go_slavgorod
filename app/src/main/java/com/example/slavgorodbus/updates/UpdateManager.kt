@@ -260,7 +260,7 @@ class UpdateManager(private val context: Context) {
 fun UpdateDialog(
     version: UpdateManager.AppVersion,
     onDismiss: () -> Unit,
-    onDownload: @Composable () -> Unit,
+    onDownload: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -277,7 +277,7 @@ fun UpdateDialog(
             )
         },
         confirmButton = {
-            Button(onClick = onDownload as () -> Unit) {
+            Button(onClick = { onDownload() }) {
                 Text("📥 Скачать")
             }
         },

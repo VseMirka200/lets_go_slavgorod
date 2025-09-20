@@ -10,6 +10,7 @@ import android.util.Log
 import com.example.slavgorodbus.data.model.FavoriteTime
 import com.example.slavgorodbus.data.local.dataStore
 import com.example.slavgorodbus.ui.viewmodel.NotificationMode
+import com.example.slavgorodbus.utils.Constants
 import kotlinx.coroutines.runBlocking
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -21,8 +22,8 @@ import java.time.DayOfWeek
 
 object AlarmScheduler {
 
-    private const val ALARM_REQUEST_CODE_PREFIX = "fav_alarm_"
-    private const val FIVE_MINUTES_IN_MILLIS = 5 * 60 * 1000L
+    private const val ALARM_REQUEST_CODE_PREFIX = Constants.ALARM_REQUEST_CODE_PREFIX
+    private const val FIVE_MINUTES_IN_MILLIS = Constants.NOTIFICATION_LEAD_TIME_MINUTES * 60 * 1000L
 
     /**
      * Проверяет, должны ли отправляться уведомления в соответствии с настройками пользователя

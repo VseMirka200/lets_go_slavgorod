@@ -6,11 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.slavgorodbus.data.local.dao.FavoriteTimeDao
 import com.example.slavgorodbus.data.local.entity.FavoriteTimeEntity
+import com.example.slavgorodbus.utils.Constants
 import kotlinx.coroutines.asExecutor
 
 @Database(
     entities = [FavoriteTimeEntity::class],
-    version = 3,
+    version = Constants.DATABASE_VERSION,
     exportSchema = false,
     autoMigrations = []
 )
@@ -27,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "bus_app_database"
+                    Constants.DATABASE_NAME
                 )
                     .fallbackToDestructiveMigration()
                     .enableMultiInstanceInvalidation()

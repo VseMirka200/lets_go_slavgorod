@@ -41,24 +41,16 @@ fun SwipeableMainScreen(
     val currentRoute by navController.currentBackStackEntryAsState()
     val currentScreenRoute = currentRoute?.destination?.route
     
-    // Находим текущий индекс экрана в списке основных экранов
-    // Используем ключ для сброса состояния при изменении маршрута
-    var currentIndex by remember(currentScreenRoute) { mutableStateOf(0) }
-    
-    // Обновляем индекс при изменении маршрута или принудительном показе настроек
-    LaunchedEffect(currentScreenRoute, forceSettingsIndex) {
-        val newIndex = if (forceSettingsIndex) {
-            2 // Принудительно показываем настройки
-        } else {
-            // При входе в настройки всегда показываем экран настроек (индекс 2)
-            when (currentScreenRoute) {
-                Screen.Settings.route -> 2
-                else -> bottomNavItems.indexOfFirst { it.route == currentScreenRoute }.takeIf { it >= 0 } ?: 0
-            }
-        }
-        Log.d("SwipeableMainScreen", "Updating currentIndex: $currentIndex -> $newIndex, forceSettingsIndex: $forceSettingsIndex, currentScreenRoute: $currentScreenRoute")
-        currentIndex = newIndex
+    // Вычисляем текущий индекс на основе маршрута
+    val currentIndex = when {
+        forceSettingsIndex -> 2 // Принудительно показываем настройки
+        currentScreenRoute == Screen.Settings.route -> 2 // Настройки
+        currentScreenRoute == Screen.FavoriteTimes.route -> 1 // Избранное
+        currentScreenRoute == Screen.Home.route -> 0 // Главная
+        else -> 0 // По умолчанию главная
     }
+    
+    Log.d("SwipeableMainScreen", "Current index: $currentIndex, forceSettingsIndex: $forceSettingsIndex, currentScreenRoute: $currentScreenRoute")
 
     SwipeableContainer(
         currentIndex = currentIndex,

@@ -3,7 +3,6 @@ package com.example.slavgorodbus
 import android.Manifest
 import android.app.AlarmManager
 import android.app.Application
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,7 +12,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,8 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -64,23 +62,23 @@ class MainActivity : ComponentActivity() {
         }
 
     private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                Log.d("MainActivity", "Notification permission already granted.")
-                // Check for exact alarm permission on Android 12+
+        when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
+                // For older versions, check exact alarm permission
                 checkExactAlarmPermission()
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            }
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED -> {
+                Log.d("MainActivity", "Notification permission already granted.")
+                checkExactAlarmPermission()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                 Log.i("MainActivity", "Showing rationale for notification permission. Launching permission request again.")
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
+            }
+            else -> {
                 Log.d("MainActivity", "Requesting notification permission.")
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
-        } else {
-            // For older versions, check exact alarm permission
-            checkExactAlarmPermission()
         }
     }
 
@@ -104,16 +102,7 @@ class MainActivity : ComponentActivity() {
         askNotificationPermission()
 
         setContent {
-            val currentAppTheme by themeViewModel.currentTheme.collectAsState()
-            val useDarkTheme = when (currentAppTheme) {
-                AppTheme.SYSTEM -> isSystemInDarkTheme()
-                AppTheme.LIGHT -> false
-                AppTheme.DARK -> true
-            }
-
-            SlavgorodBusTheme(darkTheme = useDarkTheme) {
-                BusScheduleApp(themeViewModel = themeViewModel)
-            }
+            BusScheduleApp(themeViewModel = themeViewModel)
         }
     }
 }
@@ -132,19 +121,27 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
         }
     )
     
+    val currentAppTheme by themeViewModel.currentTheme.collectAsState()
+    val useDarkTheme = when (currentAppTheme) {
+        AppTheme.SYSTEM -> isSystemInDarkTheme()
+        AppTheme.LIGHT -> false
+        AppTheme.DARK -> true
+    }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            BottomNavigation(navController = navController)
+    SlavgorodBusTheme(darkTheme = useDarkTheme) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                BottomNavigation(navController = navController)
+            }
+        ) { innerPadding ->
+            AppNavHost(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding),
+                busViewModel = busViewModel,
+                themeViewModel = themeViewModel
+            )
         }
-    ) { innerPadding ->
-        AppNavHost(
-            navController = navController,
-            modifier = Modifier.padding(innerPadding),
-            busViewModel = busViewModel,
-            themeViewModel = themeViewModel
-        )
     }
 }
 

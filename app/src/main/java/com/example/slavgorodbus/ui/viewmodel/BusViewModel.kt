@@ -9,7 +9,10 @@ import com.example.slavgorodbus.data.model.BusRoute
 import com.example.slavgorodbus.data.model.BusSchedule
 import com.example.slavgorodbus.data.model.FavoriteTime
 import com.example.slavgorodbus.data.local.AppDatabase
+import com.example.slavgorodbus.data.repository.BusRouteRepository
 import com.example.slavgorodbus.notifications.AlarmScheduler
+import com.example.slavgorodbus.utils.loge
+import com.example.slavgorodbus.utils.toFavoriteTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,27 +39,17 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     private val favoriteTimeDao = AppDatabase.getDatabase(application).favoriteTimeDao()
+    private val routeRepository = BusRouteRepository()
 
     val favoriteTimes: StateFlow<List<FavoriteTime>> =
         favoriteTimeDao.getAllFavoriteTimes()
             .map { entities ->
                 entities.map { entity ->
-                    val route = getRouteById(entity.routeId)
-                    FavoriteTime(
-                        id = entity.id,
-                        routeId = entity.routeId,
-                        routeNumber = route?.routeNumber ?: "N/A",
-                        routeName = route?.name ?: "Неизвестный маршрут",
-                        stopName = entity.stopName,
-                        departureTime = entity.departureTime,
-                        dayOfWeek = entity.dayOfWeek,
-                        departurePoint = entity.departurePoint,
-                        isActive = entity.isActive
-                    )
+                    entity.toFavoriteTime(routeRepository)
                 }
             }
             .catch { exception ->
-                Log.e("BusViewModel", "Error collecting favorite times", exception)
+                loge("Error collecting favorite times", exception)
                 emit(emptyList())
             }
             .stateIn(
@@ -65,39 +58,14 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                 initialValue = emptyList()
             )
 
-    private val _allRoutes = MutableStateFlow<List<BusRoute>>(emptyList())
-
     init {
-        val sampleRoutes = listOf(
-            BusRoute(
-                id = "102",
-                routeNumber = "102",
-                name = "Автобус №102",
-                description = "Маршрут Славгород — Яровое",
-                travelTime = "~40 минут",
-                pricePrimary = "38₽ город / 55₽ межгород",
-                paymentMethods = "Нал. / Безнал.",
-                color = "#FF6200EE"
-            ),
-            BusRoute(
-                id = "1",
-                routeNumber = "1",
-                name = "Автобус №1",
-                description = "Маршрут Вокзал — Совхоз",
-                travelTime = "~24 минуты",
-                pricePrimary = "38₽ город",
-                paymentMethods = "Только нал.",
-                color = "#FF1976D2"
-            )
-        )
-        _allRoutes.value = sampleRoutes
         loadInitialRoutes()
     }
 
     private fun loadInitialRoutes() {
         _uiState.update { currentState ->
             currentState.copy(
-                routes = _allRoutes.value,
+                routes = routeRepository.getAllRoutes(),
                 isLoading = false,
                 error = null
             )
@@ -106,16 +74,7 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
-        val routesToDisplay = if (query.isBlank()) {
-            _allRoutes.value
-        } else {
-            val lowercaseQuery = query.lowercase()
-            _allRoutes.value.filter { route ->
-                route.routeNumber.lowercase().contains(lowercaseQuery) ||
-                        route.name.lowercase().contains(lowercaseQuery) ||
-                        route.description.lowercase().contains(lowercaseQuery)
-            }
-        }
+        val routesToDisplay = routeRepository.searchRoutes(query)
         _uiState.update { currentState ->
             currentState.copy(
                 routes = routesToDisplay,
@@ -124,8 +83,7 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getRouteById(routeId: String?): BusRoute? {
-        if (routeId == null) return null
-        return _allRoutes.value.find { it.id == routeId }
+        return routeRepository.getRouteById(routeId)
     }
 
     fun addFavoriteTime(schedule: BusSchedule) {

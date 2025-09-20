@@ -1,0 +1,237 @@
+Gradle start parameters:
+  tasks = [:app:assembleDebug]
+  excluded tasks = []
+  current dir = C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod
+  project properties args = [android.studio.version: 251.26094.121.2513.14007798, android.injected.attribution.file.location: C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\.gradle, android.injected.invoked.from.ide: true]
+  system properties args = [idea.active: true, user.variant: , file.encoding: UTF-8, idea.version: 2025.1, user.language: ru, user.country: RU, idea.vendor.name: Google]
+
+Build failed: [Execution failed for task ':app:compileDebugKotlin'.]
+
+Time metrics:
+  Total Gradle task time: 2,00 s
+  Spent time before task action: 0,01 s
+  Task action before worker execution: 0,05 s
+  Run compilation in Gradle worker: 2,45 s
+    Connect to Kotlin daemon: 0,05 s
+    Run compilation: 1,74 s
+      Non incremental compilation in daemon: 0,65 s
+      Incremental compilation in daemon: 1,73 s
+        Sources compilation round: 1,72 s
+          Compiler initialization time: 0,04 s
+          Compiler code analysis: 1,67 s
+  Start gradle worker: 0,00 s
+
+Size metrics:
+    ABI snapshot size: 31 B
+  Increase memory usage: 536,8 MB
+  Total memory usage at the end of build: 964,9 MB
+  Total compiler iteration: 1
+    Number of lines analyzed: 4706
+    Analysis lines per second: 2816
+  Start time of task action: 2025-09-20T12:40:39
+
+Build attributes:
+  REBUILD_REASON:
+    Incremental compilation is not enabled(1)
+    Unknown Gradle changes(1)
+
+Total time for Kotlin tasks: 1,85 s (92,5 % of all tasks time)
+Time  |% of Kotlin time|Task                   
+1,85 s|100,0 %         |:app:compileDebugKotlin
+
+Task ':app:compileDebugKotlin' finished in 1,85 s
+Task info:
+  Kotlin language version: 2.1
+Compilation log for task ':app:compileDebugKotlin':
+  Non-incremental compilation will be performed: UNKNOWN_CHANGES_IN_GRADLE_INPUTS
+  Cleaning 3 output directories
+Time metrics:
+  Total Gradle task time: 1,85 s
+  Spent time before task action: 0,01 s
+  Task action before worker execution: 0,05 s
+  Run compilation in Gradle worker: 1,78 s
+    Connect to Kotlin daemon: 0,04 s
+    Run compilation: 1,74 s
+      Incremental compilation in daemon: 1,73 s
+        Sources compilation round: 1,72 s
+          Compiler initialization time: 0,04 s
+          Compiler code analysis: 1,67 s
+  Start gradle worker: 0,00 s
+Size metrics:
+    ABI snapshot size: 31 B
+  Increase memory usage: 415,5 MB
+  Total memory usage at the end of build: 594,4 MB
+  Total compiler iteration: 1
+    Number of lines analyzed: 4706
+    Analysis lines per second: 2816
+  Start time of task action: 2025-09-20T12:40:39
+Build attributes:
+  REBUILD_REASON: Unknown Gradle changes
+GC metrics:
+  PS MarkSweep:
+    GC count: 0
+    GC time: 0,00 s
+  PS Scavenge:
+    GC count: 1
+    GC time: 0,04 s
+
+Task ':app:kspDebugKotlin' finished in 0,03 s
+Task info:
+  Kotlin language version: 1.9
+Compilation log for task ':app:kspDebugKotlin':
+  Compiler perf stats:
+  INIT: Compiler initialized in 120 ms
+          ANALYZE     522 ms    8994,253 loc/s
+  Find Java class performed 14 times, total time 65 ms
+  Type info performed 28 times, total time 98 ms
+  Call resolve performed 34 times, total time 169 ms
+  Binary class from Kotlin file performed 6583 times, total time 288 ms
+  Find Java class performed 3 times, total time 53 ms
+  Find Java class performed 10 times, total time 0 ms
+Time metrics:
+  Total Gradle task time: 0,03 s
+  Run compilation in Gradle worker: 0,66 s
+    Connect to Kotlin daemon: 0,01 s
+    Non incremental compilation in daemon: 0,65 s
+Size metrics:
+  Increase memory usage: 121,2 MB
+  Total memory usage at the end of build: 370,5 MB
+Build attributes:
+  REBUILD_REASON: Incremental compilation is not enabled
+
+Task ':app:processDebugResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:processDebugMainManifest' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeExtDexDebug' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:processDebugNavigationResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:checkDebugDuplicateClasses' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mapDebugSourceSetPaths' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:checkDebugAarMetadata' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugNativeLibs' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugAssets' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:extractDeepLinksDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeLibDexDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:packageDebugResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugBuildConfig' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:javaPreCompileDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugResValues' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:l8DexDesugarLibDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:desugarDebugFileDependencies' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugJniLibFolders' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:createDebugCompatibleScreenManifests' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:stripDebugDebugSymbols' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:parseDebugLocalResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:processDebugManifest' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugNativeDebugMetadata' was skipped: NO-SOURCE
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugShaders' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:writeDebugAppMetadata' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:writeDebugSigningConfigVersions' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:compileDebugNavigationResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:validateSigningDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:processDebugManifestForPackage' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:checkKotlinGradlePluginConfigurationErrors' was skipped: SKIPPED
+
+Task ':app:preBuild' finished in 0,00 s
+
+Task ':app:preDebugBuild' finished in 0,00 s
+
+Task ':app:compileDebugShaders' was skipped: NO-SOURCE
+
+Task ':app:generateDebugAssets' finished in 0,00 s
+
+Task ':app:compressDebugAssets' finished in 0,00 s
+

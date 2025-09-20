@@ -1,0 +1,490 @@
+Gradle start parameters:
+  tasks = [:app:assembleDebug]
+  excluded tasks = []
+  current dir = C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod
+  project properties args = [android.studio.version: 251.26094.121.2513.14007798, android.injected.attribution.file.location: C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\.gradle, android.injected.invoked.from.ide: true]
+  system properties args = [idea.active: true, user.variant: , file.encoding: UTF-8, idea.version: 2025.1, user.language: ru, user.country: RU, idea.vendor.name: Google]
+
+Time metrics:
+  Total Gradle task time: 4,95 s
+  Spent time before task action: 0,05 s
+  Task action before worker execution: 0,36 s
+  Run compilation in Gradle worker: 2,52 s
+    Clear jar cache: 0,00 s
+    Clear output: 0,00 s
+    Precise backup output: 0,02 s
+    Cleaning up the backup stash: 0,01 s
+    Connect to Kotlin daemon: 0,01 s
+    Calculate output size: 0,01 s
+    Run compilation: 1,73 s
+      Non incremental compilation in daemon: 0,77 s
+      Incremental compilation in daemon: 1,72 s
+        Store build info: 0,00 s
+        Calculate initial dirty sources set: 0,02 s
+          Detect removed classes: 0,01 s
+        Update caches: 0,03 s
+        Sources compilation round: 1,57 s
+          Compiler initialization time: 0,03 s
+          Compiler code analysis: 0,79 s
+          Compiler IR translation: 0,28 s
+          Compiler code generation: 0,46 s
+            Compiler IR lowering: 0,14 s
+            Compiler IR generation: 0,32 s
+        Write history file: 0,00 s
+        Shrink and save current classpath snapshot after compilation: 0,00 s
+  Start gradle worker: 0,00 s
+
+Size metrics:
+  Total size of the cache directory: 1,3 MB
+    ABI snapshot size: 1,5 KB
+  Increase memory usage: -76361344 B
+  Total memory usage at the end of build: 477,4 MB
+  Total compiler iteration: 1
+    Number of lines analyzed: 792
+    Number of lines for code generation: 792
+    Analysis lines per second: 1002
+    Code generation lines per second: 1721
+    Compiler IR translation line number: 792
+    Compiler IR lowering line number: 792
+    Compiler IR generation line number: 792
+  Number of times classpath snapshot is shrunk and saved after compilation: 1
+    Number of classpath entries: 69
+    Size of classpath snapshot: 7,7 MB
+    Size of shrunk classpath snapshot: 110,0 KB
+  Start time of task action: 2081-06-10T05:21:25
+
+Build attributes:
+  REBUILD_REASON: Incremental compilation is not enabled
+
+Total time for Kotlin tasks: 1,99 s (40,2 % of all tasks time)
+Time  |% of Kotlin time|Task                   
+1,99 s|100,0 %         |:app:compileDebugKotlin
+
+Task ':app:compileDebugKotlin' finished in 1,99 s
+Task info:
+  Kotlin language version: 2.1
+Compilation log for task ':app:compileDebugKotlin':
+  Classpath changes info passed from Gradle task: NoChanges
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.2.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.3.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.4.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.5.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.6.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.3.2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferencesKt)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.clearAvailableUpdate.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.setUpdateMode.1.WhenMappings)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.special..inlined.map.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.special..inlined.map.1.2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.UpdateManagerKt)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.3)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.4)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.4.2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.5)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.clearAvailableUpdate.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.6)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.UpdateManager.checkForUpdatesWithResult.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.ComposableSingletons.UpdateManagerKt.lambda-1.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.special..inlined.map.1.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.ComposableSingletons.UpdateManagerKt.lambda-2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.setAvailableUpdate.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.setUpdateNotificationShown.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.setAutoUpdateCheckEnabled.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.checkForUpdates.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.ComposableSingletons.UpdateManagerKt.lambda-3.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.setUpdateMode.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.5.2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.UpdateManagerKt.UpdateDialog.3)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.6.2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.UpdateManager.checkForUpdates.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.UpdateManagerKt.UpdateDialog.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.ComposableSingletons.UpdateManagerKt)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.1.2.1)
+  Process SignatureChanged(fqName = .kotlin_module)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.setLastUpdateCheckTime.2)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.ui.viewmodel.UpdateSettingsViewModel.setAutoUpdateCheckEnabled.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.UpdateManager.checkForUpdatesWithResult.2.result.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.2.2.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.updates.UpdateManagerKt.UpdateDialog.1)
+  Process SignatureChanged(fqName = com.example.slavgorodbus.data.local.UpdatePreferences.special..inlined.map.1.2)
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateMode.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateMode.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateMode.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\0.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateMode.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\1.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\2.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$checkForUpdates$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$checkForUpdates$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\3.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$checkForUpdatesWithResult$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$checkForUpdatesWithResult$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\4.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$checkForUpdatesWithResult$2$result$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$checkForUpdatesWithResult$2$result$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\5.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$Companion.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$Companion.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\6.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$AppVersion.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$AppVersion.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\7.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$UpdateResult.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManager$UpdateResult.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\8.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\9.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt$lambda-1$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt$lambda-1$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\10.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt$lambda-2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt$lambda-2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\11.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt$lambda-3$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\ComposableSingletons$UpdateManagerKt$lambda-3$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\12.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\13.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt$UpdateDialog$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt$UpdateDialog$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\14.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt$UpdateDialog$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt$UpdateDialog$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\15.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt$UpdateDialog$3.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\updates\UpdateManagerKt$UpdateDialog$3.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\16.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\17.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\18.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\19.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1$2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$special$$inlined$map$1$2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\20.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setAutoUpdateCheckEnabled$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setAutoUpdateCheckEnabled$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\21.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setUpdateMode$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setUpdateMode$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\22.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setUpdateMode$1$WhenMappings.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$setUpdateMode$1$WhenMappings.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\23.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$checkForUpdates$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$checkForUpdates$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\24.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$clearAvailableUpdate$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel$clearAvailableUpdate$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\25.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferencesKeys.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferencesKeys.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\26.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\27.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\28.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$1$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$1$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\29.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$1$2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$1$2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\30.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\31.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$2$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$2$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\32.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$2$2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$2$2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\33.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$3.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$3.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\34.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$3$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$3$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\35.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$3$2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$3$2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\36.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$4.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$4.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\37.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$4$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$4$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\38.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$4$2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$4$2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\39.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$5.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$5.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\40.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$5$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$5$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\41.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$5$2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$5$2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\42.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$6.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$6.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\43.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$6$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$6$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\44.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$6$2$1.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$special$$inlined$map$6$2$1.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\45.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setAutoUpdateCheckEnabled$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setAutoUpdateCheckEnabled$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\46.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setLastUpdateCheckTime$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setLastUpdateCheckTime$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\47.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setAvailableUpdate$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setAvailableUpdate$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\48.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$clearAvailableUpdate$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$clearAvailableUpdate$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\49.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setUpdateNotificationShown$2.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferences$setUpdateNotificationShown$2.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\50.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferencesKt.class on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\com\example\slavgorodbus\data\local\UpdatePreferencesKt.class to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\51.backup
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\tmp\kotlin-classes\debug\META-INF\app_debug.kotlin_module on clearing cache for C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt
+  Marking the C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\dirty-sources.txt file as newly added
+  Compile iteration:
+    app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateMode.kt <- was modified since last time
+    app\src\main\java\com\example\slavgorodbus\updates\UpdateManager.kt <- was modified since last time
+    app\src\main\java\com\example\slavgorodbus\ui\viewmodel\UpdateSettingsViewModel.kt <- was modified since last time
+    app\src\main\java\com\example\slavgorodbus\data\local\UpdatePreferences.kt <- was modified since last time
+  Deleting C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\dirty-sources.txt
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\last-build.bin to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\52.backup
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\local-state\build-history.bin to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\53.backup
+  [ClasspathSnapshot] Shrunk current classpath snapshot after compilation (shrink mode = UnchangedLookupsUnchangedClasspath), no updates since previous run
+  Moving C:\Users\vsemirka\Documents\GitHub\Lets_go_Slavgorod\app\build\kotlin\compileDebugKotlin\cacheable\caches-jvm\lookups\counters.tab to the stash as C:\Users\vsemirka\AppData\Local\Temp\kotlin-backups12299724872103235570\54.backup
+  Cleaning up stash
+  Incremental compilation completed
+Time metrics:
+  Total Gradle task time: 1,99 s
+  Spent time before task action: 0,01 s
+  Task action before worker execution: 0,06 s
+  Run compilation in Gradle worker: 1,73 s
+    Clear jar cache: 0,00 s
+    Precise backup output: 0,02 s
+    Cleaning up the backup stash: 0,01 s
+    Connect to Kotlin daemon: 0,01 s
+    Calculate output size: 0,01 s
+    Run compilation: 1,73 s
+      Incremental compilation in daemon: 1,72 s
+        Store build info: 0,00 s
+        Calculate initial dirty sources set: 0,02 s
+          Detect removed classes: 0,01 s
+        Update caches: 0,03 s
+        Sources compilation round: 1,57 s
+          Compiler initialization time: 0,03 s
+          Compiler code analysis: 0,79 s
+          Compiler IR translation: 0,28 s
+          Compiler code generation: 0,46 s
+            Compiler IR lowering: 0,14 s
+            Compiler IR generation: 0,32 s
+        Write history file: 0,00 s
+        Shrink and save current classpath snapshot after compilation: 0,00 s
+  Start gradle worker: 0,00 s
+Size metrics:
+  Total size of the cache directory: 1,3 MB
+    ABI snapshot size: 1,5 KB
+  Increase memory usage: -18770704 B
+  Total memory usage at the end of build: 230,2 MB
+  Total compiler iteration: 1
+    Number of lines analyzed: 792
+    Number of lines for code generation: 792
+    Analysis lines per second: 1002
+    Code generation lines per second: 1721
+    Compiler IR translation line number: 792
+    Compiler IR lowering line number: 792
+    Compiler IR generation line number: 792
+  Number of times classpath snapshot is shrunk and saved after compilation: 1
+    Number of classpath entries: 69
+    Size of classpath snapshot: 7,7 MB
+    Size of shrunk classpath snapshot: 110,0 KB
+  Start time of task action: 2025-09-20T14:40:43
+GC metrics:
+  PS MarkSweep:
+    GC count: 1
+    GC time: 0,12 s
+  PS Scavenge:
+    GC count: 2
+    GC time: 0,02 s
+
+Task ':app:kspDebugKotlin' finished in 1,18 s
+Task info:
+  Kotlin language version: 1.9
+Compilation log for task ':app:kspDebugKotlin':
+  Compiler perf stats:
+  INIT: Compiler initialized in 169 ms
+          ANALYZE     592 ms    9456,081 loc/s
+  Find Java class performed 10 times, total time 2 ms
+  Type info performed 29 times, total time 112 ms
+  Call resolve performed 35 times, total time 159 ms
+  Binary class from Kotlin file performed 4367 times, total time 349 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 10 times, total time 0 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 14 times, total time 1 ms
+  Find Java class performed 0 times
+  Find Java class performed 0 times
+  Find Java class performed 3 times, total time 45 ms
+  Find Java class performed 10 times, total time 0 ms
+Time metrics:
+  Total Gradle task time: 1,18 s
+  Spent time before task action: 0,05 s
+  Task action before worker execution: 0,31 s
+  Run compilation in Gradle worker: 0,78 s
+    Clear output: 0,00 s
+    Connect to Kotlin daemon: 0,01 s
+    Non incremental compilation in daemon: 0,77 s
+  Start gradle worker: 0,00 s
+Size metrics:
+  Increase memory usage: -57590640 B
+  Total memory usage at the end of build: 247,3 MB
+  Start time of task action: 2025-09-20T14:40:41
+Build attributes:
+  REBUILD_REASON: Incremental compilation is not enabled
+
+Task ':app:packageDebug' finished in 0,53 s
+Time metrics:
+  Total Gradle task time: 0,53 s
+
+Task ':app:dexBuilderDebug' finished in 0,47 s
+Time metrics:
+  Total Gradle task time: 0,47 s
+
+Task ':app:compileDebugJavaWithJavac' finished in 0,18 s
+Time metrics:
+  Total Gradle task time: 0,18 s
+
+Task ':app:mergeProjectDexDebug' finished in 0,09 s
+Time metrics:
+  Total Gradle task time: 0,09 s
+
+Task ':app:processDebugMainManifest' finished in 0,06 s
+Time metrics:
+  Total Gradle task time: 0,06 s
+
+Task ':app:l8DexDesugarLibDebug' finished in 0,05 s
+Time metrics:
+  Total Gradle task time: 0,05 s
+
+Task ':app:checkDebugDuplicateClasses' finished in 0,04 s
+Time metrics:
+  Total Gradle task time: 0,04 s
+
+Task ':app:processDebugResources' finished in 0,04 s
+Time metrics:
+  Total Gradle task time: 0,04 s
+
+Task ':app:mergeDebugNativeLibs' finished in 0,04 s
+Time metrics:
+  Total Gradle task time: 0,04 s
+
+Task ':app:desugarDebugFileDependencies' finished in 0,04 s
+Time metrics:
+  Total Gradle task time: 0,04 s
+
+Task ':app:generateDebugResources' finished in 0,04 s
+Time metrics:
+  Total Gradle task time: 0,04 s
+
+Task ':app:compileDebugShaders' was skipped: NO-SOURCE
+Time metrics:
+  Total Gradle task time: 0,03 s
+
+Task ':app:mergeExtDexDebug' finished in 0,02 s
+Time metrics:
+  Total Gradle task time: 0,02 s
+
+Task ':app:mergeDebugResources' finished in 0,02 s
+Time metrics:
+  Total Gradle task time: 0,02 s
+
+Task ':app:processDebugManifestForPackage' finished in 0,02 s
+Time metrics:
+  Total Gradle task time: 0,02 s
+
+Task ':app:checkDebugAarMetadata' finished in 0,02 s
+Time metrics:
+  Total Gradle task time: 0,02 s
+
+Task ':app:processDebugManifest' finished in 0,02 s
+Time metrics:
+  Total Gradle task time: 0,02 s
+
+Task ':app:processDebugNavigationResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mapDebugSourceSetPaths' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:createDebugCompatibleScreenManifests' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugShaders' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:javaPreCompileDebug' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:extractDeepLinksDebug' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:packageDebugResources' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugJavaResource' finished in 0,01 s
+Time metrics:
+  Total Gradle task time: 0,01 s
+
+Task ':app:mergeDebugAssets' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugResValues' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:processDebugJavaRes' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:createDebugApkListingFileRedirect' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeLibDexDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:parseDebugLocalResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugNativeDebugMetadata' was skipped: NO-SOURCE
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:generateDebugBuildConfig' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:compileDebugNavigationResources' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:mergeDebugJniLibFolders' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:validateSigningDebug' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:writeDebugSigningConfigVersions' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:stripDebugDebugSymbols' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:compressDebugAssets' finished in 0,00 s
+Time metrics:
+  Total Gradle task time: 0,00 s
+
+Task ':app:preBuild' finished in 0,00 s
+
+Task ':app:checkKotlinGradlePluginConfigurationErrors' was skipped: SKIPPED
+
+Task ':app:preDebugBuild' finished in 0,00 s
+
+Task ':app:writeDebugAppMetadata' finished in 0,00 s
+
+Task ':app:generateDebugAssets' finished in 0,00 s
+
+Task ':app:assembleDebug' finished in 0,00 s
+

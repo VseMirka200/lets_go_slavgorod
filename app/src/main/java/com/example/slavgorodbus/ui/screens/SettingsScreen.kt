@@ -10,10 +10,10 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,21 +26,17 @@ import com.example.slavgorodbus.ui.viewmodel.AppTheme
 import com.example.slavgorodbus.ui.viewmodel.NotificationMode
 import com.example.slavgorodbus.ui.viewmodel.NotificationSettingsViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModel
-import com.example.slavgorodbus.updates.UpdateManager
-import com.example.slavgorodbus.updates.UpdateDialog
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
     themeViewModel: ThemeViewModel = viewModel(),
     notificationSettingsViewModel: NotificationSettingsViewModel = viewModel(),
-    onNavigateToAbout: () -> Unit,
-    activity: androidx.activity.ComponentActivity
+    onNavigateToAbout: () -> Unit
 ) {
     val currentAppTheme by themeViewModel.currentTheme.collectAsState()
     var showThemeDropdown by remember { mutableStateOf(false) }
@@ -53,12 +49,6 @@ fun SettingsScreen(
     var showSelectDaysDialog by remember { mutableStateOf(false) }
     val selectedDaysFromVM by notificationSettingsViewModel.selectedNotificationDays.collectAsState()
 
-    var updateAvailable by remember { mutableStateOf<UpdateManager.AppVersion?>(null) }
-    var isCheckingUpdates by remember { mutableStateOf(false) }
-    var showUpdateDialog by remember { mutableStateOf(false) }
-    var updateError by remember { mutableStateOf<String?>(null) }
-    var showErrorDialog by remember { mutableStateOf(false) }
-    var shouldCheckUpdates by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -121,22 +111,6 @@ fun SettingsScreen(
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = "Обновления",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            UpdateSettingsCard(
-                isCheckingUpdates = isCheckingUpdates,
-                onCheckForUpdates = {
-                    shouldCheckUpdates = true
-                    isCheckingUpdates = true
-                    updateError = null
-                }
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            Text(
                 text = stringResource(R.string.settings_section_about_title),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -147,53 +121,6 @@ fun SettingsScreen(
         }
     }
 
-    // Проверка обновлений - запускается при изменении shouldCheckUpdates
-    LaunchedEffect(shouldCheckUpdates) {
-        if (shouldCheckUpdates) {
-            shouldCheckUpdates = false
-            try {
-                Log.d("SettingsScreen", "Начинаем проверку обновлений...")
-                val updateManager = UpdateManager(activity)
-                
-                // Сначала тестируем подключение к GitHub для диагностики
-                Log.d("SettingsScreen", "Тестируем подключение к GitHub...")
-                val connectionOk = updateManager.testConnection()
-                Log.d("SettingsScreen", "Подключение к GitHub: $connectionOk")
-                
-                // Выполняем основную проверку обновлений
-                val result = updateManager.checkForUpdatesWithResult()
-                
-                Log.d("SettingsScreen", "Результат проверки: success=${result.success}, error=${result.error}")
-                
-                // Обрабатываем результат проверки
-                if (result.success) {
-                    if (result.update != null) {
-                        // Найдено обновление - показываем диалог
-                        Log.d("SettingsScreen", "Найдено обновление: ${result.update.versionName}")
-                        updateAvailable = result.update
-                        showUpdateDialog = true
-                    } else {
-                        // Обновлений нет
-                        Log.d("SettingsScreen", "Обновления не найдены")
-                    }
-                } else {
-                    // Произошла ошибка - показываем диалог с ошибкой
-                    Log.w("SettingsScreen", "Ошибка проверки обновлений: ${result.error}")
-                    updateError = result.error ?: "Неизвестная ошибка"
-                    showErrorDialog = true
-                }
-            } catch (e: Exception) {
-                // Обрабатываем неожиданные исключения
-                Log.e("SettingsScreen", "Исключение при проверке обновлений", e)
-                updateError = "Ошибка: ${e.message}"
-                showErrorDialog = true
-            } finally {
-                // Всегда сбрасываем флаг загрузки
-                isCheckingUpdates = false
-                Log.d("SettingsScreen", "Проверка обновлений завершена")
-            }
-        }
-    }
 
     if (showSelectDaysDialog) {
         SelectDaysDialog(
@@ -207,40 +134,6 @@ fun SettingsScreen(
         )
     }
 
-    if (showUpdateDialog && updateAvailable != null) {
-        UpdateDialog(
-            version = updateAvailable!!,
-            onDismiss = { showUpdateDialog = false },
-            onDownload = {
-                showUpdateDialog = false
-                val updateManager = UpdateManager(activity)
-                updateManager.downloadUpdate(updateAvailable!!)
-            }
-        )
-    }
-
-    if (showErrorDialog && updateError != null) {
-        AlertDialog(
-            onDismissRequest = { showErrorDialog = false },
-            title = {
-                Text(
-                    text = "Ошибка проверки обновлений",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            },
-            text = {
-                Text(
-                    text = updateError!!,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            confirmButton = {
-                Button(onClick = { showErrorDialog = false }) {
-                    Text("OK")
-                }
-            }
-        )
-    }
 }
 
 @Composable
@@ -421,54 +314,6 @@ fun NotificationSettingsCard(
     }
 }
 
-/**
- * Карточка настроек для проверки обновлений
- * Отображает кнопку для ручной проверки обновлений с индикатором загрузки
- * @param isCheckingUpdates флаг, указывающий на то, что проверка обновлений в процессе
- * @param onCheckForUpdates колбэк, вызываемый при нажатии на кнопку проверки
- */
-@Composable
-fun UpdateSettingsCard(
-    isCheckingUpdates: Boolean,
-    onCheckForUpdates: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = !isCheckingUpdates) { onCheckForUpdates() }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Левая часть: иконка и текст
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.Update,
-                    contentDescription = "Проверить обновления",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(Modifier.width(16.dp))
-                Text(
-                    text = if (isCheckingUpdates) "Проверка обновлений..." else "Проверить обновления",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (isCheckingUpdates) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
-                )
-            }
-            // Правая часть: индикатор загрузки (показывается только во время проверки)
-            if (isCheckingUpdates) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun AboutSettingsCard(
@@ -477,7 +322,10 @@ fun AboutSettingsCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onNavigateToAbout() },
+            .clickable { 
+                Log.d("SettingsScreen", "AboutSettingsCard clicked")
+                onNavigateToAbout() 
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(

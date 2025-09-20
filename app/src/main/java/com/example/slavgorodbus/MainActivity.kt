@@ -2,6 +2,8 @@ package com.example.slavgorodbus
 
 import android.Manifest
 import android.app.AlarmManager
+import android.app.Application
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -21,8 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -41,14 +47,11 @@ import com.example.slavgorodbus.ui.viewmodel.AppTheme
 import com.example.slavgorodbus.ui.viewmodel.BusViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModelFactory
-import com.example.slavgorodbus.updates.UpdateChecker
-import com.example.slavgorodbus.updates.UpdateDialog
-import com.example.slavgorodbus.updates.UpdateManager
 
 class MainActivity : ComponentActivity() {
 
     private val themeViewModel: ThemeViewModel by viewModels {
-        ThemeViewModelFactory(applicationContext)
+        ThemeViewModelFactory(this)
     }
 
     private val requestPermissionLauncher =
@@ -94,7 +97,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -116,12 +118,20 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BusScheduleApp(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
-    val busViewModel: BusViewModel = viewModel()
+    val localContext = LocalContext.current
+    val busViewModel: BusViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return BusViewModel(localContext.applicationContext as Application) as T
+            }
+        }
+    )
+    
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -138,7 +148,6 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -214,7 +223,8 @@ fun AppNavHost(
             SwipeableMainScreen(
                 navController = navController,
                 busViewModel = busViewModel,
-                themeViewModel = themeViewModel
+                themeViewModel = themeViewModel,
+                forceSettingsIndex = true
             )
         }
 
@@ -225,6 +235,14 @@ fun AppNavHost(
         ) {
             Log.d("AppNavHost", "Displaying AboutScreen for route: ${Screen.About.route}")
             AboutScreen(
+                onBackClick = { 
+                    navController.navigate(Screen.Settings.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }

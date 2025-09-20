@@ -1,5 +1,6 @@
 package com.example.slavgorodbus.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -77,6 +78,7 @@ fun SwipeableContainer(
             }
     ) {
         // Отображение контента с передачей текущего индекса
+        Log.d("SwipeableContainer", "Displaying content for index: $currentIndex")
         content(currentIndex)
     }
 }

@@ -14,10 +14,9 @@ android {
     defaultConfig {
         applicationId = "com.example.slavgorodbus"
         minSdk = 24
-        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 10003
-        versionName = "1.1.4"
+        versionName = "1.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -83,10 +82,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
 
     implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.coil.compose)
-
-    implementation(libs.androidx.glance.appwidget)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

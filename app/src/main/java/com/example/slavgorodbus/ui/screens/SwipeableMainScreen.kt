@@ -1,14 +1,11 @@
 package com.example.slavgorodbus.ui.screens
 
-import android.os.Build
-import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
+import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.Alignment
 import androidx.compose.runtime.*
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -32,21 +29,35 @@ import com.example.slavgorodbus.ui.viewmodel.ThemeViewModel
  * @param themeViewModel ViewModel для управления темой приложения
  * @param modifier модификатор для настройки внешнего вида
  */
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SwipeableMainScreen(
     navController: NavController,
     busViewModel: BusViewModel,
     themeViewModel: ThemeViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    forceSettingsIndex: Boolean = false
 ) {
     // Получаем текущий маршрут из навигации
     val currentRoute by navController.currentBackStackEntryAsState()
     val currentScreenRoute = currentRoute?.destination?.route
     
     // Находим текущий индекс экрана в списке основных экранов
-    val currentIndex = remember(currentScreenRoute) {
-        bottomNavItems.indexOfFirst { it.route == currentScreenRoute }.takeIf { it >= 0 } ?: 0
+    // Используем ключ для сброса состояния при изменении маршрута
+    var currentIndex by remember(currentScreenRoute) { mutableStateOf(0) }
+    
+    // Обновляем индекс при изменении маршрута или принудительном показе настроек
+    LaunchedEffect(currentScreenRoute, forceSettingsIndex) {
+        val newIndex = if (forceSettingsIndex) {
+            2 // Принудительно показываем настройки
+        } else {
+            // При входе в настройки всегда показываем экран настроек (индекс 2)
+            when (currentScreenRoute) {
+                Screen.Settings.route -> 2
+                else -> bottomNavItems.indexOfFirst { it.route == currentScreenRoute }.takeIf { it >= 0 } ?: 0
+            }
+        }
+        Log.d("SwipeableMainScreen", "Updating currentIndex: $currentIndex -> $newIndex, forceSettingsIndex: $forceSettingsIndex, currentScreenRoute: $currentScreenRoute")
+        currentIndex = newIndex
     }
 
     SwipeableContainer(
@@ -91,14 +102,12 @@ fun SwipeableMainScreen(
                 viewModel = busViewModel
             )
             2 -> {
-                // Получаем Activity для передачи в SettingsScreen
-                val activity = LocalContext.current as ComponentActivity
                 SettingsScreen(
                     themeViewModel = themeViewModel,
                     onNavigateToAbout = {
+                        Log.d("SwipeableMainScreen", "Navigating to About screen")
                         navController.navigate(Screen.About.route)
-                    },
-                    activity = activity
+                    }
                 )
             }
         }

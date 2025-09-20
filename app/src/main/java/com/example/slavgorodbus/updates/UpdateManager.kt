@@ -1,22 +1,18 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.example.slavgorodbus.updates
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.Uri
 import android.util.Log
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -34,6 +30,7 @@ import java.net.URL
  * - Запуск загрузки обновления через браузер
  */
 
+@Suppress("DEPRECATION")
 class UpdateManager(private val context: Context) {
     
     companion object {
@@ -55,7 +52,7 @@ class UpdateManager(private val context: Context) {
         val versionName: String,
         val versionCode: Int,
         val downloadUrl: String,
-        val releaseNotes: String
+        val releaseNotes: String,
     )
     
     /**
@@ -67,7 +64,7 @@ class UpdateManager(private val context: Context) {
     data class UpdateResult(
         val success: Boolean,
         val update: AppVersion? = null,
-        val error: String? = null
+        val error: String? = null,
     )
     
     /**
@@ -227,22 +224,15 @@ class UpdateManager(private val context: Context) {
     private fun isInternetAvailable(): Boolean {
         return try {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                // Для Android 6.0+ используем современный API
-                val network = connectivityManager.activeNetwork ?: return false
-                val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-                
-                // Проверяем доступность Wi-Fi, мобильного интернета или Ethernet
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
-            } else {
-                // Для старых версий Android используем устаревший API
-                @Suppress("DEPRECATION")
-                val networkInfo = connectivityManager.activeNetworkInfo
-                networkInfo?.isConnectedOrConnecting == true
-            }
+
+            // Для Android 6.0+ используем современный API
+            val network = connectivityManager.activeNetwork ?: return false
+            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+            // Проверяем доступность Wi-Fi, мобильного интернета или Ethernet
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
         } catch (e: Exception) {
             Log.e(TAG, "Ошибка при проверке интернет-соединения", e)
             false
@@ -254,58 +244,10 @@ class UpdateManager(private val context: Context) {
      * @param version информация об обновлении
      */
     fun downloadUpdate(version: AppVersion) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(version.downloadUrl))
+        val intent = Intent(Intent.ACTION_VIEW, version.downloadUrl.toUri())
         context.startActivity(intent)
     }
-    
-    /**
-     * Тестирует подключение к GitHub API
-     * Используется для диагностики проблем с сетью
-     * @return true если GitHub доступен, false в противном случае
-     */
-    suspend fun testConnection(): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                // Простой GET запрос к основному API GitHub
-                val url = URL("https://api.github.com")
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
-                
-                val responseCode = connection.responseCode
-                Log.d(TAG, "Тест подключения к GitHub: $responseCode")
-                responseCode == HttpURLConnection.HTTP_OK
-            } catch (e: Exception) {
-                Log.e(TAG, "Ошибка при тесте подключения к GitHub", e)
-                false
-            }
-        }
-    }
-}
 
-/**
- * Composable компонент для автоматической проверки обновлений при запуске
- * @param activity Activity для создания UpdateManager
- * @param onUpdateAvailable колбэк, вызываемый при обнаружении обновления
- */
-@Composable
-fun UpdateChecker(
-    activity: Activity,
-    onUpdateAvailable: (UpdateManager.AppVersion) -> Unit
-) {
-    var updateAvailable by remember { mutableStateOf<UpdateManager.AppVersion?>(null) }
-    
-    // Запускаем проверку обновлений при первом создании компонента
-    LaunchedEffect(Unit) {
-        val updateManager = UpdateManager(activity)
-        updateAvailable = updateManager.checkForUpdates()
-    }
-    
-    // Если найдено обновление, уведомляем родительский компонент
-    updateAvailable?.let { version ->
-        onUpdateAvailable(version)
-    }
 }
 
 /**
@@ -318,7 +260,7 @@ fun UpdateChecker(
 fun UpdateDialog(
     version: UpdateManager.AppVersion,
     onDismiss: () -> Unit,
-    onDownload: () -> Unit
+    onDownload: @Composable () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -335,7 +277,7 @@ fun UpdateDialog(
             )
         },
         confirmButton = {
-            Button(onClick = onDownload) {
+            Button(onClick = onDownload as () -> Unit) {
                 Text("📥 Скачать")
             }
         },

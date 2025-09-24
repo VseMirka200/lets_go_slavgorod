@@ -112,7 +112,7 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                 isActive = true
             )
             try {
-                AlarmScheduler.scheduleAlarm(getApplication(), favoriteForScheduler)
+                AlarmScheduler.checkAndUpdateNotifications(getApplication(), favoriteForScheduler)
             } catch (e: Exception) {
                 Log.e("BusViewModel", "Error scheduling alarm for new favorite: ${schedule.id}", e)
             }
@@ -152,7 +152,7 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                     Log.d("BusViewModel", "FavoriteTime ${favoriteTime.id} activated.")
                     val updatedFavoriteForScheduler = favoriteTime.copy(isActive = true)
                     try {
-                        AlarmScheduler.scheduleAlarm(getApplication(), updatedFavoriteForScheduler)
+                        AlarmScheduler.checkAndUpdateNotifications(getApplication(), updatedFavoriteForScheduler)
                     } catch (e: Exception) {
                         Log.e("BusViewModel", "Error rescheduling alarm for favorite: ${favoriteTime.id}", e)
                     }

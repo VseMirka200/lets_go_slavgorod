@@ -147,4 +147,18 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
             }
         }
     }
+
+    /**
+     * Обновляет уведомления для конкретного избранного времени
+     */
+    fun updateNotificationForFavoriteTime(favoriteTime: FavoriteTime) {
+        viewModelScope.launch {
+            try {
+                Log.d(TAG, "Updating notification for favorite time: ${favoriteTime.id}")
+                AlarmScheduler.checkAndUpdateNotifications(getApplication(), favoriteTime)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating notification for favorite time: ${favoriteTime.id}", e)
+            }
+        }
+    }
 }

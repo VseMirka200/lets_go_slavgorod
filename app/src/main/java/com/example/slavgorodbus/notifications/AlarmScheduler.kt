@@ -102,7 +102,7 @@ object AlarmScheduler {
             return
         }
 
-        val calculatedDepartureTime = calculateNextDepartureTimeInMillis(favoriteTime)
+        val calculatedDepartureTime = calculateNextDepartureTimeInMillis(context, favoriteTime)
         if (calculatedDepartureTime == -1L) {
             Log.e("AlarmScheduler", "Failed to calculate a valid departure time for ${favoriteTime.id}. Not scheduling.")
             return
@@ -236,7 +236,7 @@ object AlarmScheduler {
         }
     }
 
-    private fun calculateNextDepartureTimeInMillis(favoriteTime: FavoriteTime): Long {
+    private fun calculateNextDepartureTimeInMillis(context: Context, favoriteTime: FavoriteTime): Long {
         if (favoriteTime.departureTime.isBlank()) {
             Log.e("AlarmScheduler", "Departure time is blank for ID ${favoriteTime.id}")
             return -1L
@@ -276,14 +276,38 @@ object AlarmScheduler {
             set(Calendar.MILLISECOND, 0)
         }
 
-        for (i in 0..7) {
-            val candidateDeparture = (nextDepartureBase.clone() as Calendar).apply {
-                add(Calendar.DAY_OF_YEAR, i)
+        // Проверяем, нужно ли учитывать день недели или планировать на каждый день
+        val shouldCheckDayOfWeek = try {
+            val preferences = runBlocking { context.dataStore.data.first() }
+            val notificationModeString = preferences[stringPreferencesKey("notification_mode")] 
+                ?: NotificationMode.ALL_DAYS.name
+            val notificationMode = NotificationMode.valueOf(notificationModeString)
+            notificationMode != NotificationMode.ALL_DAYS
+        } catch (e: Exception) {
+            Log.w("AlarmScheduler", "Error checking notification mode, defaulting to day-specific scheduling", e)
+            true
+        }
+
+        if (shouldCheckDayOfWeek) {
+            // Планируем только на указанный день недели
+            for (i in 0..7) {
+                val candidateDeparture = (nextDepartureBase.clone() as Calendar).apply {
+                    add(Calendar.DAY_OF_YEAR, i)
+                }
+                if (candidateDeparture.get(Calendar.DAY_OF_WEEK) == targetDayOfWeek && candidateDeparture.after(now)) {
+                    Log.d("AlarmScheduler", "Calculated next departure for ${favoriteTime.id} (${favoriteTime.departureTime}, targetDay $targetDayOfWeek): ${formatMillis(candidateDeparture.timeInMillis)} (found after $i day iterations)")
+                    return candidateDeparture.timeInMillis
+                }
             }
-            if (candidateDeparture.get(Calendar.DAY_OF_WEEK) == targetDayOfWeek && candidateDeparture.after(now)) {
-                Log.d("AlarmScheduler", "Calculated next departure for ${favoriteTime.id} (${favoriteTime.departureTime}, targetDay $targetDayOfWeek): ${formatMillis(candidateDeparture.timeInMillis)} (found after $i day iterations)")
-                return candidateDeparture.timeInMillis
+        } else {
+            // Планируем на каждый день в указанное время
+            val nextDeparture = (nextDepartureBase.clone() as Calendar).apply {
+                if (!after(now)) {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                }
             }
+            Log.d("AlarmScheduler", "Calculated next departure for ${favoriteTime.id} (${favoriteTime.departureTime}, every day): ${formatMillis(nextDeparture.timeInMillis)}")
+            return nextDeparture.timeInMillis
         }
 
         Log.e("AlarmScheduler", "Could not find a suitable future departure day within a week for ${favoriteTime.id}")
@@ -309,6 +333,19 @@ object AlarmScheduler {
             } catch (e: Exception) {
                 Log.e("AlarmScheduler", "Error updating alarm for ${favoriteTime.id}", e)
             }
+        }
+    }
+
+    /**
+     * Проверяет и обновляет уведомления при изменении настроек
+     */
+    fun checkAndUpdateNotifications(context: Context, favoriteTime: FavoriteTime) {
+        if (shouldSendNotification(context, favoriteTime)) {
+            scheduleAlarm(context, favoriteTime)
+            Log.d("AlarmScheduler", "Notification scheduled for ${favoriteTime.id}")
+        } else {
+            cancelAlarm(context, favoriteTime.id)
+            Log.d("AlarmScheduler", "Notification cancelled for ${favoriteTime.id} due to settings")
         }
     }
 

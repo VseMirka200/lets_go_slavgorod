@@ -26,7 +26,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -40,6 +39,7 @@ import com.example.lets_go_slavgorod.ui.screens.AboutScreen
 import com.example.lets_go_slavgorod.ui.screens.RouteDetailsScreen
 import com.example.lets_go_slavgorod.ui.screens.ScheduleScreen
 import com.example.lets_go_slavgorod.ui.screens.SwipeableMainScreen
+import com.example.lets_go_slavgorod.ui.screens.WebViewScreen
 import com.example.lets_go_slavgorod.ui.theme.lets_go_slavgorodTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
@@ -286,5 +286,36 @@ fun AppNavHost(
             )
         }
         
+        composable(
+            route = "webview/{url}/{title}",
+            arguments = listOf(
+                navArgument("url") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType }
+            ),
+            enterTransition = { NavigationAnimations.slideInFromRight },
+            exitTransition = { NavigationAnimations.slideOutToLeft }
+        ) { backStackEntry ->
+            val url = backStackEntry.arguments?.getString("url")?.decodeUrl() ?: ""
+            val title = backStackEntry.arguments?.getString("title")?.decodeUrl() ?: "Веб-страница"
+            WebViewScreen(
+                navController = navController,
+                url = url,
+                title = title
+            )
+        }
+        
     }
+}
+
+/**
+ * Декодирует URL из навигации
+ */
+private fun String.decodeUrl(): String {
+    return this.replace("%2F", "/")
+        .replace("%3A", ":")
+        .replace("%3F", "?")
+        .replace("%26", "&")
+        .replace("%3D", "=")
+        .replace("%23", "#")
+        .replace("%20", " ")
 }

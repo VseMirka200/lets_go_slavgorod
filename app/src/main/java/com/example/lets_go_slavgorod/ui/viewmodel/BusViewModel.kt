@@ -30,11 +30,15 @@ import kotlinx.coroutines.flow.firstOrNull
  * @param routes список доступных маршрутов
  * @param isLoading флаг загрузки данных
  * @param error сообщение об ошибке (если есть)
+ * @param isAddingFavorite флаг добавления в избранное
+ * @param isRemovingFavorite флаг удаления из избранного
  */
 data class BusUiState(
     val routes: List<BusRoute> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isAddingFavorite: Boolean = false,
+    val isRemovingFavorite: Boolean = false
 )
 
 /**
@@ -55,7 +59,7 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     private val favoriteTimeDao = AppDatabase.getDatabase(application).favoriteTimeDao()
-    private val routeRepository = BusRouteRepository()
+    private val routeRepository = BusRouteRepository(application)
 
     val favoriteTimes: StateFlow<List<FavoriteTime>> =
         favoriteTimeDao.getAllFavoriteTimes()
@@ -104,44 +108,91 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addFavoriteTime(schedule: BusSchedule) {
         viewModelScope.launch {
-            val favoriteTimeEntity = FavoriteTimeEntity(
-                id = schedule.id,
-                routeId = schedule.routeId,
-                departureTime = schedule.departureTime,
-                stopName = schedule.stopName,
-                departurePoint = schedule.departurePoint,
-                dayOfWeek = schedule.dayOfWeek,
-                isActive = true
-            )
-            favoriteTimeDao.addFavoriteTime(favoriteTimeEntity)
-
-            val route = getRouteById(schedule.routeId)
-            val favoriteForScheduler = FavoriteTime(
-                id = schedule.id,
-                routeId = schedule.routeId,
-                routeNumber = route?.routeNumber ?: "N/A",
-                routeName = route?.name ?: "Маршрут",
-                stopName = schedule.stopName,
-                departureTime = schedule.departureTime,
-                dayOfWeek = schedule.dayOfWeek,
-                departurePoint = schedule.departurePoint,
-                isActive = true
-            )
             try {
+                _uiState.update { currentState ->
+                    currentState.copy(isAddingFavorite = true, error = null)
+                }
+                
+                // Валидация данных перед добавлением
+                val sanitizedSchedule = schedule.sanitized()
+                if (!sanitizedSchedule.isValid()) {
+                    Log.e("BusViewModel", "Invalid schedule data, cannot add to favorites: ${schedule.id}")
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isAddingFavorite = false,
+                            error = "Некорректные данные расписания"
+                        )
+                    }
+                    return@launch
+                }
+                
+                val favoriteTimeEntity = FavoriteTimeEntity(
+                    id = sanitizedSchedule.id,
+                    routeId = sanitizedSchedule.routeId,
+                    departureTime = sanitizedSchedule.departureTime,
+                    stopName = sanitizedSchedule.stopName,
+                    departurePoint = sanitizedSchedule.departurePoint,
+                    dayOfWeek = sanitizedSchedule.dayOfWeek,
+                    isActive = true
+                )
+                favoriteTimeDao.addFavoriteTime(favoriteTimeEntity)
+
+                val route = getRouteById(sanitizedSchedule.routeId)
+                val favoriteForScheduler = FavoriteTime(
+                    id = sanitizedSchedule.id,
+                    routeId = sanitizedSchedule.routeId,
+                    routeNumber = route?.routeNumber ?: "N/A",
+                    routeName = route?.name ?: "Маршрут",
+                    stopName = sanitizedSchedule.stopName,
+                    departureTime = sanitizedSchedule.departureTime,
+                    dayOfWeek = sanitizedSchedule.dayOfWeek,
+                    departurePoint = sanitizedSchedule.departurePoint,
+                    isActive = true
+                )
+                
                 AlarmScheduler.checkAndUpdateNotifications(getApplication(), favoriteForScheduler)
+                Log.d("BusViewModel", "Successfully added favorite time: ${sanitizedSchedule.id}")
+                
+                _uiState.update { currentState ->
+                    currentState.copy(isAddingFavorite = false, error = null)
+                }
+                
             } catch (e: Exception) {
-                Log.e("BusViewModel", "Error scheduling alarm for new favorite: ${schedule.id}", e)
+                Log.e("BusViewModel", "Error adding favorite time: ${schedule.id}", e)
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isAddingFavorite = false,
+                        error = "Ошибка при добавлении в избранное: ${e.message}"
+                    )
+                }
             }
         }
     }
 
     fun removeFavoriteTime(scheduleId: String) {
         viewModelScope.launch {
-            favoriteTimeDao.removeFavoriteTime(scheduleId)
             try {
+                _uiState.update { currentState ->
+                    currentState.copy(isRemovingFavorite = true, error = null)
+                }
+                
+                favoriteTimeDao.removeFavoriteTime(scheduleId)
                 AlarmScheduler.cancelAlarm(getApplication(), scheduleId)
+                
+                Log.d("BusViewModel", "Successfully removed favorite time: $scheduleId")
+                
+                _uiState.update { currentState ->
+                    currentState.copy(isRemovingFavorite = false, error = null)
+                }
+                
             } catch (e: Exception) {
-                Log.e("BusViewModel", "Error cancelling alarm for removed favorite: $scheduleId", e)
+                Log.e("BusViewModel", "Error removing favorite time: $scheduleId", e)
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isRemovingFavorite = false,
+                        error = "Ошибка при удалении из избранного: ${e.message}"
+                    )
+                }
             }
         }
     }
@@ -181,5 +232,54 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isFavoriteTime(scheduleId: String): Boolean {
         return favoriteTimes.value.any { it.id == scheduleId }
+    }
+    
+    /**
+     * Очищает ошибки из состояния UI
+     */
+    fun clearError() {
+        _uiState.update { currentState ->
+            currentState.copy(error = null)
+        }
+    }
+    
+    /**
+     * Обновляет кэш маршрутов
+     */
+    fun refreshCache() {
+        viewModelScope.launch {
+            try {
+                routeRepository.refreshCache()
+                Log.d("BusViewModel", "Cache refreshed successfully")
+            } catch (e: Exception) {
+                Log.e("BusViewModel", "Error refreshing cache", e)
+            }
+        }
+    }
+    
+    /**
+     * Очищает кэш маршрутов
+     */
+    fun clearCache() {
+        try {
+            routeRepository.clearCache()
+            Log.d("BusViewModel", "Cache cleared successfully")
+        } catch (e: Exception) {
+            Log.e("BusViewModel", "Error clearing cache", e)
+        }
+    }
+    
+    /**
+     * Проверяет доступность сети
+     */
+    fun isNetworkAvailable(): Boolean {
+        return routeRepository.isNetworkAvailable()
+    }
+    
+    /**
+     * Получает тип соединения
+     */
+    fun getConnectionType(): String {
+        return routeRepository.getConnectionType()
     }
 }

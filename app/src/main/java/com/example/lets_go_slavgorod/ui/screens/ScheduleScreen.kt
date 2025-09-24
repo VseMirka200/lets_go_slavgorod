@@ -277,7 +277,7 @@ private fun ExpandableScheduleSection(
                         indication = null,
                         onClick = onToggleExpand
                     )
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -299,7 +299,7 @@ private fun ExpandableScheduleSection(
                     if (schedules.isNotEmpty()) {
                         schedules.forEach { schedule ->
                             if (schedules.first() != schedule) {
-                                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                                HorizontalDivider(modifier = Modifier.padding(start = 16.dp, end = 16.dp))
                             }
 
                             val isCurrentlyFavorite = remember(favoriteTimesList, schedule.id) {
@@ -317,7 +317,7 @@ private fun ExpandableScheduleSection(
                                     }
                                 },
                                 isNextUpcoming = schedule.id == nextUpcomingScheduleId,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
                             )
                         }
                     } else if (shouldShowNoScheduleMessage(route)) {
@@ -352,7 +352,7 @@ private fun NoRouteSelectedMessage(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp)
             )
         }
     }
@@ -377,7 +377,7 @@ private fun RouteDetailsSummaryCard(route: BusRoute) {
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)) {
             route.travelTime?.let { DetailRow("Время в пути:", it) }
             route.pricePrimary?.let { DetailRow("Стоимость:", it) }
             route.paymentMethods?.let { DetailRow("Способы оплаты:", it, allowMultiLineValue = false) }

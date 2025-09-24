@@ -35,7 +35,7 @@ fun ScheduleCard(
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -79,7 +79,7 @@ fun ScheduleCard(
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                                 shape = MaterialTheme.shapes.small
                             )
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .padding(start = 6.dp, end = 6.dp, top = 2.dp, bottom = 2.dp)
                     )
                 }
 

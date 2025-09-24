@@ -53,7 +53,7 @@ fun BusRouteCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = Constants.PADDING_MEDIUM.dp, vertical = Constants.PADDING_SMALL.dp)
+            .padding(start = Constants.PADDING_MEDIUM.dp, end = Constants.PADDING_MEDIUM.dp, top = Constants.PADDING_SMALL.dp, bottom = Constants.PADDING_SMALL.dp)
             .clickable { onRouteClick(route) },
         elevation = CardDefaults.cardElevation(defaultElevation = Constants.CARD_ELEVATION.dp),
         shape = RoundedCornerShape(Constants.CARD_CORNER_RADIUS.dp),

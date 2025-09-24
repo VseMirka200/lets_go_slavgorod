@@ -105,11 +105,11 @@ private fun FavoriteNestedGroupedList(
                 ) {
                     Column(Modifier.padding(bottom = 8.dp)) {
                         Text(
-                            text = routeName.trim(),
+                            text = routeName?.trim() ?: "",
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
                             color = MaterialTheme.colorScheme.primary
                         )
 
@@ -128,7 +128,7 @@ private fun FavoriteNestedGroupedList(
                                 onToggleFavoriteActiveState = onToggleFavoriteActiveState
                             )
                             if (timesByDeparturePoint.keys.last() != departurePoint && timesByDeparturePoint.size > 1) {
-                                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                                HorizontalDivider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp))
                             }
                         }
                     }
@@ -160,7 +160,7 @@ private fun ExpandableDeparturePointSection(
                     indication = null,
                     onClick = onToggleExpand
                 )
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -201,7 +201,7 @@ private fun ExpandableDeparturePointSection(
                         routeNumber = null,
                         routeName = null,
                         isNextUpcoming = false,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
                     )
                 }
             }

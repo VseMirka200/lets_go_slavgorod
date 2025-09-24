@@ -149,10 +149,10 @@ object AlarmScheduler {
             return
         }
 
-        val routeInfoForNotification = "Автобус №${favoriteTime.routeNumber.trim()}"
-        val departureTimeInfoForNotification = "в ${favoriteTime.departureTime.trim()}"
+        val routeInfoForNotification = "Автобус №${favoriteTime.routeNumber?.trim() ?: ""}"
+        val departureTimeInfoForNotification = "в ${favoriteTime.departureTime?.trim() ?: ""}"
         val destinationInfoForNotification = ""
-        val departurePointStr = favoriteTime.departurePoint.trim()
+        val departurePointStr = favoriteTime.departurePoint?.trim() ?: ""
         val departurePointInfoForNotification = if (departurePointStr.isNotBlank()) {
             "От: $departurePointStr"
         } else {
@@ -280,8 +280,8 @@ object AlarmScheduler {
         val hour: Int
         val minute: Int
         try {
-            hour = timeParts[0].trim().toInt()
-            minute = timeParts[1].trim().toInt()
+            hour = timeParts[0]?.trim()?.toInt() ?: return -1L
+            minute = timeParts[1]?.trim()?.toInt() ?: return -1L
         } catch (nfe: NumberFormatException) {
             Log.e("AlarmScheduler", "Invalid number format in departure time parts: '${favoriteTime.departureTime}' for ID ${favoriteTime.id}", nfe)
             return -1L

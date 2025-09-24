@@ -83,6 +83,9 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
 
     implementation(libs.androidx.navigation.compose)
+    
+    // WebView для открытия ссылок внутри приложения
+    implementation("androidx.webkit:webkit:1.8.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

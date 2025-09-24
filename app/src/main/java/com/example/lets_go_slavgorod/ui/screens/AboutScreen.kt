@@ -25,9 +25,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import android.util.Log
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.BuildConfig
 import com.example.lets_go_slavgorod.R
 import androidx.core.net.toUri
+import com.example.lets_go_slavgorod.ui.navigation.Screen
 
 /**
  * Экран "О программе" - отображает информацию о приложении и разработчике
@@ -44,6 +46,7 @@ import androidx.core.net.toUri
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
+    navController: NavController? = null,
     onBackClick: () -> Unit = {},
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     innerPadding: PaddingValues = PaddingValues()
@@ -113,6 +116,7 @@ fun AboutScreen(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             LinksCard(
+                navController = navController,
                 githubUrl = developerGitHubUrl,
                 vkUrl = "https://vk.com/vsemirka200",
                 telegramUrl = feedbackTelegramUrl
@@ -193,6 +197,7 @@ private fun AppInfoCard(
  */
 @Composable
 private fun LinksCard(
+    navController: NavController?,
     githubUrl: String,
     vkUrl: String,
     telegramUrl: String
@@ -205,12 +210,14 @@ private fun LinksCard(
             modifier = Modifier.padding(16.dp)
         ) {
             LinkItem(
+                navController = navController,
                 text = "GitHub",
                 url = githubUrl,
                 icon = Icons.Default.Link
             )
             Spacer(Modifier.height(12.dp))
             LinkItem(
+                navController = navController,
                 text = "Вконтакте",
                 url = vkUrl,
                 icon = Icons.Default.Link
@@ -224,6 +231,7 @@ private fun LinksCard(
  */
 @Composable
 private fun LinkItem(
+    navController: NavController?,
     text: String,
     url: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector
@@ -234,11 +242,18 @@ private fun LinkItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                try {
-                    context.startActivity(intent)
-                } catch (e: Exception) {
-                    Log.e("AboutScreen", "Could not open URL: $url", e)
+                if (navController != null) {
+                    // Открываем ссылку в WebView внутри приложения
+                    val route = Screen.WebView.createRoute(url, text)
+                    navController.navigate(route)
+                } else {
+                    // Fallback: открываем в браузере
+                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                    try {
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Log.e("AboutScreen", "Could not open URL: $url", e)
+                    }
                 }
             }
             .padding(vertical = 4.dp),

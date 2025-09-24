@@ -28,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.R
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.NotificationMode
@@ -56,6 +58,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    navController: NavController? = null,
     modifier: Modifier = Modifier,
     themeViewModel: ThemeViewModel = viewModel(),
     notificationSettingsViewModel: NotificationSettingsViewModel = viewModel(),
@@ -186,9 +189,16 @@ fun SettingsScreen(
                     updateSettingsVM.clearUpdateCheckStatus()
                 },
                 onDownloadUpdate = { url ->
-                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW,
-                        url.toUri())
-                    context.startActivity(intent)
+                    if (navController != null) {
+                        // Открываем ссылку в WebView внутри приложения
+                        val route = Screen.WebView.createRoute(url, "Скачать обновление")
+                        navController.navigate(route)
+                    } else {
+                        // Fallback: открываем в браузере
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW,
+                            url.toUri())
+                        context.startActivity(intent)
+                    }
                 }
             )
 
@@ -245,7 +255,7 @@ fun ThemeSettingsCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onShowThemeDropdownChange(true) }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -348,7 +358,7 @@ fun NotificationSettingsCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onShowNotificationModeDropdownChange(true) }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -515,7 +525,7 @@ fun UpdateSettingsCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onShowUpdateModeDropdownChange(true) }
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {

@@ -104,11 +104,13 @@ fun SwipeableMainScreen(
             )
             2 -> {
                 SettingsScreen(
+                    navController = navController,
                     themeViewModel = themeViewModel
                 )
             }
             3 -> {
                 AboutScreen(
+                    navController = navController,
                     onBackClick = {
                         // Возвращаемся на главную при нажатии "Назад" в свайп-режиме
                         navController.navigate(Screen.Home.route) {

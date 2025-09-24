@@ -50,14 +50,9 @@ inline fun <reified T> T.logw(message: String) {
 
 /**
  * Проверяет, является ли строка пустой или null
+ * (Использует стандартную функцию Kotlin)
  */
-fun String?.isNullOrBlank(): Boolean = this.isNullOrBlank()
 
-/**
- * Extension для List<BusRoute> - поиск по ID
- */
-fun List<BusRoute>.findById(id: String?): BusRoute? = 
-    if (id == null) null else find { it.id == id }
 
 /**
  * Extension для поиска маршрутов

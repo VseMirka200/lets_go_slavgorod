@@ -130,21 +130,30 @@ class BusApplication : Application() {
                 val updateManager = UpdateManager(this@BusApplication)
                 val result = updateManager.checkForUpdatesWithResult()
                 
-                if (result.success && result.update != null) {
-                    logd("Automatic update check found new version: ${result.update.versionName}")
-                    
-                    // Сохраняем информацию о доступном обновлении
-                    updatePreferences.setAvailableUpdate(
-                        version = result.update.versionName,
-                        url = result.update.downloadUrl,
-                        notes = result.update.releaseNotes
-                    )
-                } else if (result.success) {
-                    logd("Automatic update check: no updates available")
-                    // Очищаем информацию о доступном обновлении, если его больше нет
-                    updatePreferences.clearAvailableUpdate()
-                } else {
-                    loge("Automatic update check failed: ${result.error}")
+                when {
+                    result.success && result.update != null -> {
+                        logd("Automatic update check found new version: ${result.update.versionName}")
+                        
+                        // Валидируем данные обновления перед сохранением
+                        if (result.update.versionName.isNotBlank() && result.update.downloadUrl.isNotBlank()) {
+                            updatePreferences.setAvailableUpdate(
+                                version = result.update.versionName,
+                                url = result.update.downloadUrl,
+                                notes = result.update.releaseNotes
+                            )
+                        } else {
+                            loge("Invalid update data received: version='${result.update.versionName}', url='${result.update.downloadUrl}'")
+                        }
+                    }
+                    result.success -> {
+                        logd("Automatic update check: no updates available")
+                        // Очищаем информацию о доступном обновлении, если его больше нет
+                        updatePreferences.clearAvailableUpdate()
+                    }
+                    else -> {
+                        loge("Automatic update check failed: ${result.error}")
+                        // Не очищаем кэш при ошибке, чтобы не потерять данные
+                    }
                 }
                 
                 // Обновляем время последней проверки
@@ -152,6 +161,7 @@ class BusApplication : Application() {
                 
             } catch (e: Exception) {
                 loge("Error during automatic update check", e)
+                // В случае ошибки не прерываем работу приложения
             }
         }
     }

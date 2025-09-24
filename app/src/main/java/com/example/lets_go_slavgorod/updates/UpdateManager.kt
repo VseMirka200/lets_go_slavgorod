@@ -99,32 +99,78 @@ class UpdateManager(private val context: Context) {
                 readTimeout = TIMEOUT_MS.toInt()
                 setRequestProperty("Accept", "application/vnd.github.v3+json")
                 setRequestProperty("User-Agent", "lets_go_slavgorod_App")
+                setRequestProperty("Connection", "close")
             }
             
             val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                                val response = connection.inputStream.bufferedReader().use { it.readText() }
-                                    val json = JSONObject(response)
-                
-                val versionName = json.optString("tag_name", "1.0.0")
-                val assets = json.optJSONArray("assets")
-                val downloadUrl = if (assets != null && assets.length() > 0) {
-                    assets.getJSONObject(0).optString("browser_download_url", "")
-                } else {
-                    ""
+            Log.d(TAG, "GitHub API response code: $responseCode")
+            
+            when (responseCode) {
+                HttpURLConnection.HTTP_OK -> {
+                    val response = connection.inputStream.bufferedReader().use { it.readText() }
+                    if (response.isBlank()) {
+                        Log.w(TAG, "Empty response from GitHub API")
+                        return@withContext null
+                    }
+                    
+                    val json = JSONObject(response)
+                    
+                    val versionName = json.optString("tag_name", "").trim()
+                    val assets = json.optJSONArray("assets")
+                    val downloadUrl = if (assets != null && assets.length() > 0) {
+                        assets.getJSONObject(0).optString("browser_download_url", "").trim()
+                    } else {
+                        ""
+                    }
+                    val releaseNotes = json.optString("body", "").trim()
+                    
+                    // Валидация полученных данных
+                    if (versionName.isBlank()) {
+                        Log.w(TAG, "Empty version name in response")
+                        return@withContext null
+                    }
+                    
+                    Log.d(TAG, "Successfully parsed release info: version=$versionName, hasDownloadUrl=${downloadUrl.isNotBlank()}")
+                    UpdateInfo(versionName, downloadUrl, releaseNotes)
                 }
-                val releaseNotes = json.optString("body", "")
-                
-                UpdateInfo(versionName, downloadUrl, releaseNotes)
-            } else {
-                Log.w(TAG, "GitHub API returned error code: $responseCode")
-                null
+                HttpURLConnection.HTTP_NOT_FOUND -> {
+                    Log.w(TAG, "Repository not found (404)")
+                    null
+                }
+                HttpURLConnection.HTTP_FORBIDDEN -> {
+                    Log.w(TAG, "Access forbidden (403) - rate limit or permissions")
+                    null
+                }
+                HttpURLConnection.HTTP_UNAVAILABLE -> {
+                    Log.w(TAG, "Service unavailable (503)")
+                    null
+                }
+                else -> {
+                    Log.w(TAG, "GitHub API returned unexpected error code: $responseCode")
+                    null
+                }
             }
+        } catch (e: java.net.SocketTimeoutException) {
+            Log.e(TAG, "Timeout while fetching latest release", e)
+            null
+        } catch (e: java.net.UnknownHostException) {
+            Log.e(TAG, "Unknown host while fetching latest release", e)
+            null
+        } catch (e: java.net.ConnectException) {
+            Log.e(TAG, "Connection failed while fetching latest release", e)
+            null
+        } catch (e: org.json.JSONException) {
+            Log.e(TAG, "JSON parsing error while fetching latest release", e)
+            null
         } catch (e: Exception) {
-            Log.e(TAG, "Error fetching latest release", e)
+            Log.e(TAG, "Unexpected error while fetching latest release", e)
             null
         } finally {
-            connection?.disconnect()
+            try {
+                connection?.disconnect()
+            } catch (e: Exception) {
+                Log.w(TAG, "Error disconnecting from GitHub API", e)
+            }
         }
     }
     
@@ -180,6 +226,7 @@ class UpdateManager(private val context: Context) {
     suspend fun checkForUpdatesWithResult(): UpdateResult = withContext(Dispatchers.IO) {
         try {
             if (!isNetworkAvailable()) {
+                Log.w(TAG, "No network connection available")
                 return@withContext UpdateResult(false, error = "Нет интернет-соединения")
             }
             
@@ -191,7 +238,19 @@ class UpdateManager(private val context: Context) {
             }
             
             if (latestRelease == null) {
+                Log.w(TAG, "Failed to fetch latest release information")
                 return@withContext UpdateResult(false, error = "Не удалось получить информацию об обновлениях")
+            }
+            
+            // Валидация полученных данных
+            if (latestRelease.versionName.isBlank()) {
+                Log.w(TAG, "Invalid version name received: '${latestRelease.versionName}'")
+                return@withContext UpdateResult(false, error = "Получена некорректная информация о версии")
+            }
+            
+            if (latestRelease.downloadUrl.isBlank()) {
+                Log.w(TAG, "No download URL available for version: ${latestRelease.versionName}")
+                return@withContext UpdateResult(false, error = "Ссылка для загрузки недоступна")
             }
             
             Log.d(TAG, "Latest version: ${latestRelease.versionName}")
@@ -203,9 +262,18 @@ class UpdateManager(private val context: Context) {
                 Log.i(TAG, "No updates available")
                 UpdateResult(true, null)
             }
+        } catch (e: java.net.SocketTimeoutException) {
+            Log.e(TAG, "Network timeout during update check", e)
+            UpdateResult(false, error = "Превышено время ожидания. Проверьте соединение.")
+        } catch (e: java.net.UnknownHostException) {
+            Log.e(TAG, "Unknown host during update check", e)
+            UpdateResult(false, error = "Не удалось подключиться к серверу обновлений")
+        } catch (e: java.net.ConnectException) {
+            Log.e(TAG, "Connection failed during update check", e)
+            UpdateResult(false, error = "Ошибка подключения к серверу")
         } catch (e: Exception) {
-            Log.e(TAG, "Error checking for updates", e)
-            UpdateResult(false, error = "Ошибка при проверке обновлений: ${e.message}")
+            Log.e(TAG, "Unexpected error during update check", e)
+            UpdateResult(false, error = "Неожиданная ошибка при проверке обновлений: ${e.message}")
         }
     }
     

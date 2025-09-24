@@ -16,11 +16,29 @@ import com.example.slavgorodbus.MainActivity
 import com.example.slavgorodbus.R
 import java.util.Locale
 
+/**
+ * Вспомогательный класс для работы с уведомлениями
+ * 
+ * Основные функции:
+ * - Создание канала уведомлений
+ * - Отображение уведомлений о времени отправления автобусов
+ * - Обработка разрешений для уведомлений
+ */
 object NotificationHelper {
+    // ID канала уведомлений
     private const val CHANNEL_ID = "bus_departure_channel"
+    // Название канала уведомлений
     private const val CHANNEL_NAME = "Уведомления об отправлении"
+    // Базовый ID для уведомлений
     private const val NOTIFICATION_ID_BASE = 1000
 
+    /**
+     * Создает канал уведомлений для Android 8.0+
+     * 
+     * Настраивает канал с высоким приоритетом для уведомлений о времени отправления
+     * 
+     * @param context контекст приложения
+     */
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -36,6 +54,19 @@ object NotificationHelper {
         }
     }
 
+    /**
+     * Отображает уведомление о времени отправления автобуса
+     * 
+     * Создает уведомление с информацией о маршруте, времени отправления и точке отправления.
+     * Проверяет разрешения для Android 13+ и обрабатывает ошибки.
+     * 
+     * @param context контекст приложения
+     * @param favoriteTimeId ID избранного времени
+     * @param routeInfo информация о маршруте
+     * @param departureTimeInfo время отправления
+     * @param destinationInfo информация о пункте назначения (не используется)
+     * @param departurePointInfo информация о точке отправления
+     */
     fun showDepartureNotification(
         context: Context,
         favoriteTimeId: String,

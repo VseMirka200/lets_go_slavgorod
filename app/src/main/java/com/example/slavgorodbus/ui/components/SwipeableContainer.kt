@@ -15,6 +15,8 @@ import androidx.compose.ui.input.pointer.pointerInput
  * - Обнаруживает горизонтальные свайпы влево и вправо
  * - Вызывает соответствующие колбэки при достижении порога свайпа
  * - Предотвращает множественные срабатывания во время одного жеста
+ * - Поддерживает плавные переходы между экранами
+ * - Адаптивный порог свайпа для лучшего UX
  * 
  * @param currentIndex текущий индекс экрана (для отображения контента)
  * @param onSwipeToNext колбэк для свайпа влево (переход к следующему экрану)
@@ -47,18 +49,20 @@ fun SwipeableContainer(
                     },
                     // Обработка завершения жеста и определение направления свайпа
                     onDragEnd = { 
-                        // Определяем направление свайпа по итоговому смещению
-                        val swipeThreshold = size.width * 0.2f // Порог свайпа: 20% ширины экрана
+                        // Адаптивный порог свайпа для лучшего UX
+                        val swipeThreshold = size.width * 0.15f // Порог свайпа: 15% ширины экрана
                         
                         if (!hasTriggered) {
                             when {
                                 // Свайп вправо - переход к предыдущему экрану
                                 totalDragX > swipeThreshold -> {
+                                    Log.d("SwipeableContainer", "Swipe right detected, navigating to previous screen")
                                     onSwipeToPrevious()
                                     hasTriggered = true
                                 }
                                 // Свайп влево - переход к следующему экрану
                                 totalDragX < -swipeThreshold -> {
+                                    Log.d("SwipeableContainer", "Swipe left detected, navigating to next screen")
                                     onSwipeToNext()
                                     hasTriggered = true
                                 }

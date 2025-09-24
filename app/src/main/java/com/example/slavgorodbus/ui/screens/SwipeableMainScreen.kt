@@ -19,15 +19,23 @@ import com.example.slavgorodbus.ui.viewmodel.ThemeViewModel
  * Главный экран с поддержкой свайп-навигации между основными разделами
  * 
  * Функциональность:
- * - Объединяет три основных экрана: Главная, Избранное, Настройки
- * - Поддерживает свайп-навигацию между экранами
+ * - Объединяет четыре основных экрана: Главная, Избранное, Настройки, О программе
+ * - Поддерживает горизонтальные свайпы для переключения между экранами
  * - Синхронизируется с нижней навигацией
  * - Сохраняет состояние экранов при переключении
+ * - Адаптивные пороги свайпа для лучшего UX
+ * 
+ * Порядок экранов:
+ * 0 - Главная (список маршрутов)
+ * 1 - Избранное (сохраненные маршруты)
+ * 2 - Настройки (конфигурация приложения)
+ * 3 - О программе (информация и поддержка)
  * 
  * @param navController контроллер навигации для управления переходами
  * @param busViewModel ViewModel для управления данными автобусов
  * @param themeViewModel ViewModel для управления темой приложения
  * @param modifier модификатор для настройки внешнего вида
+ * @param forceSettingsIndex принудительно показать экран настроек
  */
 @Composable
 fun SwipeableMainScreen(
@@ -44,6 +52,7 @@ fun SwipeableMainScreen(
     // Вычисляем текущий индекс на основе маршрута
     val currentIndex = when {
         forceSettingsIndex -> 2 // Принудительно показываем настройки
+        currentScreenRoute == Screen.About.route -> 3 // О программе
         currentScreenRoute == Screen.Settings.route -> 2 // Настройки
         currentScreenRoute == Screen.FavoriteTimes.route -> 1 // Избранное
         currentScreenRoute == Screen.Home.route -> 0 // Главная
@@ -95,10 +104,22 @@ fun SwipeableMainScreen(
             )
             2 -> {
                 SettingsScreen(
-                    themeViewModel = themeViewModel,
-                    onNavigateToAbout = {
-                        Log.d("SwipeableMainScreen", "Navigating to About screen")
-                        navController.navigate(Screen.About.route)
+                    themeViewModel = themeViewModel
+                )
+            }
+            3 -> {
+                AboutScreen(
+                    onBackClick = {
+                        // Возвращаемся на главную при нажатии "Назад" в свайп-режиме
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    onDonateClick = {
+                        navController.navigate("donation_form")
                     }
                 )
             }

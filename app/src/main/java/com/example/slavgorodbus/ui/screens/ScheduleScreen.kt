@@ -32,8 +32,8 @@ import androidx.compose.runtime.collectAsState
 
 const val STOP_SLAVGORD_RYNOK = "Славгород (Рынок)"
 const val STOP_YAROVOE_MCHS = "Яровое (МЧС-128)"
-const val STOP_VOKZAL = "Вокзал"
-const val STOP_SOVHOZ = "Совхоз"
+const val STOP_VOKZAL = "Вокзала"
+const val STOP_SOVHOZ = "Совхоза"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

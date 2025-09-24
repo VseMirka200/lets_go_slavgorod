@@ -20,13 +20,34 @@ import java.util.Calendar
 import java.util.Locale
 import java.time.DayOfWeek
 
+/**
+ * Менеджер планирования уведомлений о времени отправления автобусов
+ * 
+ * Основные функции:
+ * - Планирование уведомлений с учетом пользовательских настроек
+ * - Отмена уведомлений при удалении избранного времени
+ * - Обновление всех уведомлений при изменении настроек
+ * - Поддержка различных режимов уведомлений (все дни/будни/выбранные дни/отключено)
+ */
 object AlarmScheduler {
 
+    // Префикс для кодов запросов будильников
     private const val ALARM_REQUEST_CODE_PREFIX = Constants.ALARM_REQUEST_CODE_PREFIX
+    // Время опережения уведомления (5 минут до отправления)
     private const val FIVE_MINUTES_IN_MILLIS = Constants.NOTIFICATION_LEAD_TIME_MINUTES * 60 * 1000L
 
     /**
      * Проверяет, должны ли отправляться уведомления в соответствии с настройками пользователя
+     * 
+     * Учитывает различные режимы уведомлений:
+     * - DISABLED: уведомления отключены
+     * - ALL_DAYS: уведомления каждый день
+     * - WEEKDAYS: уведомления только в будни
+     * - SELECTED_DAYS: уведомления в выбранные дни недели
+     * 
+     * @param context контекст приложения для доступа к настройкам
+     * @param favoriteTime избранное время для проверки
+     * @return true если уведомление должно быть отправлено
      */
     private fun shouldSendNotification(context: Context, favoriteTime: FavoriteTime): Boolean {
         return try {
@@ -90,6 +111,15 @@ object AlarmScheduler {
         }
     }
 
+    /**
+     * Планирует уведомление для избранного времени
+     * 
+     * Создает точный будильник за 5 минут до времени отправления автобуса.
+     * Учитывает настройки пользователя и совместимость с версиями Android.
+     * 
+     * @param context контекст приложения
+     * @param favoriteTime избранное время для планирования уведомления
+     */
     fun scheduleAlarm(context: Context, favoriteTime: FavoriteTime) {
         if (!shouldSendNotification(context, favoriteTime)) {
             Log.d("AlarmScheduler", "Notification skipped for ${favoriteTime.id} due to user settings")

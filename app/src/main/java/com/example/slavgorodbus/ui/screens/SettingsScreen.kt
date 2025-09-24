@@ -40,6 +40,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.core.net.toUri
 
+/**
+ * Экран настроек приложения
+ * 
+ * Содержит настройки для:
+ * - Темы приложения (светлая/темная/системная)
+ * - Уведомлений (режимы: все дни/будни/выбранные дни/отключено)
+ * - Обновлений (автоматические/ручные/отключено)
+ * 
+ * @param modifier модификатор для настройки внешнего вида
+ * @param themeViewModel ViewModel для управления темой приложения
+ * @param notificationSettingsViewModel ViewModel для настроек уведомлений
+ * @param updateSettingsViewModel ViewModel для настроек обновлений (опционально)
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +61,6 @@ fun SettingsScreen(
     themeViewModel: ThemeViewModel = viewModel(),
     notificationSettingsViewModel: NotificationSettingsViewModel = viewModel(),
     updateSettingsViewModel: UpdateSettingsViewModel? = null,
-    onNavigateToAbout: () -> Unit,
 ) {
     val context = LocalContext.current
     val updateSettingsVM = updateSettingsViewModel ?: viewModel(
@@ -182,14 +194,6 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            Text(
-                text = stringResource(R.string.settings_section_about_title),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            AboutSettingsCard(
-                onNavigateToAbout = onNavigateToAbout
-            )
         }
     }
 
@@ -208,6 +212,20 @@ fun SettingsScreen(
 
 }
 
+/**
+ * Карточка настроек темы приложения
+ * 
+ * Позволяет пользователю выбрать тему:
+ * - Системная (следует настройкам устройства)
+ * - Светлая
+ * - Темная
+ * 
+ * @param currentAppTheme текущая выбранная тема
+ * @param showThemeDropdown флаг отображения выпадающего меню
+ * @param onShowThemeDropdownChange callback для изменения состояния меню
+ * @param themeOptions доступные варианты тем
+ * @param onThemeSelected callback для выбора темы
+ */
 @Composable
 fun ThemeSettingsCard(
     currentAppTheme: AppTheme,
@@ -296,6 +314,21 @@ fun ThemeSettingsCard(
     }
 }
 
+/**
+ * Карточка настроек уведомлений
+ * 
+ * Позволяет настроить режим уведомлений:
+ * - Все дни: уведомления каждый день
+ * - Только будни: уведомления с понедельника по пятницу
+ * - Выбранные дни: уведомления в выбранные дни недели
+ * - Отключено: уведомления не приходят
+ * 
+ * @param currentNotificationMode текущий режим уведомлений
+ * @param showNotificationModeDropdown флаг отображения выпадающего меню
+ * @param onShowNotificationModeDropdownChange callback для изменения состояния меню
+ * @param notificationModeOptions доступные режимы уведомлений
+ * @param onNotificationModeSelected callback для выбора режима
+ */
 @Composable
 fun NotificationSettingsCard(
     currentNotificationMode: NotificationMode,
@@ -387,39 +420,6 @@ fun NotificationSettingsCard(
 }
 
 
-@Composable
-fun AboutSettingsCard(
-    onNavigateToAbout: () -> Unit,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { 
-                Log.d("SettingsScreen", "AboutSettingsCard clicked")
-                onNavigateToAbout() 
-            },
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Info,
-                contentDescription = stringResource(R.string.settings_about_icon_desc),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(Modifier.width(16.dp))
-            Text(
-                text = stringResource(R.string.about_screen_title),
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

@@ -89,7 +89,7 @@
     <string name="developer_section_title">Разработал: VseMirka200</string>
     <string name="links_section_title">Ссылки:</string>
     <string name="link_text_github">GitHub</string>
-    <string name="developer_github_url_value">https://github.com/VseMirka200/Lets-go-Slavgorod</string>
+    <string name="developer_github_url_value">https://github.com/VseMirka200/Lets_go_Slavgorod</string>
     <string name="error_no_browser">Не удалось открыть ссылку. Проверьте, установлен ли браузер.</string>
     <string name="feedback_section_title">Обратная связь</string>
     <string name="feedback_link_text">Написать в Telegram</string>

@@ -37,6 +37,7 @@ import com.example.slavgorodbus.ui.animations.NavigationAnimations
 import com.example.slavgorodbus.ui.navigation.BottomNavigation
 import com.example.slavgorodbus.ui.navigation.Screen
 import com.example.slavgorodbus.ui.screens.AboutScreen
+import com.example.slavgorodbus.ui.screens.DonationFormScreen
 import com.example.slavgorodbus.ui.screens.RouteDetailsScreen
 import com.example.slavgorodbus.ui.screens.ScheduleScreen
 import com.example.slavgorodbus.ui.screens.SwipeableMainScreen
@@ -46,12 +47,23 @@ import com.example.slavgorodbus.ui.viewmodel.BusViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModel
 import com.example.slavgorodbus.ui.viewmodel.ThemeViewModelFactory
 
+/**
+ * Главная активность приложения "Поехали! Славгород"
+ * 
+ * Основные функции:
+ * - Управление разрешениями для уведомлений
+ * - Инициализация темы приложения
+ * - Настройка навигации между экранами
+ * - Обработка точных будильников для уведомлений
+ */
 class MainActivity : ComponentActivity() {
 
+    // ViewModel для управления темой приложения
     private val themeViewModel: ThemeViewModel by viewModels {
         ThemeViewModelFactory(this)
     }
 
+    // Launcher для запроса разрешения на уведомления
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -61,6 +73,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    /**
+     * Запрашивает разрешение на отправку уведомлений
+     * 
+     * Проверяет версию Android и соответствующие разрешения:
+     * - Android 13+: POST_NOTIFICATIONS
+     * - Старые версии: точные будильники
+     */
     private fun askNotificationPermission() {
         when {
             Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
@@ -82,6 +101,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Проверяет разрешение на точные будильники
+     * 
+     * Необходимо для корректной работы уведомлений о времени отправления автобусов
+     */
     private fun checkExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(ALARM_SERVICE) as? AlarmManager
@@ -107,6 +131,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Основной Composable компонент приложения
+ * 
+ * Настраивает:
+ * - Тему приложения (светлая/темная/системная)
+ * - Навигацию между экранами
+ * - Нижнюю панель навигации
+ * 
+ * @param themeViewModel ViewModel для управления темой
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BusScheduleApp(themeViewModel: ThemeViewModel) {
@@ -145,6 +179,21 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
     }
 }
 
+/**
+ * Навигационный хост приложения
+ * 
+ * Определяет маршруты между экранами:
+ * - Главная: список маршрутов
+ * - Избранное: сохраненные маршруты
+ * - Настройки: конфигурация приложения
+ * - О программе: информация и поддержка
+ * - Детали маршрута: расписание конкретного маршрута
+ * 
+ * @param navController контроллер навигации
+ * @param modifier модификатор для настройки внешнего вида
+ * @param busViewModel ViewModel для работы с данными маршрутов
+ * @param themeViewModel ViewModel для управления темой
+ */
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -227,19 +276,24 @@ fun AppNavHost(
 
         composable(
             route = Screen.About.route,
-            enterTransition = { NavigationAnimations.scaleIn },
-            exitTransition = { NavigationAnimations.scaleOut }
+            enterTransition = { NavigationAnimations.slideInFromRight },
+            exitTransition = { NavigationAnimations.slideOutToLeft }
         ) {
-            Log.d("AppNavHost", "Displaying AboutScreen for route: ${Screen.About.route}")
-            AboutScreen(
-                onBackClick = { 
-                    navController.navigate(Screen.Settings.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            inclusive = false
-                        }
-                        launchSingleTop = true
-                    }
-                }
+            Log.d("AppNavHost", "Displaying SwipeableMainScreen for About route: ${Screen.About.route}")
+            SwipeableMainScreen(
+                navController = navController,
+                busViewModel = busViewModel,
+                themeViewModel = themeViewModel
+            )
+        }
+        
+        composable(
+            route = "donation_form",
+            enterTransition = { NavigationAnimations.slideInFromRight },
+            exitTransition = { NavigationAnimations.slideOutToLeft }
+        ) {
+            DonationFormScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
     }

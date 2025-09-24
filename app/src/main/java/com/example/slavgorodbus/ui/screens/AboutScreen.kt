@@ -8,6 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,11 +29,26 @@ import com.example.slavgorodbus.BuildConfig
 import com.example.slavgorodbus.R
 import androidx.core.net.toUri
 
+/**
+ * Экран "О программе" - отображает информацию о приложении и разработчике
+ * 
+ * Содержит:
+ * - Название приложения и версию
+ * - Информацию о разработчике
+ * - Ссылки на GitHub и Telegram
+ * - Раздел поддержки разработчика с кнопками для благодарности
+ * 
+ * @param onBackClick callback для обработки нажатия кнопки "Назад"
+ * @param onDonateClick callback для обработки нажатия кнопки "Донат"
+ * @param modifier модификатор для настройки внешнего вида
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
     onBackClick: () -> Unit = {},
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    onDonateClick: () -> Unit = {},
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues()
 ) {
     val context = LocalContext.current
 
@@ -66,65 +87,359 @@ fun AboutScreen(
                 navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         )
-        Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .verticalScroll(rememberScrollState())
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
                     .padding(16.dp)
-                    .padding(bottom = 72.dp),
+                .verticalScroll(rememberScrollState()),
             ) {
+            // Раздел Информация о приложении
                 Text(
-                    text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                text = "Информация о приложении",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            AppInfoCard(
+                appName = stringResource(id = R.string.app_name),
+                developer = developerSectionTitleText,
+                version = appVersion
+            )
 
-                // Раздел Разработчик
-                Text(
-                    text = developerSectionTitleText,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
                 // Раздел Ссылки
                 Text(
-                    stringResource(id = R.string.links_section_title),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                ClickableLinkText(
-                    text = linkTextGitHub,
-                    url = developerGitHubUrl
-                )
-                Spacer(modifier = Modifier.height(24.dp))
+                text = "Ссылки",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            LinksCard(
+                githubUrl = developerGitHubUrl,
+                vkUrl = "https://vk.com/vsemirka200",
+                telegramUrl = feedbackTelegramUrl
+            )
+                
+            Spacer(Modifier.height(24.dp))
 
                 // Раздел Обратная связь
                 Text(
-                    text = feedbackSectionTitle,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                ClickableLinkText(
-                    text = feedbackLinkText,
-                    url = feedbackTelegramUrl
-                )
-            }
-
+                text = "Обратная связь",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            FeedbackCard()
+            
+            Spacer(Modifier.height(24.dp))
+            
+            // Раздел Поддержка разработчика
             Text(
-                text = stringResource(R.string.app_version_label, appVersion),
+                text = "Поддержка разработчика",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            SupportCard(onDonateClick = onDonateClick)
+        }
+    }
+}
+
+/**
+ * Карточка с информацией о приложении
+ */
+@Composable
+private fun AppInfoCard(
+    appName: String,
+    developer: String,
+    version: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Информация о приложении",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = appName,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = developer,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+            Text(
+                        text = "Версия: $version",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Карточка со ссылками
+ */
+@Composable
+private fun LinksCard(
+    githubUrl: String,
+    vkUrl: String,
+    telegramUrl: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            LinkItem(
+                text = "GitHub",
+                url = githubUrl,
+                icon = Icons.Default.Link
+            )
+            Spacer(Modifier.height(12.dp))
+            LinkItem(
+                text = "Вконтакте",
+                url = vkUrl,
+                icon = Icons.Default.Link
             )
         }
     }
 }
 
+/**
+ * Элемент ссылки в карточке
+ */
+@Composable
+private fun LinkItem(
+    text: String,
+    url: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    val context = LocalContext.current
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                try {
+                    context.startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e("AboutScreen", "Could not open URL: $url", e)
+                }
+            }
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
+            textDecoration = TextDecoration.Underline
+        )
+    }
+}
+
+/**
+ * Карточка поддержки разработчика
+ */
+@Composable
+private fun SupportCard(
+    onDonateClick: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Если приложение вам нравится, вы можете поддержать его разработку:",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(Modifier.height(16.dp))
+            
+            // Кнопки поддержки
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Кнопка "Донат"
+                OutlinedButton(
+                    onClick = onDonateClick,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("Донат")
+                }
+                
+                // Кнопка "Оценить"
+                OutlinedButton(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, "https://github.com/VseMirka200/Lets_go_Slavgorod".toUri())
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            Log.e("AboutScreen", "Could not open GitHub", e)
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("Оценить")
+                }
+            }
+            
+            Spacer(Modifier.height(12.dp))
+            
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Text(
+                        text = "💡 Способы поддержки:",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "• Оставить отзыв в Telegram\n• Поставить звезду на GitHub\n• Поделиться с друзьями\n• Сообщить об ошибках",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Карточка обратной связи
+ */
+@Composable
+private fun FeedbackCard() {
+    val context = LocalContext.current
+    val telegramBotUrl = "https://t.me/lets_go_slavgorod_bot"
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Есть вопросы или предложения? Напишите нам в Telegram!",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(Modifier.height(16.dp))
+            
+            // Кнопка обратной связи
+            Button(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
+                    try {
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Log.e("AboutScreen", "Could not open Telegram bot", e)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Feedback,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text("Обратная связь")
+            }
+            
+            Spacer(Modifier.height(12.dp))
+            
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    Text(
+                        text = "💬 Что можно сообщить:",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "• Ошибки в приложении\n" +
+                                "• Предложения по улучшению\n" +
+                                "• Вопросы по расписанию\n",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * Компонент для отображения кликабельной ссылки
+ * 
+ * Отображает текст как ссылку с подчеркиванием и открывает URL при нажатии.
+ * Оптимизирован для вертикального списка ссылок с выравниванием по левому краю.
+ * 
+ * @param text текст ссылки для отображения
+ * @param url URL для открытия при нажатии
+ * @param modifier модификатор для настройки внешнего вида
+ */
 @Composable
 private fun ClickableLinkText(
     text: String,
@@ -134,11 +449,13 @@ private fun ClickableLinkText(
     val localContext = LocalContext.current
     Text(
         text = text,
-        style = MaterialTheme.typography.bodyLarge.copy(
+        style = MaterialTheme.typography.bodyMedium.copy(
             color = MaterialTheme.colorScheme.primary,
             textDecoration = TextDecoration.Underline,
         ),
-        modifier = modifier.clickable {
+        textAlign = androidx.compose.ui.text.style.TextAlign.Start,
+        modifier = modifier
+            .clickable {
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             try {
                 localContext.startActivity(intent)

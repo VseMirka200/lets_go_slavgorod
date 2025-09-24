@@ -24,12 +24,28 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.firstOrNull
 
+/**
+ * Состояние UI для экрана с маршрутами
+ * 
+ * @param routes список доступных маршрутов
+ * @param isLoading флаг загрузки данных
+ * @param error сообщение об ошибке (если есть)
+ */
 data class BusUiState(
     val routes: List<BusRoute> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null
 )
 
+/**
+ * ViewModel для управления данными маршрутов и избранными временами
+ * 
+ * Основные функции:
+ * - Загрузка и поиск маршрутов
+ * - Управление избранными временами отправления
+ * - Планирование уведомлений для избранных времен
+ * - Интеграция с базой данных и системой уведомлений
+ */
 class BusViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(BusUiState())

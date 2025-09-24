@@ -19,6 +19,14 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 
+/**
+ * Режимы уведомлений о времени отправления автобусов
+ * 
+ * - WEEKDAYS: уведомления только в будни (понедельник-пятница)
+ * - ALL_DAYS: уведомления каждый день
+ * - SELECTED_DAYS: уведомления в выбранные пользователем дни недели
+ * - DISABLED: уведомления отключены
+ */
 enum class NotificationMode {
     WEEKDAYS,
     ALL_DAYS,
@@ -26,6 +34,15 @@ enum class NotificationMode {
     DISABLED
 }
 
+/**
+ * ViewModel для управления настройками уведомлений
+ * 
+ * Основные функции:
+ * - Управление режимами уведомлений (все дни/будни/выбранные дни/отключено)
+ * - Сохранение выбранных дней недели для уведомлений
+ * - Обновление всех активных уведомлений при изменении настроек
+ * - Интеграция с AlarmScheduler для планирования уведомлений
+ */
 class NotificationSettingsViewModel(application: Application) : AndroidViewModel(application) {
 
     private companion object {

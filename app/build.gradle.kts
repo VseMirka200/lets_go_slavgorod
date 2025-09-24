@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.slavgorodbus"
+    namespace = "com.example.lets_go_slavgorod"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.slavgorodbus"
+        applicationId = "com.example.lets_go_slavgorod"
         minSdk = 24
         //noinspection OldTargetApi
         targetSdk = 35

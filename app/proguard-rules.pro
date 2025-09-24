@@ -27,14 +27,14 @@
 -dontwarn androidx.compose.**
 
 # Keep data classes and entities
--keep class com.example.slavgorodbus.data.model.** { *; }
--keep class com.example.slavgorodbus.data.local.entity.** { *; }
+-keep class com.example.lets_go_slavgorod.data.model.** { *; }
+-keep class com.example.lets_go_slavgorod.data.local.entity.** { *; }
 
 # Keep ViewModels
--keep class com.example.slavgorodbus.ui.viewmodel.** { *; }
+-keep class com.example.lets_go_slavgorod.ui.viewmodel.** { *; }
 
 # Keep notification classes
--keep class com.example.slavgorodbus.notifications.** { *; }
+-keep class com.example.lets_go_slavgorod.notifications.** { *; }
 
 # Keep BroadcastReceiver classes
 -keep class * extends android.content.BroadcastReceiver { *; }
@@ -44,10 +44,10 @@
 -keep class android.app.PendingIntent { *; }
 
 # Keep Application class
--keep class com.example.slavgorodbus.BusApplication { *; }
+-keep class com.example.lets_go_slavgorod.BusApplication { *; }
 
 # Keep MainActivity
--keep class com.example.slavgorodbus.MainActivity { *; }
+-keep class com.example.lets_go_slavgorod.MainActivity { *; }
 
 # Optimize: Remove logging in release builds
 -assumenosideeffects class android.util.Log {

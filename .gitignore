@@ -99,3 +99,6 @@ Desktop.ini
 build/
 app/build/
 build/
+
+# Kotlin build cache
+.kotlin/

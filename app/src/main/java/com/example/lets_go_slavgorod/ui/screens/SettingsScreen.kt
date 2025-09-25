@@ -11,10 +11,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -25,8 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.example.lets_go_slavgorod.BuildConfig
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.ui.navigation.Screen
@@ -37,6 +45,7 @@ import com.example.lets_go_slavgorod.ui.viewmodel.NotificationSettingsViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateMode
+import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.Locale
@@ -48,6 +57,7 @@ import java.util.Locale
  * - Темы приложения (светлая/темная/системная)
  * - Уведомлений (режимы: все дни/будни/выбранные дни/отключено)
  * - Обновлений (автоматические/ручные/отключено)
+ * - О программе (информация о приложении, ссылки, обратная связь, поддержка)
  * 
  * @param modifier модификатор для настройки внешнего вида
  * @param themeViewModel ViewModel для управления темой приложения
@@ -98,29 +108,64 @@ fun SettingsScreen(
     
 
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.settings_screen_title),
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+    SettingsSwipeableContainer(
+        onSwipeToNext = {
+            // Свайп влево - переход к маршрутам
+            Log.d("SettingsScreen", "Swipe left detected, navigating to Home")
+            Log.d("SettingsScreen", "navController is null: ${navController == null}")
+            if (navController != null) {
+                try {
+                    // Простая навигация без сложных параметров
+                    navController.navigate(Screen.Home.route)
+                    Log.d("SettingsScreen", "Navigation to Home completed")
+                } catch (e: Exception) {
+                    Log.e("SettingsScreen", "Navigation to Home failed", e)
+                }
+            } else {
+                Log.e("SettingsScreen", "navController is null, cannot navigate")
+            }
+        },
+        onSwipeToPrevious = {
+            // Свайп вправо - переход к избранному
+            Log.d("SettingsScreen", "Swipe right detected, navigating to FavoriteTimes")
+            Log.d("SettingsScreen", "navController is null: ${navController == null}")
+            if (navController != null) {
+                try {
+                    // Простая навигация без сложных параметров
+                    navController.navigate(Screen.FavoriteTimes.route)
+                    Log.d("SettingsScreen", "Navigation to FavoriteTimes completed")
+                } catch (e: Exception) {
+                    Log.e("SettingsScreen", "Navigation to FavoriteTimes failed", e)
+                }
+            } else {
+                Log.e("SettingsScreen", "navController is null, cannot navigate")
+            }
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.settings_screen_title),
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-        ) {
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+            ) {
             Text(
                 text = stringResource(R.string.settings_section_theme_title),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -204,6 +249,17 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(24.dp))
 
+            // Раздел "О программе" - кнопка для перехода к отдельному экрану
+            Text(
+                text = stringResource(R.string.settings_section_about_title),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            AboutNavigationCard(
+                navController = navController
+            )
+            
+
         }
     }
 
@@ -218,6 +274,7 @@ fun SettingsScreen(
                 Log.d("SettingsScreen", "Selected days confirmed: $newSelectedDays")
             }
         )
+    }
     }
 
 }
@@ -796,3 +853,45 @@ private fun formatLastCheckTime(timestamp: Long): String {
     }
 }
 
+/**
+ * Карточка навигации к экрану "О программе"
+ */
+@Composable
+private fun AboutNavigationCard(
+    navController: NavController?
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    navController?.navigate(Screen.About.route)
+                }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = stringResource(R.string.settings_about_icon_desc),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(16.dp))
+                Text(
+                    text = stringResource(R.string.about_screen_title),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Перейти к разделу О программе",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}

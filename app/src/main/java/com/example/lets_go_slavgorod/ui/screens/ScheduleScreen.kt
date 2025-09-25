@@ -24,6 +24,9 @@ import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.data.model.BusSchedule
 import com.example.lets_go_slavgorod.ui.components.ScheduleCard
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
+import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
+import com.example.lets_go_slavgorod.ui.navigation.Screen
+import android.util.Log
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -40,7 +43,8 @@ const val STOP_SOVHOZ = "Совхоза"
 fun ScheduleScreen(
     route: BusRoute?,
     onBackClick: () -> Unit,
-    viewModel: BusViewModel
+    viewModel: BusViewModel,
+    navController: androidx.navigation.NavController? = null
 ) {
     val allSchedulesForRoute = remember(route) {
         if (route != null) {
@@ -96,48 +100,80 @@ fun ScheduleScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = route?.name ?: "Расписание",
-                        style = MaterialTheme.typography.titleLarge,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+    SettingsSwipeableContainer(
+        onSwipeToNext = {
+            // Свайп влево - переход к избранному
+            Log.d("ScheduleScreen", "Swipe left detected, navigating to FavoriteTimes")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.FavoriteTimes.route)
+                    Log.d("ScheduleScreen", "Navigation to FavoriteTimes completed")
+                } catch (e: Exception) {
+                    Log.e("ScheduleScreen", "Navigation to FavoriteTimes failed", e)
+                }
+            } else {
+                Log.e("ScheduleScreen", "navController is null, cannot navigate")
+            }
+        },
+        onSwipeToPrevious = {
+            // Свайп вправо - переход к настройкам
+            Log.d("ScheduleScreen", "Swipe right detected, navigating to Settings")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.Settings.route)
+                    Log.d("ScheduleScreen", "Navigation to Settings completed")
+                } catch (e: Exception) {
+                    Log.e("ScheduleScreen", "Navigation to Settings failed", e)
+                }
+            } else {
+                Log.e("ScheduleScreen", "navController is null, cannot navigate")
+            }
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = route?.name ?: "Расписание",
+                            style = MaterialTheme.typography.titleLarge,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад")
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            )
-        }
-    ) { paddingValues ->
-        if (route == null) {
-            NoRouteSelectedMessage(Modifier
-                .padding(paddingValues)
-                .fillMaxSize())
-        } else {
-            ScheduleListContent(
-                modifier = Modifier.padding(paddingValues),
-                route = route,
-                schedulesSlavgorod = schedulesSlavgorod,
-                schedulesYarovoe = schedulesYarovoe,
-                schedulesVokzal = schedulesVokzal,
-                schedulesSovhoz = schedulesSovhoz,
-                nextUpcomingSlavgorodId = nextUpcomingSlavgorodId,
-                nextUpcomingYarovoeId = nextUpcomingYarovoeId,
-                nextUpcomingVokzalId = nextUpcomingVokzalId,
-                nextUpcomingSovhozId = nextUpcomingSovhozId,
-                viewModel = viewModel
-            )
+            }
+        ) { paddingValues ->
+            if (route == null) {
+                NoRouteSelectedMessage(Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize())
+            } else {
+                ScheduleListContent(
+                    modifier = Modifier.padding(paddingValues),
+                    route = route,
+                    schedulesSlavgorod = schedulesSlavgorod,
+                    schedulesYarovoe = schedulesYarovoe,
+                    schedulesVokzal = schedulesVokzal,
+                    schedulesSovhoz = schedulesSovhoz,
+                    nextUpcomingSlavgorodId = nextUpcomingSlavgorodId,
+                    nextUpcomingYarovoeId = nextUpcomingYarovoeId,
+                    nextUpcomingVokzalId = nextUpcomingVokzalId,
+                    nextUpcomingSovhozId = nextUpcomingSovhozId,
+                    viewModel = viewModel
+                )
+            }
         }
     }
 }

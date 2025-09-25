@@ -21,15 +21,105 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import com.example.lets_go_slavgorod.R
 import com.example.lets_go_slavgorod.data.model.BusRoute
+import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
+import com.example.lets_go_slavgorod.ui.navigation.Screen
+import android.util.Log
+
+@Composable
+fun RouteNumberHeader(
+    routeNumber: String,
+    colorString: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    try {
+                        Color(colorString.toColorInt())
+                    } catch (_: IllegalArgumentException) {
+                        MaterialTheme.colorScheme.primary
+                    }.copy(alpha = 0.9f)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = routeNumber,
+                color = Color.White,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun DetailItem(label: String, value: String?, modifier: Modifier = Modifier) {
+    if (!value.isNullOrBlank()) {
+        Column(modifier = modifier.padding(bottom = 12.dp)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteDetailsScreen(
     route: BusRoute?,
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: androidx.navigation.NavController? = null
 ) {
-    Scaffold(
+    SettingsSwipeableContainer(
+        onSwipeToNext = {
+            // Свайп влево - переход к избранному
+            Log.d("RouteDetailsScreen", "Swipe left detected, navigating to FavoriteTimes")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.FavoriteTimes.route)
+                    Log.d("RouteDetailsScreen", "Navigation to FavoriteTimes completed")
+                } catch (e: Exception) {
+                    Log.e("RouteDetailsScreen", "Navigation to FavoriteTimes failed", e)
+                }
+            } else {
+                Log.e("RouteDetailsScreen", "navController is null, cannot navigate")
+            }
+        },
+        onSwipeToPrevious = {
+            // Свайп вправо - переход к настройкам
+            Log.d("RouteDetailsScreen", "Swipe right detected, navigating to Settings")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.Settings.route)
+                    Log.d("RouteDetailsScreen", "Navigation to Settings completed")
+                } catch (e: Exception) {
+                    Log.e("RouteDetailsScreen", "Navigation to Settings failed", e)
+                }
+            } else {
+                Log.e("RouteDetailsScreen", "navController is null, cannot navigate")
+            }
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -97,56 +187,4 @@ fun RouteDetailsScreen(
     }
 }
 
-@Composable
-private fun RouteNumberHeader(
-    routeNumber: String,
-    colorString: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    try {
-                        Color(colorString.toColorInt())
-                    } catch (_: IllegalArgumentException) {
-                        MaterialTheme.colorScheme.primary
-                    }.copy(alpha = 0.9f)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = routeNumber,
-                color = Color.White,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 28.sp
-                )
-            )
-        }
-    }
-}
-
-@Composable
-private fun DetailItem(label: String, value: String?, modifier: Modifier = Modifier) {
-    if (!value.isNullOrBlank()) {
-        Column(modifier = modifier.padding(bottom = 12.dp)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
 }

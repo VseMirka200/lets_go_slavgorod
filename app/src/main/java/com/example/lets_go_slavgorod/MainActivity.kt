@@ -36,8 +36,10 @@ import com.example.lets_go_slavgorod.ui.animations.NavigationAnimations
 import com.example.lets_go_slavgorod.ui.navigation.BottomNavigation
 import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.screens.AboutScreen
+import com.example.lets_go_slavgorod.ui.screens.HomeScreen
 import com.example.lets_go_slavgorod.ui.screens.RouteDetailsScreen
 import com.example.lets_go_slavgorod.ui.screens.ScheduleScreen
+import com.example.lets_go_slavgorod.ui.screens.SettingsScreen
 import com.example.lets_go_slavgorod.ui.screens.SwipeableMainScreen
 import com.example.lets_go_slavgorod.ui.screens.WebViewScreen
 import com.example.lets_go_slavgorod.ui.theme.lets_go_slavgorodTheme
@@ -210,10 +212,9 @@ fun AppNavHost(
             enterTransition = { NavigationAnimations.slideInFromRight },
             exitTransition = { NavigationAnimations.slideOutToLeft }
         ) {
-            SwipeableMainScreen(
+            HomeScreen(
                 navController = navController,
-                busViewModel = busViewModel,
-                themeViewModel = themeViewModel
+                viewModel = busViewModel
             )
         }
 
@@ -242,7 +243,8 @@ fun AppNavHost(
             ScheduleScreen(
                 route = route,
                 onBackClick = { navController.popBackStack() },
-                viewModel = busViewModel
+                viewModel = busViewModel,
+                navController = navController
             )
         }
 
@@ -256,7 +258,8 @@ fun AppNavHost(
             val route = busViewModel.getRouteById(routeId)
             RouteDetailsScreen(
                 route = route,
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                navController = navController
             )
         }
 
@@ -265,11 +268,9 @@ fun AppNavHost(
             enterTransition = { NavigationAnimations.slideInFromRight },
             exitTransition = { NavigationAnimations.slideOutToLeft }
         ) {
-            SwipeableMainScreen(
+            SettingsScreen(
                 navController = navController,
-                busViewModel = busViewModel,
-                themeViewModel = themeViewModel,
-                forceSettingsIndex = true
+                themeViewModel = themeViewModel
             )
         }
 
@@ -278,11 +279,9 @@ fun AppNavHost(
             enterTransition = { NavigationAnimations.slideInFromRight },
             exitTransition = { NavigationAnimations.slideOutToLeft }
         ) {
-            Log.d("AppNavHost", "Displaying SwipeableMainScreen for About route: ${Screen.About.route}")
-            SwipeableMainScreen(
+            AboutScreen(
                 navController = navController,
-                busViewModel = busViewModel,
-                themeViewModel = themeViewModel
+                onBackClick = { navController.popBackStack() }
             )
         }
         
@@ -297,10 +296,19 @@ fun AppNavHost(
         ) { backStackEntry ->
             val url = backStackEntry.arguments?.getString("url")?.decodeUrl() ?: ""
             val title = backStackEntry.arguments?.getString("title")?.decodeUrl() ?: "Веб-страница"
+            
+            // Определяем, нужен ли полноэкранный режим для страниц поддержки и платежей
+            val isFullScreen = url.contains("cloudtips.ru") || 
+                              url.contains("pay.") || 
+                              url.contains("donate") || 
+                              url.contains("support") ||
+                              url.contains("payment")
+            
             WebViewScreen(
                 navController = navController,
                 url = url,
-                title = title
+                title = title,
+                isFullScreen = isFullScreen
             )
         }
         

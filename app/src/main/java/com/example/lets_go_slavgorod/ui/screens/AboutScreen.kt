@@ -28,8 +28,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.BuildConfig
 import com.example.lets_go_slavgorod.R
-import androidx.core.net.toUri
+import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
 import com.example.lets_go_slavgorod.ui.navigation.Screen
+import androidx.core.net.toUri
 
 /**
  * Экран "О программе" - отображает информацию о приложении и разработчике
@@ -66,7 +67,38 @@ fun AboutScreen(
     val appVersion = BuildConfig.VERSION_NAME
     val feedbackTelegramUrl = "https://t.me/$feedbackTelegramBotUsername"
 
-    Column(modifier = modifier.fillMaxSize()) {
+    SettingsSwipeableContainer(
+        onSwipeToNext = {
+            // Свайп влево - переход к избранному
+            Log.d("AboutScreen", "Swipe left detected, navigating to FavoriteTimes")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.FavoriteTimes.route)
+                    Log.d("AboutScreen", "Navigation to FavoriteTimes completed")
+                } catch (e: Exception) {
+                    Log.e("AboutScreen", "Navigation to FavoriteTimes failed", e)
+                }
+            } else {
+                Log.e("AboutScreen", "navController is null, cannot navigate")
+            }
+        },
+        onSwipeToPrevious = {
+            // Свайп вправо - переход к настройкам
+            Log.d("AboutScreen", "Swipe right detected, navigating to Settings")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.Settings.route)
+                    Log.d("AboutScreen", "Navigation to Settings completed")
+                } catch (e: Exception) {
+                    Log.e("AboutScreen", "Navigation to Settings failed", e)
+                }
+            } else {
+                Log.e("AboutScreen", "navController is null, cannot navigate")
+            }
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
             title = {
                 Text(
@@ -130,7 +162,7 @@ fun AboutScreen(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            FeedbackCard()
+            FeedbackCard(navController = navController)
             
             Spacer(Modifier.height(24.dp))
             
@@ -140,8 +172,9 @@ fun AboutScreen(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            SupportCard()
+            SupportCard(navController = navController)
         }
+    }
     }
 }
 
@@ -279,7 +312,9 @@ private fun LinkItem(
  * Карточка поддержки разработчика
  */
 @Composable
-private fun SupportCard() {
+private fun SupportCard(
+    navController: NavController?
+) {
     val context = LocalContext.current
     
     Card(
@@ -305,11 +340,18 @@ private fun SupportCard() {
                 // Кнопка "Донат"
                 OutlinedButton(
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, "https://pay.cloudtips.ru/p/9bc2de2e".toUri())
-                        try {
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            Log.e("AboutScreen", "Could not open CloudTips", e)
+                        if (navController != null) {
+                            // Открываем ссылку в WebView внутри приложения
+                            val route = Screen.WebView.createRoute("https://pay.cloudtips.ru/p/9bc2de2e", "Поддержать разработчика")
+                            navController.navigate(route)
+                        } else {
+                            // Fallback: открываем в браузере
+                            val intent = Intent(Intent.ACTION_VIEW, "https://pay.cloudtips.ru/p/9bc2de2e".toUri())
+                            try {
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                Log.e("AboutScreen", "Could not open CloudTips", e)
+                            }
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -326,11 +368,18 @@ private fun SupportCard() {
                 // Кнопка "Оценить"
                 OutlinedButton(
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, "https://github.com/VseMirka200/lets_go_slavgorod".toUri())
-                        try {
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            Log.e("AboutScreen", "Could not open GitHub", e)
+                        if (navController != null) {
+                            // Открываем ссылку в WebView внутри приложения
+                            val route = Screen.WebView.createRoute("https://github.com/VseMirka200/lets_go_slavgorod", "GitHub")
+                            navController.navigate(route)
+                        } else {
+                            // Fallback: открываем в браузере
+                            val intent = Intent(Intent.ACTION_VIEW, "https://github.com/VseMirka200/lets_go_slavgorod".toUri())
+                            try {
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                Log.e("AboutScreen", "Could not open GitHub", e)
+                            }
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -377,9 +426,12 @@ private fun SupportCard() {
  * Карточка обратной связи
  */
 @Composable
-private fun FeedbackCard() {
+private fun FeedbackCard(
+    navController: NavController?
+) {
     val context = LocalContext.current
-    val telegramBotUrl = "https://t.me/lets_go_slavgorod_bot"
+    val feedbackTelegramBotUsername = stringResource(id = R.string.feedback_telegram_bot_username)
+    val telegramBotUrl = "https://t.me/$feedbackTelegramBotUsername"
     
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -399,11 +451,25 @@ private fun FeedbackCard() {
             // Кнопка обратной связи
             Button(
                 onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
                     try {
-                        context.startActivity(intent)
+                        // Пытаемся открыть в приложении Telegram
+                        val telegramIntent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
+                        telegramIntent.setPackage("org.telegram.messenger")
+                        context.startActivity(telegramIntent)
                     } catch (e: Exception) {
-                        Log.e("AboutScreen", "Could not open Telegram bot", e)
+                        try {
+                            // Fallback: открываем в браузере
+                            val intent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
+                            context.startActivity(intent)
+                        } catch (e2: Exception) {
+                            Log.e("AboutScreen", "Could not open Telegram bot", e2)
+                            // Показываем сообщение пользователю
+                            android.widget.Toast.makeText(
+                                context,
+                                "Не удалось открыть Telegram. Установите приложение Telegram.",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()

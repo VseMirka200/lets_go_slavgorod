@@ -23,16 +23,15 @@ data class BottomNavItem(
  * Список элементов нижней навигации приложения
  * 
  * Содержит основные экраны:
- * - Главная: основной экран с маршрутами
+ * - Маршруты: основной экран с маршрутами
  * - Избранное: сохраненные пользователем маршруты
- * - Настройки: конфигурация приложения
- * - О программе: информация о приложении и поддержка разработчика
+ * - Настройки: конфигурация приложения (включая раздел "О программе")
  */
 val bottomNavItems = listOf(
     BottomNavItem(
         route = Screen.Home.route,
         icon = Icons.Default.Home,
-        title = "Главная"
+        title = "Маршруты"
     ),
     BottomNavItem(
         route = Screen.FavoriteTimes.route,
@@ -43,10 +42,5 @@ val bottomNavItems = listOf(
         route = Screen.Settings.route,
         icon = Icons.Default.Settings,
         title = "Настройки"
-    ),
-    BottomNavItem(
-        route = Screen.About.route,
-        icon = Icons.Default.Info,
-        title = "О программе"
     )
 )

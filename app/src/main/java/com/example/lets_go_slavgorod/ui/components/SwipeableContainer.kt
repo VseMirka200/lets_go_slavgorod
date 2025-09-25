@@ -34,6 +34,7 @@ fun SwipeableContainer(
 ) {
     // Состояние для отслеживания общего расстояния свайпа
     var totalDragX by remember { mutableStateOf(0f) }
+    var totalDragY by remember { mutableStateOf(0f) }
     // Флаг для предотвращения множественных срабатываний
     var hasTriggered by remember { mutableStateOf(false) }
     
@@ -45,37 +46,48 @@ fun SwipeableContainer(
                     // Сброс состояния при начале жеста
                     onDragStart = { 
                         totalDragX = 0f
+                        totalDragY = 0f
                         hasTriggered = false
                     },
                     // Обработка завершения жеста и определение направления свайпа
                     onDragEnd = { 
                         // Адаптивный порог свайпа для лучшего UX
-                        val swipeThreshold = size.width * 0.15f // Порог свайпа: 15% ширины экрана
+                        val swipeThreshold = size.width * 0.2f // Порог свайпа: 20% ширины экрана
+                        val verticalThreshold = size.height * 0.1f // Порог вертикального движения: 10% высоты экрана
                         
                         if (!hasTriggered) {
-                            when {
-                                // Свайп вправо - переход к предыдущему экрану
-                                totalDragX > swipeThreshold -> {
-                                    Log.d("SwipeableContainer", "Swipe right detected, navigating to previous screen")
-                                    onSwipeToPrevious()
-                                    hasTriggered = true
-                                }
-                                // Свайп влево - переход к следующему экрану
-                                totalDragX < -swipeThreshold -> {
-                                    Log.d("SwipeableContainer", "Swipe left detected, navigating to next screen")
-                                    onSwipeToNext()
-                                    hasTriggered = true
+                            // Проверяем, что это горизонтальный свайп (не вертикальная прокрутка)
+                            val isHorizontalSwipe = kotlin.math.abs(totalDragX) > kotlin.math.abs(totalDragY) && 
+                                                  kotlin.math.abs(totalDragX) > swipeThreshold &&
+                                                  kotlin.math.abs(totalDragY) < verticalThreshold
+                            
+                            if (isHorizontalSwipe) {
+                                when {
+                                    // Свайп вправо - переход к предыдущему экрану
+                                    totalDragX > swipeThreshold -> {
+                                        Log.d("SwipeableContainer", "Swipe right detected, navigating to previous screen")
+                                        onSwipeToPrevious()
+                                        hasTriggered = true
+                                    }
+                                    // Свайп влево - переход к следующему экрану
+                                    totalDragX < -swipeThreshold -> {
+                                        Log.d("SwipeableContainer", "Swipe left detected, navigating to next screen")
+                                        onSwipeToNext()
+                                        hasTriggered = true
+                                    }
                                 }
                             }
                         }
                         
                         // Сброс состояния после обработки
                         totalDragX = 0f
+                        totalDragY = 0f
                     },
                     // Накопление расстояния свайпа
                     onDrag = { _, dragAmount ->
                         if (!hasTriggered) {
                             totalDragX += dragAmount.x
+                            totalDragY += dragAmount.y
                         }
                     }
                 )

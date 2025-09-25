@@ -33,6 +33,115 @@ import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.ui.components.SearchBar
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 import com.example.lets_go_slavgorod.ui.components.BusRouteCard
+import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
+import com.example.lets_go_slavgorod.ui.navigation.Screen
+import android.util.Log
+
+@Composable
+fun LoadingState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorState(errorMessage: String) {
+    Box(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DirectionsBus,
+                contentDescription = stringResource(R.string.error_icon_description),
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+            Text(
+                text = stringResource(id = R.string.error_loading_routes),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+            Text(
+                text = errorMessage.ifEmpty { stringResource(id = R.string.unknown_error) ?: "Неизвестная ошибка" },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun EmptyState(searchQuery: String) {
+    Box(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DirectionsBus,
+                contentDescription = stringResource(R.string.empty_state_icon_description),
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = if (searchQuery.isNotEmpty()) {
+                    "По запросу \"$searchQuery\" ничего не найдено"
+                } else {
+                    "Маршруты не найдены"
+                },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (searchQuery.isNotEmpty()) {
+                Text(
+                    text = "Попробуйте изменить поисковый запрос",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RoutesListState(
+    routes: List<BusRoute>,
+    navController: NavController,
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(vertical = 8.dp),
+        // Оптимизация: добавляем кэширование элементов
+        userScrollEnabled = true
+    ) {
+        items(
+            items = routes,
+            key = { route -> route.id },
+            // Оптимизация: добавляем content type для лучшей производительности
+            contentType = { BusRoute::class }
+        ) { route ->
+            BusRouteCard(
+                route = route,
+                onRouteClick = { clickedRoute ->
+                    navController.navigate("schedule/${clickedRoute.id}")
+                },
+                onInfoClick = { clickedRoute ->
+                    navController.navigate("routeDetails/${clickedRoute.id}")
+                }
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,10 +150,24 @@ fun HomeScreen(
     viewModel: BusViewModel,
     modifier: Modifier = Modifier
 ) {
+    Log.d("HomeScreen", "HomeScreen is being displayed")
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
 
-    Scaffold(
+    SettingsSwipeableContainer(
+        onSwipeToNext = {
+            // Свайп влево - переход к избранному
+            Log.d("HomeScreen", "Swipe left detected, navigating to FavoriteTimes")
+            navController.navigate(Screen.FavoriteTimes.route)
+        },
+        onSwipeToPrevious = {
+            // Свайп вправо - переход к настройкам
+            Log.d("HomeScreen", "Swipe right detected, navigating to Settings")
+            navController.navigate(Screen.Settings.route)
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
+        Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -85,105 +208,4 @@ fun HomeScreen(
     }
 }
 
-@Composable
-private fun LoadingState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorState(errorMessage: String) {
-    Box(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.DirectionsBus,
-                contentDescription = stringResource(R.string.error_icon_description),
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.error
-            )
-            Text(
-                text = stringResource(id = R.string.error_loading_routes),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.error
-            )
-            Text(
-                text = errorMessage.ifEmpty { stringResource(id = R.string.unknown_error) ?: "Неизвестная ошибка" },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyState(searchQuery: String) {
-    Box(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.DirectionsBus,
-                contentDescription = stringResource(R.string.empty_state_icon_description),
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = if (searchQuery.isNotEmpty()) stringResource(id = R.string.routes_not_found)
-                else stringResource(id = R.string.routes_unavailable),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            if (searchQuery.isNotEmpty()) {
-                Text(
-                    text = stringResource(id = R.string.try_changing_search_query),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun RoutesListState(
-    routes: List<BusRoute>,
-    navController: NavController,
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp),
-        // Оптимизация: добавляем кэширование элементов
-        userScrollEnabled = true
-    ) {
-        items(
-            items = routes,
-            key = { route -> route.id },
-            // Оптимизация: добавляем content type для лучшей производительности
-            contentType = { BusRoute::class }
-        ) { route ->
-            BusRouteCard(
-                route = route,
-                onRouteClick = { clickedRoute ->
-                    navController.navigate("schedule/${clickedRoute.id}")
-                },
-                onInfoClick = { clickedRoute ->
-                    navController.navigate("routeDetails/${clickedRoute.id}")
-                }
-            )
-        }
-    }
 }

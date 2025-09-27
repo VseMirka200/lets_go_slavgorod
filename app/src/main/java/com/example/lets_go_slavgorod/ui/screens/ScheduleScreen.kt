@@ -25,10 +25,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-const val STOP_SLAVGORD_RYNOK = "Славгород (Рынок)"
-const val STOP_YAROVOE_MCHS = "Яровое (МЧС-128)"
-const val STOP_VOKZAL = "Вокзала"
-const val STOP_SOVHOZ = "Совхоза"
+const val STOP_SLAVGORD_RYNOK = "Рынок (Славгород)"
+const val STOP_YAROVOE_MCHS = "МСЧ-128 (Яровое)"
+const val STOP_VOKZAL = "вокзал"
+const val STOP_SOVHOZ = "совхоз"
 
 /**
  * Экран расписания маршрута с детальной информацией
@@ -50,34 +50,44 @@ fun ScheduleScreen(
 ) {
     val allSchedulesForRoute = remember(route) {
         if (route != null) {
-            ScheduleUtils.generateSchedules(route.id)
+            val schedules = ScheduleUtils.generateSchedules(route.id)
+            Log.d("ScheduleScreen", "Generated ${schedules.size} schedules for route ${route.id}")
+            schedules
         } else {
             emptyList()
         }
     }
 
     val schedulesSlavgorod = remember(allSchedulesForRoute) {
-        allSchedulesForRoute
+        val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_SLAVGORD_RYNOK }
             .sortedBy { it.departureTime }
+        Log.d("ScheduleScreen", "Slavgorod schedules: ${filtered.size}")
+        filtered
     }
 
     val schedulesYarovoe = remember(allSchedulesForRoute) {
-        allSchedulesForRoute
+        val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_YAROVOE_MCHS }
             .sortedBy { it.departureTime }
+        Log.d("ScheduleScreen", "Yarovoe schedules: ${filtered.size}")
+        filtered
     }
 
     val schedulesVokzal = remember(allSchedulesForRoute) {
-        allSchedulesForRoute
+        val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_VOKZAL }
             .sortedBy { it.departureTime }
+        Log.d("ScheduleScreen", "Vokzal schedules: ${filtered.size}")
+        filtered
     }
 
     val schedulesSovhoz = remember(allSchedulesForRoute) {
-        allSchedulesForRoute
+        val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_SOVHOZ }
             .sortedBy { it.departureTime }
+        Log.d("ScheduleScreen", "Sovhoz schedules: ${filtered.size}")
+        filtered
     }
 
     // Определяем ближайшие рейсы для каждой точки отправления
@@ -122,7 +132,8 @@ fun ScheduleScreen(
                     route = route,
                     onBackClick = onBackClick
                 )
-            }
+            },
+            contentWindowInsets = WindowInsets(0)
         ) { paddingValues ->
             if (route == null) {
                 NoRouteSelectedMessage(Modifier
@@ -161,7 +172,8 @@ private fun getNextUpcomingScheduleId(schedules: List<BusSchedule>): String? {
     val currentTime = Calendar.getInstance()
     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     
-    return schedules.firstOrNull { schedule ->
+    // Находим все рейсы, которые еще не прошли сегодня
+    val upcomingToday = schedules.filter { schedule ->
         try {
             val departureTime = timeFormat.parse(schedule.departureTime)
             if (departureTime != null) {
@@ -171,12 +183,6 @@ private fun getNextUpcomingScheduleId(schedules: List<BusSchedule>): String? {
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
                 }
-                
-                // Если время уже прошло сегодня, проверяем завтра
-                if (scheduleCalendar.before(currentTime)) {
-                    scheduleCalendar.add(Calendar.DAY_OF_YEAR, 1)
-                }
-                
                 scheduleCalendar.after(currentTime)
             } else {
                 false
@@ -185,7 +191,18 @@ private fun getNextUpcomingScheduleId(schedules: List<BusSchedule>): String? {
             Log.e("ScheduleScreen", "Error parsing time: ${schedule.departureTime}", e)
             false
         }
-    }?.id
+    }
+    
+    // Если есть рейсы сегодня, возвращаем ближайший
+    if (upcomingToday.isNotEmpty()) {
+        Log.d("ScheduleScreen", "Found ${upcomingToday.size} upcoming departures today. Next: ${upcomingToday.first().departureTime}")
+        return upcomingToday.first().id
+    }
+    
+    // Если рейсов сегодня больше нет, возвращаем первый рейс завтра
+    val firstTomorrow = schedules.firstOrNull()
+    Log.d("ScheduleScreen", "No departures today. First tomorrow: ${firstTomorrow?.departureTime}")
+    return firstTomorrow?.id
 }
 
 /**

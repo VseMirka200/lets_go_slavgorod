@@ -51,7 +51,9 @@ fun ScheduleList(
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        // Оптимизация производительности
+        userScrollEnabled = true
     ) {
         // Секции для маршрута №102 (Славгород — Яровое)
         if (route.id == "102") {
@@ -59,14 +61,14 @@ fun ScheduleList(
             if (schedulesSlavgorod.isNotEmpty()) {
                 item {
                     ExpandableScheduleSection(
-                        title = "Отправление из Славгород (Рынок)",
+                        title = "Отправление из Рынок (Славгород)",
                         schedules = schedulesSlavgorod,
                         nextUpcomingScheduleId = nextUpcomingSlavgorodId,
                         isExpanded = isSlavgorodSectionExpanded,
                         onToggleExpand = { isSlavgorodSectionExpanded = !isSlavgorodSectionExpanded },
                         viewModel = viewModel,
                         route = route,
-                        departurePointForCheck = "Славгород (Рынок)"
+                        departurePointForCheck = "Рынок (Славгород)"
                     )
                 }
             }
@@ -75,14 +77,14 @@ fun ScheduleList(
             if (schedulesYarovoe.isNotEmpty()) {
                 item {
                     ExpandableScheduleSection(
-                        title = "Отправление из Яровое (МЧС-128)",
+                        title = "Отправление из МСЧ-128 (Яровое)",
                         schedules = schedulesYarovoe,
                         nextUpcomingScheduleId = nextUpcomingYarovoeId,
                         isExpanded = isYarovoeSectionExpanded,
                         onToggleExpand = { isYarovoeSectionExpanded = !isYarovoeSectionExpanded },
                         viewModel = viewModel,
                         route = route,
-                        departurePointForCheck = "Яровое (МЧС-128)"
+                        departurePointForCheck = "МСЧ-128 (Яровое)"
                     )
                 }
             }
@@ -94,14 +96,14 @@ fun ScheduleList(
             if (schedulesVokzal.isNotEmpty()) {
                 item {
                     ExpandableScheduleSection(
-                        title = "Отправление из Вокзала",
+                        title = "Отправление из вокзала",
                         schedules = schedulesVokzal,
                         nextUpcomingScheduleId = nextUpcomingVokzalId,
                         isExpanded = isVokzalSectionExpanded,
                         onToggleExpand = { isVokzalSectionExpanded = !isVokzalSectionExpanded },
                         viewModel = viewModel,
                         route = route,
-                        departurePointForCheck = "Вокзала"
+                        departurePointForCheck = "вокзал"
                     )
                 }
             }
@@ -110,14 +112,14 @@ fun ScheduleList(
             if (schedulesSovhoz.isNotEmpty()) {
                 item {
                     ExpandableScheduleSection(
-                        title = "Отправление из Совхоза",
+                        title = "Отправление из совхоза",
                         schedules = schedulesSovhoz,
                         nextUpcomingScheduleId = nextUpcomingSovhozId,
                         isExpanded = isSovhozSectionExpanded,
                         onToggleExpand = { isSovhozSectionExpanded = !isSovhozSectionExpanded },
                         viewModel = viewModel,
                         route = route,
-                        departurePointForCheck = "Совхоза"
+                        departurePointForCheck = "совхоз"
                     )
                 }
             }
@@ -161,36 +163,60 @@ private fun ExpandableScheduleSection(
                 .animateContentSize()
                 .padding(bottom = if (isExpanded && schedules.isNotEmpty()) 8.dp else 0.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onToggleExpand
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onToggleExpand
+                        )
+                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (isExpanded) "Свернуть" else "Развернуть",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (isExpanded) "Свернуть" else "Развернуть",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                
+                // Показываем ближайший рейс в свернутом виде
+                if (!isExpanded && nextUpcomingScheduleId != null) {
+                    val nextSchedule = schedules.find { it.id == nextUpcomingScheduleId }
+                    if (nextSchedule != null) {
+                        ScheduleCard(
+                            schedule = nextSchedule,
+                            isFavorite = favoriteTimesList.any { it.id == nextSchedule.id && it.isActive },
+                            onFavoriteClick = {
+                                val isCurrentlyFavorite = favoriteTimesList.any { it.id == nextSchedule.id && it.isActive }
+                                if (isCurrentlyFavorite) {
+                                    viewModel.removeFavoriteTime(nextSchedule.id)
+                                } else {
+                                    viewModel.addFavoriteTime(nextSchedule)
+                                }
+                            },
+                            isNextUpcoming = true,
+                            allSchedules = schedules,
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 8.dp)
+                        )
+                    }
+                }
             }
 
             AnimatedVisibility(visible = isExpanded) {
                 Column {
                     if (schedules.isNotEmpty()) {
-                        schedules.forEach { schedule ->
-                            if (schedules.first() != schedule) {
+                        schedules.forEachIndexed { index, schedule ->
+                            if (index > 0) {
                                 HorizontalDivider(modifier = Modifier.padding(start = 16.dp, end = 16.dp))
                             }
 

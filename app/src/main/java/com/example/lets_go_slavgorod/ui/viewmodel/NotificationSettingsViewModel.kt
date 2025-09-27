@@ -47,7 +47,9 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
 
     private companion object {
         val NOTIFICATION_MODE_KEY = stringPreferencesKey("notification_mode")
-        val SELECTED_DAYS_KEY = stringSetPreferencesKey("selected_notification_days") // ++ Ключ для выбранных дней ++
+        val SELECTED_DAYS_KEY = stringSetPreferencesKey("selected_notification_days")
+        val ROUTE_NOTIFICATION_MODE_KEY = stringPreferencesKey("route_notification_mode_")
+        val ROUTE_SELECTED_DAYS_KEY = stringSetPreferencesKey("route_selected_days_")
         const val TAG = "NotificationSettingsVM"
     }
 
@@ -123,6 +125,86 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to save selected notification days", e)
+            }
+        }
+    }
+
+    /**
+     * Получает настройки уведомлений для конкретного маршрута
+     */
+    fun getRouteNotificationMode(routeId: String): StateFlow<NotificationMode> =
+        getApplication<Application>().dataStore.data
+            .map { preferences ->
+                val modeName = preferences[stringPreferencesKey("${ROUTE_NOTIFICATION_MODE_KEY.name}$routeId")]
+                    ?: currentNotificationMode.value.name
+                try {
+                    NotificationMode.valueOf(modeName)
+                } catch (_: IllegalArgumentException) {
+                    currentNotificationMode.value
+                }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = currentNotificationMode.value
+            )
+
+    /**
+     * Получает выбранные дни для конкретного маршрута
+     */
+    fun getRouteSelectedDays(routeId: String): StateFlow<Set<DayOfWeek>> =
+        getApplication<Application>().dataStore.data
+            .map { preferences ->
+                val dayNames = preferences[stringSetPreferencesKey("${ROUTE_SELECTED_DAYS_KEY.name}$routeId")]
+                    ?: selectedNotificationDays.value
+                dayNames.mapNotNull { dayName ->
+                    try {
+                        DayOfWeek.valueOf(dayName)
+                    } catch (_: IllegalArgumentException) {
+                        null
+                    }
+                }.toSet()
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = selectedNotificationDays.value
+            )
+
+    /**
+     * Устанавливает режим уведомлений для конкретного маршрута
+     */
+    fun setRouteNotificationMode(routeId: String, mode: NotificationMode) {
+        viewModelScope.launch {
+            try {
+                getApplication<Application>().dataStore.edit { settings ->
+                    settings[stringPreferencesKey("${ROUTE_NOTIFICATION_MODE_KEY.name}$routeId")] = mode.name
+                    if (mode != NotificationMode.SELECTED_DAYS) {
+                        settings.remove(stringSetPreferencesKey("${ROUTE_SELECTED_DAYS_KEY.name}$routeId"))
+                    }
+                }
+                Log.d(TAG, "Route $routeId notification mode set to: ${mode.name}")
+                updateAllActiveAlarms()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save route notification mode", e)
+            }
+        }
+    }
+
+    /**
+     * Устанавливает выбранные дни для конкретного маршрута
+     */
+    fun setRouteSelectedDays(routeId: String, days: Set<DayOfWeek>) {
+        viewModelScope.launch {
+            try {
+                val dayNames = days.map { it.name }.toSet()
+                getApplication<Application>().dataStore.edit { settings ->
+                    settings[stringSetPreferencesKey("${ROUTE_SELECTED_DAYS_KEY.name}$routeId")] = dayNames
+                }
+                Log.d(TAG, "Route $routeId selected days saved: $dayNames")
+                updateAllActiveAlarms()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save route selected days", e)
             }
         }
     }

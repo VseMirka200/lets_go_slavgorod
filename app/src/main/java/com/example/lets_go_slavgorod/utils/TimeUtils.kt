@@ -137,8 +137,8 @@ object TimeUtils {
     fun formatTimeUntilDeparture(minutes: Int): String {
         return when {
             minutes < 1 -> "Сейчас"
-            minutes == 1 -> "Через 1 минуту"
-            minutes < 60 -> "Через $minutes мин"
+            minutes == 1 -> "1 минуту"
+            minutes < 60 -> " $minutes мин"
             else -> {
                 val hours = minutes / 60
                 val remainingMinutes = minutes % 60

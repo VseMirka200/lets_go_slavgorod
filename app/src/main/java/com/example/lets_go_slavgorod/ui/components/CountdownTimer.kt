@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lets_go_slavgorod.ui.theme.BusBlue
@@ -49,114 +50,125 @@ fun CountdownTimer(
     modifier: Modifier = Modifier
 ) {
     var currentTime by remember { mutableStateOf(Calendar.getInstance()) }
-    var timeUntilDeparture by remember { mutableStateOf<Int?>(null) }
-    var timeWithSeconds by remember { mutableStateOf<Pair<Int, Int>?>(null) }
-    var isNextDeparture by remember { mutableStateOf(false) }
     
-    // Анимация для пульсации ближайшего рейса
+    // Анимация пульсации для ближайшего рейса
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
+        initialValue = 0.7f,
+        targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = EaseInOut),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "pulse"
+        label = "pulseAlpha"
     )
     
-    // Обновляем время каждую секунду для ближайших рейсов, каждую минуту для остальных
-    LaunchedEffect(Unit) {
-        while (true) {
-            currentTime = Calendar.getInstance()
-            timeUntilDeparture = TimeUtils.getTimeUntilDeparture(schedule.departureTime, currentTime)
-            timeWithSeconds = TimeUtils.getTimeUntilDepartureWithSeconds(schedule.departureTime, currentTime)
-            isNextDeparture = TimeUtils.isNextDeparture(schedule, allSchedules, currentTime)
-            
-            // Для ближайших рейсов (менее 10 минут) обновляем каждую секунду
-            val updateInterval = if (timeUntilDeparture != null && timeUntilDeparture!! < 10) 1000L else 60000L
-            delay(updateInterval)
+    // Определяем, является ли этот рейс ближайшим
+    val isNextDeparture = remember(schedule, allSchedules, currentTime) {
+        allSchedules.isNotEmpty() && 
+        TimeUtils.getNextDeparture(allSchedules, currentTime)?.id == schedule.id
+    }
+    
+    // Обновляем время каждую секунду только для ближайшего рейса
+    LaunchedEffect(isNextDeparture) {
+        if (isNextDeparture) {
+            while (true) {
+                delay(1000)
+                currentTime = Calendar.getInstance()
+            }
         }
     }
     
-    // Обновляем время при изменении расписания
-    LaunchedEffect(schedule.departureTime) {
-        currentTime = Calendar.getInstance()
-        timeUntilDeparture = TimeUtils.getTimeUntilDeparture(schedule.departureTime, currentTime)
-        timeWithSeconds = TimeUtils.getTimeUntilDepartureWithSeconds(schedule.departureTime, currentTime)
-        isNextDeparture = TimeUtils.isNextDeparture(schedule, allSchedules, currentTime)
-        
+    // Вычисляем время до отправления
+    val timeWithSeconds = if (isNextDeparture) {
+        TimeUtils.getTimeUntilDepartureWithSeconds(schedule.departureTime, currentTime)
+    } else {
+        null
     }
     
-    // Отображаем компонент только если рейс еще не ушел
-    Log.d("CountdownTimer", "Schedule: ${schedule.departureTime}, timeUntilDeparture: $timeUntilDeparture, isNextDeparture: $isNextDeparture")
+    val timeUntilDeparture = if (isNextDeparture) {
+        timeWithSeconds?.first
+    } else {
+        TimeUtils.getTimeUntilDeparture(schedule.departureTime, currentTime)
+    }
     
-    timeUntilDeparture?.let { minutes ->
-        val formattedTime = if (timeWithSeconds != null && minutes < 10) {
-            // Для ближайших рейсов показываем секунды
-            TimeUtils.formatTimeUntilDepartureWithSeconds(
-                timeWithSeconds!!.first, 
-                timeWithSeconds!!.second, 
-                schedule.departureTime
-            )
-        } else {
-            // Для дальних рейсов показываем только минуты с точным временем
-            TimeUtils.formatTimeUntilDepartureWithExactTime(minutes, schedule.departureTime)
-        }
-        
+    val minutes = timeUntilDeparture ?: -1
+    
+    // Форматируем время для отображения
+    val formattedTime = if (isNextDeparture && timeWithSeconds != null) {
+        // Для ближайших рейсов показываем секунды
+        TimeUtils.formatTimeUntilDepartureWithSeconds(
+            timeWithSeconds.first, 
+            timeWithSeconds.second, 
+            schedule.departureTime
+        )
+    } else {
+        // Для дальних рейсов показываем только минуты с точным временем
+        TimeUtils.formatTimeUntilDepartureWithExactTime(minutes, schedule.departureTime)
+    }
+    
+    Log.d("CountdownTimer", "Formatted time: $formattedTime, minutes: $minutes")
+    
+    if (isNextDeparture && showLabel) {
+        // Для ближайшего рейса показываем только плашку
         Row(
-            modifier = modifier
-                .background(
-                    color = if (isNextDeparture) {
-                        MaterialTheme.colorScheme.primaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    },
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+            modifier = modifier.background(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha * 0.2f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Иконка часов
             Icon(
                 imageVector = Icons.Default.Schedule,
-                contentDescription = "Время до отправления",
-                tint = if (isNextDeparture) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                contentDescription = "Ближайший рейс",
+                tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = pulseAlpha),
                 modifier = Modifier.size(16.dp)
             )
-            
-            // Текст с временем (с лейблом "Ближайший рейс" если нужно)
-            Text(
-                text = if (showLabel && isNextDeparture) {
-                    "Ближайший рейс: $formattedTime"
-                } else {
-                    formattedTime
-                },
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = if (isNextDeparture) FontWeight.SemiBold else FontWeight.Medium
-                ),
-                color = if (isNextDeparture) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
-            )
-            
-            // Индикатор ближайшего рейса
-            if (isNextDeparture) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(MaterialTheme.colorScheme.primary)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "Ближайший рейс",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = pulseAlpha)
+                )
+                Text(
+                    text = "через ${formattedTime.replace("Через ", "")}",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = pulseAlpha)
                 )
             }
         }
+    } else {
+        // Для обычных рейсов показываем только время отсчёта
+        Text(
+            text = formattedTime,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = if (minutes < 0) FontWeight.Normal else FontWeight.Medium
+            ),
+            color = if (minutes < 0) {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            modifier = if (minutes >= 0) {
+                Modifier.background(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+            } else {
+                Modifier
+            }
+        )
     }
 }
 
@@ -171,110 +183,91 @@ fun NextDepartureHeader(
     allSchedules: List<BusSchedule>,
     modifier: Modifier = Modifier
 ) {
-    var currentTime by remember { mutableStateOf(Calendar.getInstance()) }
-    var nextDeparture by remember { mutableStateOf<BusSchedule?>(null) }
-    var timeUntilDeparture by remember { mutableStateOf<Int?>(null) }
-    var timeWithSeconds by remember { mutableStateOf<Pair<Int, Int>?>(null) }
+    val nextDeparture = TimeUtils.getNextDeparture(allSchedules)
     
-    // Анимация для пульсации
-    val infiniteTransition = rememberInfiniteTransition(label = "header_pulse")
-    val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse"
-    )
-    
-    // Обновляем время каждую секунду для ближайших рейсов, каждую минуту для остальных
-    LaunchedEffect(Unit) {
-        while (true) {
-            currentTime = Calendar.getInstance()
-            nextDeparture = TimeUtils.getNextDeparture(allSchedules, currentTime)
-            timeUntilDeparture = nextDeparture?.let { 
-                TimeUtils.getTimeUntilDeparture(it.departureTime, currentTime) 
+    if (nextDeparture != null) {
+        var currentTime by remember { mutableStateOf(Calendar.getInstance()) }
+        
+        // Анимация пульсации
+        val infiniteTransition = rememberInfiniteTransition(label = "headerPulse")
+        val pulseAlpha by infiniteTransition.animateFloat(
+            initialValue = 0.7f,
+            targetValue = 1.0f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1000, easing = EaseInOut),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "headerPulseAlpha"
+        )
+        
+        // Обновляем время каждую секунду
+        LaunchedEffect(nextDeparture.id) {
+            while (true) {
+                delay(1000)
+                currentTime = Calendar.getInstance()
             }
-            timeWithSeconds = nextDeparture?.let { 
-                TimeUtils.getTimeUntilDepartureWithSeconds(it.departureTime, currentTime) 
-            }
-            
-            // Для ближайших рейсов (менее 10 минут) обновляем каждую секунду
-            val updateInterval = if (timeUntilDeparture != null && timeUntilDeparture!! < 10) 1000L else 60000L
-            delay(updateInterval)
         }
-    }
-    
-    // Обновляем при изменении расписаний
-    LaunchedEffect(allSchedules) {
-        currentTime = Calendar.getInstance()
-        nextDeparture = TimeUtils.getNextDeparture(allSchedules, currentTime)
-        timeUntilDeparture = nextDeparture?.let { 
-            TimeUtils.getTimeUntilDeparture(it.departureTime, currentTime) 
+        
+        val timeWithSeconds = TimeUtils.getTimeUntilDepartureWithSeconds(nextDeparture.departureTime, currentTime)
+        val minutes = timeWithSeconds?.first ?: 0
+        
+        val formattedTime = if (timeWithSeconds != null) {
+            TimeUtils.formatTimeUntilDepartureWithSeconds(
+                timeWithSeconds.first,
+                timeWithSeconds.second,
+                nextDeparture.departureTime
+            )
+        } else {
+            "Сейчас"
         }
-        timeWithSeconds = nextDeparture?.let { 
-            TimeUtils.getTimeUntilDepartureWithSeconds(it.departureTime, currentTime) 
-        }
-    }
-    
-    nextDeparture?.let { departure ->
-        timeUntilDeparture?.let { minutes ->
-            val formattedTime = if (timeWithSeconds != null && minutes < 10) {
-                // Для ближайших рейсов показываем секунды
-                TimeUtils.formatTimeUntilDepartureWithSeconds(
-                    timeWithSeconds!!.first, 
-                    timeWithSeconds!!.second, 
-                    departure.departureTime
-                )
-            } else {
-                // Для дальних рейсов показываем только минуты с точным временем
-                TimeUtils.formatTimeUntilDepartureWithExactTime(minutes, departure.departureTime)
-            }
-            
-            
-            Card(
-                modifier = modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = "Ближайший рейс",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            text = "Ближайший рейс: $formattedTime",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    
-                    Text(
-                        text = "Отправление в ${departure.departureTime}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = "Ближайший рейс",
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha),
+                        modifier = Modifier.size(20.dp)
                     )
-                    
                     Text(
-                        text = "От ${departure.departurePoint}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        text = "Ближайший рейс",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha)
                     )
                 }
+                Text(
+                    text = "${nextDeparture.departureTime} • ${nextDeparture.departurePoint}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+            
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = formattedTime,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha),
+                    modifier = Modifier.background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha * 0.1f),
+                        shape = RoundedCornerShape(8.dp)
+                    ).padding(horizontal = 12.dp, vertical = 6.dp)
+                )
             }
         }
     }

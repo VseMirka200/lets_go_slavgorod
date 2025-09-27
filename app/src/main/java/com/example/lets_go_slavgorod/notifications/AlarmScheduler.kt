@@ -46,17 +46,30 @@ object AlarmScheduler {
      * - SELECTED_DAYS: уведомления в выбранные дни недели
      * 
      * @param context контекст приложения для доступа к настройкам
+     * @param routeId ID маршрута для проверки индивидуальных настроек
      * @return true если уведомление должно быть отправлено
      */
-    private fun shouldSendNotification(context: Context): Boolean {
+    private fun shouldSendNotification(context: Context, routeId: String? = null): Boolean {
         return try {
             val preferences = runBlocking { context.dataStore.data.first() }
             
-            val notificationModeString = preferences[stringPreferencesKey("notification_mode")] 
-                ?: NotificationMode.ALL_DAYS.name
+            // Проверяем индивидуальные настройки маршрута, если указан routeId
+            val (notificationModeString, selectedDaysString) = if (routeId != null) {
+                val routeMode = preferences[stringPreferencesKey("route_notification_mode_$routeId")]
+                val routeDays = preferences[stringSetPreferencesKey("route_selected_days_$routeId")]
+                if (routeMode != null) {
+                    routeMode to routeDays
+                } else {
+                    // Используем глобальные настройки
+                    preferences[stringPreferencesKey("notification_mode")] to preferences[stringSetPreferencesKey("selected_notification_days")]
+                }
+            } else {
+                // Используем глобальные настройки
+                preferences[stringPreferencesKey("notification_mode")] to preferences[stringSetPreferencesKey("selected_notification_days")]
+            }
             
             val notificationMode = try {
-                NotificationMode.valueOf(notificationModeString)
+                NotificationMode.valueOf(notificationModeString ?: NotificationMode.ALL_DAYS.name)
             } catch (_: IllegalArgumentException) {
                 Log.w("AlarmScheduler", "Invalid notification mode: $notificationModeString, defaulting to ALL_DAYS")
                 NotificationMode.ALL_DAYS
@@ -78,15 +91,14 @@ object AlarmScheduler {
                     isWeekday
                 }
                 NotificationMode.SELECTED_DAYS -> {
-                    val selectedDaysString = preferences[stringSetPreferencesKey("selected_notification_days")] ?: emptySet()
-                    val selectedDays = selectedDaysString.mapNotNull { dayName ->
+                    val selectedDays = selectedDaysString?.mapNotNull { dayName ->
                         try {
                             DayOfWeek.valueOf(dayName)
                         } catch (_: IllegalArgumentException) {
                             Log.w("AlarmScheduler", "Invalid day name in settings: $dayName")
                             null
                         }
-                    }.toSet()
+                    }?.toSet() ?: emptySet()
                     
                     val currentDayOfWeek = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
                         Calendar.SUNDAY -> DayOfWeek.SUNDAY

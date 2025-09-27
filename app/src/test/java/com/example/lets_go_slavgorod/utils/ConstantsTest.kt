@@ -83,7 +83,7 @@ class ConstantsTest {
     @Test
     fun `performance settings should be reasonable`() {
         assertTrue(Constants.MAX_SEARCH_RESULTS > 0)
-        assertTrue(Constants.DEBOUNCE_DELAY_MS > 0)
+        assertTrue(Constants.SEARCH_DEBOUNCE_DELAY > 0)
         assertTrue(Constants.SWIPE_THRESHOLD_PERCENT > 0f)
         assertTrue(Constants.SWIPE_THRESHOLD_PERCENT <= 1f)
         assertTrue(Constants.MIN_SWIPE_DISTANCE > 0)

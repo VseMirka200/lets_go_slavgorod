@@ -110,6 +110,7 @@ object NotificationHelper {
         )
 
         val smallIconResId = R.drawable.ic_stat_directions_bus
+        val largeIconResId = R.drawable.ic_stat_directions_bus
         val combinedTitleText = "$routeInfo ${departureTimeInfo.lowercase(Locale.getDefault())}"
         val subTextParts = mutableListOf<String>()
         if (departurePointInfo.isNotBlank()) {
@@ -120,6 +121,7 @@ object NotificationHelper {
         val contentSubText = subTextParts.joinToString(separator = ". ")
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(smallIconResId)
+            .setLargeIcon(android.graphics.BitmapFactory.decodeResource(context.resources, largeIconResId))
             .setContentTitle(combinedTitleText)
             .setContentText(contentSubText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

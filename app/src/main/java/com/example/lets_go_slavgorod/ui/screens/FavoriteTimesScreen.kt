@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.remember
@@ -97,7 +98,8 @@ fun FavoriteTimesScreen(
                     nestedGroupedTimes = nestedGroupedFavoriteTimes,
                     onToggleFavoriteActiveState = { favoriteTime: FavoriteTime, isActive: Boolean ->
                         viewModel.updateFavoriteActiveState(favoriteTime, isActive)
-                    }
+                    },
+                    navController = navController
                 )
             }
         }
@@ -153,7 +155,8 @@ private fun FEmptyState(modifier: Modifier = Modifier) {
 private fun FavoriteNestedGroupedList(
     modifier: Modifier = Modifier,
     nestedGroupedTimes: Map<Pair<String, String>, Map<String, List<FavoriteTime>>>,
-    onToggleFavoriteActiveState: (favoriteTime: FavoriteTime, isActive: Boolean) -> Unit
+    onToggleFavoriteActiveState: (favoriteTime: FavoriteTime, isActive: Boolean) -> Unit,
+    navController: NavController? = null
 ) {
     val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
 
@@ -173,23 +176,42 @@ private fun FavoriteNestedGroupedList(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(Modifier.padding(bottom = 8.dp)) {
-                        Text(
-                            text = if (routeName.isNotBlank()) {
-                                // Проверяем, содержит ли название уже номер маршрута
-                                if (routeName.contains("№$routeNumber")) {
-                                    routeName.trim()
-                                } else {
-                                    "${routeName.trim()} №$routeNumber"
-                                }
-                            } else {
-                                "Маршрут №$routeNumber"
-                            },
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = if (routeName.isNotBlank()) {
+                                    // Проверяем, содержит ли название уже номер маршрута
+                                    if (routeName.contains("№$routeNumber")) {
+                                        routeName.trim()
+                                    } else {
+                                        "${routeName.trim()} №$routeNumber"
+                                    }
+                                } else {
+                                    "Маршрут №$routeNumber"
+                                },
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.weight(1f)
+                            )
+                            
+                            // Кнопка настроек уведомлений для маршрута
+                            IconButton(
+                                onClick = { 
+                                    navController?.navigate("route_notifications/${routeNumber}")
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Настройки уведомлений",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
 
                         timesByDeparturePoint.forEach { (departurePoint, timesInDepartureGroup) ->
                             val departureGroupKey = "${routeKey}_${departurePoint}"

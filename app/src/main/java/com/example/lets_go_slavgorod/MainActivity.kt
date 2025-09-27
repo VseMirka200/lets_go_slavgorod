@@ -46,12 +46,14 @@ import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.screens.AboutScreen
 import com.example.lets_go_slavgorod.ui.screens.HomeScreen
 import com.example.lets_go_slavgorod.ui.screens.ScheduleScreen
+import com.example.lets_go_slavgorod.ui.screens.RouteNotificationSettingsScreen
 import com.example.lets_go_slavgorod.ui.screens.SettingsScreen
 import com.example.lets_go_slavgorod.ui.screens.SwipeableMainScreen
 import com.example.lets_go_slavgorod.ui.screens.WebViewScreen
 import com.example.lets_go_slavgorod.ui.theme.lets_go_slavgorodTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
+import com.example.lets_go_slavgorod.ui.viewmodel.NotificationSettingsViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModelFactory
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
@@ -170,6 +172,15 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
         }
     )
     
+    val notificationSettingsViewModel: NotificationSettingsViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return NotificationSettingsViewModel(localContext.applicationContext as Application) as T
+            }
+        }
+    )
+    
     // ViewModel для управления обновлениями
     val updateSettingsViewModel: UpdateSettingsViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -203,7 +214,8 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
                 navController = navController,
                 modifier = Modifier.padding(innerPadding),
                 busViewModel = busViewModel,
-                themeViewModel = themeViewModel
+                themeViewModel = themeViewModel,
+                notificationSettingsViewModel = notificationSettingsViewModel
             )
             
             // Глобальный диалог обновления
@@ -245,7 +257,8 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     busViewModel: BusViewModel,
-    themeViewModel: ThemeViewModel
+    themeViewModel: ThemeViewModel,
+    notificationSettingsViewModel: NotificationSettingsViewModel
 ) {
     NavHost(
         navController = navController,
@@ -317,6 +330,25 @@ fun AppNavHost(
             )
         }
         
+        composable(
+            route = "route_notifications/{routeId}",
+            arguments = listOf(
+                navArgument("routeId") { type = NavType.StringType }
+            ),
+            enterTransition = { NavigationAnimations.slideInFromRight },
+            exitTransition = { NavigationAnimations.slideOutToLeft }
+        ) { backStackEntry ->
+            val routeId = backStackEntry.arguments?.getString("routeId") ?: ""
+            val route = busViewModel.getRouteById(routeId)
+            if (route != null) {
+                RouteNotificationSettingsScreen(
+                    route = route,
+                    notificationSettingsViewModel = notificationSettingsViewModel,
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+        }
+
         composable(
             route = "webview/{url}/{title}",
             arguments = listOf(

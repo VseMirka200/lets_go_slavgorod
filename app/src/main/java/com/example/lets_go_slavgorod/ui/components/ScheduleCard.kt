@@ -38,7 +38,7 @@ fun ScheduleCard(
     ) {
         Row(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -63,30 +63,48 @@ fun ScheduleCard(
                     }
                 }
 
-                Text(
-                    text = "Отправление в ${schedule.departureTime}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = if (isNextUpcoming) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = 18.sp
-                    ),
-                    color = if (isNextUpcoming) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                )
-
-                // Объединенный элемент: "Ближайший рейс" + обратный отсчет
                 if (isNextUpcoming) {
-                    CountdownTimer(
-                        schedule = schedule,
-                        allSchedules = allSchedules,
-                        showLabel = true, // Показываем "Ближайший рейс" внутри CountdownTimer
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                    // Для ближайшего рейса: вертикальное расположение с правильными отступами
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Отправление в ${schedule.departureTime}",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            ),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        
+                        CountdownTimer(
+                            schedule = schedule,
+                            allSchedules = allSchedules,
+                            showLabel = true,
+                            modifier = Modifier
+                        )
+                    }
                 } else {
-                    CountdownTimer(
-                        schedule = schedule,
-                        allSchedules = allSchedules,
-                        showLabel = false, // Не показываем "Ближайший рейс" для обычных рейсов
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                    // Для обычных рейсов: стандартная структура
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Отправление в ${schedule.departureTime}",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 18.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        
+                        CountdownTimer(
+                            schedule = schedule,
+                            allSchedules = allSchedules,
+                            showLabel = false,
+                            modifier = Modifier
+                        )
+                    }
                 }
 
                 schedule.notes?.let { notes ->

@@ -22,11 +22,11 @@ class ScheduleUtilsTest {
         }
         
         // Проверяем, что есть расписания из Славгорода
-        val slavgorodSchedules = schedules.filter { it.departurePoint == "Славгород (Рынок)" }
+        val slavgorodSchedules = schedules.filter { it.departurePoint == "Рынок (Славгород)" }
         assertTrue("Should have schedules from Slavgorod", slavgorodSchedules.isNotEmpty())
         
         // Проверяем, что есть расписания из Ярового
-        val yarovoeSchedules = schedules.filter { it.departurePoint == "Яровое (МЧС-128)" }
+        val yarovoeSchedules = schedules.filter { it.departurePoint == "МСЧ-128 (Яровое)" }
         assertTrue("Should have schedules from Yarovoe", yarovoeSchedules.isNotEmpty())
     }
     
@@ -43,11 +43,11 @@ class ScheduleUtilsTest {
         }
         
         // Проверяем, что есть расписания из Вокзала
-        val vokzalSchedules = schedules.filter { it.departurePoint == "Вокзала" }
+        val vokzalSchedules = schedules.filter { it.departurePoint == "вокзал" }
         assertTrue("Should have schedules from Vokzal", vokzalSchedules.isNotEmpty())
         
         // Проверяем, что есть расписания из Совхоза
-        val sovhozSchedules = schedules.filter { it.departurePoint == "Совхоза" }
+        val sovhozSchedules = schedules.filter { it.departurePoint == "совхоз" }
         assertTrue("Should have schedules from Sovhoz", sovhozSchedules.isNotEmpty())
     }
     

@@ -35,18 +35,15 @@ object Constants {
     const val DATABASE_NAME = "bus_app_database"  // Имя файла базы данных
     const val DATABASE_VERSION = 4               // Версия схемы базы данных
     
-    // Поиск
+    // Поиск и производительность
     const val SEARCH_DEBOUNCE_DELAY = 300L       // Задержка перед поиском (мс)
+    const val MAX_SEARCH_RESULTS = 100           // Максимальное количество результатов поиска
+    const val SWIPE_THRESHOLD_PERCENT = 0.2f    // Порог свайпа (20% ширины экрана)
+    const val MIN_SWIPE_DISTANCE = 120f         // Минимальное расстояние свайпа (пиксели)
     
     // Кэширование
     const val CACHE_SIZE = 50                    // Максимальный размер кэша (элементов)
     const val CACHE_EXPIRE_TIME_HOURS = 24      // Время жизни кэша (часы)
-    
-    // Оптимизация производительности
-    const val MAX_SEARCH_RESULTS = 100           // Максимальное количество результатов поиска
-    const val DEBOUNCE_DELAY_MS = 300L          // Задержка debounce для поиска (мс)
-    const val SWIPE_THRESHOLD_PERCENT = 0.2f    // Порог свайпа (20% ширины экрана)
-    const val MIN_SWIPE_DISTANCE = 150f         // Минимальное расстояние свайпа (пиксели)
     
     // Логирование (уровни важности)
     const val LOG_LEVEL_DEBUG = 0  // Отладочная информация

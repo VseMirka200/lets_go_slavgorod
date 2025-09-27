@@ -1,20 +1,22 @@
 package com.example.lets_go_slavgorod.utils
 
-import android.util.Log
 import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
 import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import com.example.lets_go_slavgorod.data.model.BusRoute
 import timber.log.Timber
 
 /**
- * Расширения для работы с логами и преобразованиями данных
+ * Утилиты и расширения для работы с данными и логированием
  * 
  * Основные функции:
- * - Удобное логирование ошибок
- * - Преобразование Entity в модель данных
+ * - Удобное логирование через Timber
+ * - Преобразование Entity в модели данных
+ * - Поиск и фильтрация маршрутов
+ * - Создание объектов BusRoute
  * 
  * @author VseMirka200
- * @version 1.0
+ * @version 1.1
+ * @since 1.0
  */
 
 /**

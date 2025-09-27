@@ -83,28 +83,28 @@ fun AboutScreen(
 
     SettingsSwipeableContainer(
         onSwipeToNext = {
-            // Свайп влево - переход к избранному
-            Log.d("AboutScreen", "Swipe left detected, navigating to FavoriteTimes")
+            // Свайп влево - переход к маршрутам
+            Log.d("AboutScreen", "Swipe left detected, navigating to Home")
             if (navController != null) {
                 try {
-                    navController.navigate(Screen.FavoriteTimes.route)
-                    Log.d("AboutScreen", "Navigation to FavoriteTimes completed")
+                    navController.navigate(Screen.Home.route)
+                    Log.d("AboutScreen", "Navigation to Home completed")
                 } catch (e: Exception) {
-                    Log.e("AboutScreen", "Navigation to FavoriteTimes failed", e)
+                    Log.e("AboutScreen", "Navigation to Home failed", e)
                 }
             } else {
                 Log.e("AboutScreen", "navController is null, cannot navigate")
             }
         },
         onSwipeToPrevious = {
-            // Свайп вправо - переход к настройкам
-            Log.d("AboutScreen", "Swipe right detected, navigating to Settings")
+            // Свайп вправо - переход к избранному
+            Log.d("AboutScreen", "Swipe right detected, navigating to FavoriteTimes")
             if (navController != null) {
                 try {
-                    navController.navigate(Screen.Settings.route)
-                    Log.d("AboutScreen", "Navigation to Settings completed")
+                    navController.navigate(Screen.FavoriteTimes.route)
+                    Log.d("AboutScreen", "Navigation to FavoriteTimes completed")
                 } catch (e: Exception) {
-                    Log.e("AboutScreen", "Navigation to Settings failed", e)
+                    Log.e("AboutScreen", "Navigation to FavoriteTimes failed", e)
                 }
             } else {
                 Log.e("AboutScreen", "navController is null, cannot navigate")

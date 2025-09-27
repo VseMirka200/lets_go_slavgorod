@@ -16,6 +16,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -132,10 +134,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        askNotificationPermission()
-
         setContent {
             BusScheduleApp(themeViewModel = themeViewModel)
+        }
+        
+        // Запрашиваем разрешения асинхронно, чтобы не блокировать UI
+        lifecycleScope.launch {
+            askNotificationPermission()
         }
     }
 }

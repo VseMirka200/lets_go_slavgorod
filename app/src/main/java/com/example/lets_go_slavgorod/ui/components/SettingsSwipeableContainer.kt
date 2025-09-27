@@ -26,6 +26,7 @@ fun SettingsSwipeableContainer(
     var totalDragX by remember { mutableFloatStateOf(0f) }
     var totalDragY by remember { mutableFloatStateOf(0f) }
     var hasTriggered by remember { mutableStateOf(false) }
+    var dragStartTime by remember { mutableLongStateOf(0L) }
     
     Box(
         modifier = modifier
@@ -36,19 +37,25 @@ fun SettingsSwipeableContainer(
                         totalDragX = 0f
                         totalDragY = 0f
                         hasTriggered = false
+                        dragStartTime = System.currentTimeMillis()
                         Log.d("SettingsSwipeableContainer", "Drag started")
                     },
                     onDragEnd = { 
-                        Log.d("SettingsSwipeableContainer", "Drag ended: X=$totalDragX, Y=$totalDragY")
+                        val dragDuration = System.currentTimeMillis() - dragStartTime
+                        Log.d("SettingsSwipeableContainer", "Drag ended: X=$totalDragX, Y=$totalDragY, Duration=${dragDuration}ms")
                         
                         if (!hasTriggered) {
-                            // Более строгие условия для свайпа
-                            val minSwipeDistance = 150f // Минимальное расстояние свайпа
-                            val maxVerticalMovement = 100f // Максимальное вертикальное движение
+                            // Улучшенные условия для свайпа
+                            val minSwipeDistance = 120f // Уменьшено для более чувствительного свайпа
+                            val maxVerticalMovement = 80f // Уменьшено для более точного определения
+                            val maxSwipeDuration = 800L // Максимальная длительность свайпа
+                            val minSwipeDuration = 100L // Минимальная длительность свайпа
                             
                             val isHorizontalSwipe = kotlin.math.abs(totalDragX) > minSwipeDistance &&
                                                    kotlin.math.abs(totalDragY) < maxVerticalMovement &&
-                                                   kotlin.math.abs(totalDragX) > kotlin.math.abs(totalDragY) * 2
+                                                   kotlin.math.abs(totalDragX) > kotlin.math.abs(totalDragY) * 1.5f &&
+                                                   dragDuration <= maxSwipeDuration &&
+                                                   dragDuration >= minSwipeDuration
                             
                             if (isHorizontalSwipe) {
                                 when {
@@ -64,7 +71,7 @@ fun SettingsSwipeableContainer(
                                     }
                                 }
                             } else {
-                                Log.d("SettingsSwipeableContainer", "Not a horizontal swipe")
+                                Log.d("SettingsSwipeableContainer", "Not a valid horizontal swipe")
                             }
                         }
                         
@@ -75,6 +82,22 @@ fun SettingsSwipeableContainer(
                         if (!hasTriggered) {
                             totalDragX += dragAmount.x
                             totalDragY += dragAmount.y
+                            
+                            // Предварительное определение направления свайпа
+                            val currentDistance = kotlin.math.abs(totalDragX)
+                            val currentVertical = kotlin.math.abs(totalDragY)
+                            
+                            // Если уже достаточно движения для определения свайпа
+                            if (currentDistance > 80f && currentDistance > currentVertical * 1.2f) {
+                                when {
+                                    totalDragX > 0 -> {
+                                        Log.d("SettingsSwipeableContainer", "Swipe right in progress")
+                                    }
+                                    totalDragX < 0 -> {
+                                        Log.d("SettingsSwipeableContainer", "Swipe left in progress")
+                                    }
+                                }
+                            }
                         }
                     }
                 )

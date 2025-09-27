@@ -90,28 +90,28 @@ fun RouteDetailsScreen(
 ) {
     SettingsSwipeableContainer(
         onSwipeToNext = {
-            // Свайп влево - переход к избранному
-            Log.d("RouteDetailsScreen", "Swipe left detected, navigating to FavoriteTimes")
+            // Свайп влево - переход к маршрутам
+            Log.d("RouteDetailsScreen", "Swipe left detected, navigating to Home")
             if (navController != null) {
                 try {
-                    navController.navigate(Screen.FavoriteTimes.route)
-                    Log.d("RouteDetailsScreen", "Navigation to FavoriteTimes completed")
+                    navController.navigate(Screen.Home.route)
+                    Log.d("RouteDetailsScreen", "Navigation to Home completed")
                 } catch (e: Exception) {
-                    Log.e("RouteDetailsScreen", "Navigation to FavoriteTimes failed", e)
+                    Log.e("RouteDetailsScreen", "Navigation to Home failed", e)
                 }
             } else {
                 Log.e("RouteDetailsScreen", "navController is null, cannot navigate")
             }
         },
         onSwipeToPrevious = {
-            // Свайп вправо - переход к настройкам
-            Log.d("RouteDetailsScreen", "Swipe right detected, navigating to Settings")
+            // Свайп вправо - переход к избранному
+            Log.d("RouteDetailsScreen", "Swipe right detected, navigating to FavoriteTimes")
             if (navController != null) {
                 try {
-                    navController.navigate(Screen.Settings.route)
-                    Log.d("RouteDetailsScreen", "Navigation to Settings completed")
+                    navController.navigate(Screen.FavoriteTimes.route)
+                    Log.d("RouteDetailsScreen", "Navigation to FavoriteTimes completed")
                 } catch (e: Exception) {
-                    Log.e("RouteDetailsScreen", "Navigation to Settings failed", e)
+                    Log.e("RouteDetailsScreen", "Navigation to FavoriteTimes failed", e)
                 }
             } else {
                 Log.e("RouteDetailsScreen", "navController is null, cannot navigate")

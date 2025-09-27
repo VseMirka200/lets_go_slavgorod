@@ -107,8 +107,8 @@ fun ScheduleScreen(
             }
         },
         onSwipeToPrevious = {
-            Log.d("ScheduleScreen", "Swipe right detected - navigating to Home")
-            navController?.navigate(Screen.Home.route) {
+            Log.d("ScheduleScreen", "Swipe right detected - navigating to Settings")
+            navController?.navigate(Screen.Settings.route) {
                 popUpTo(Screen.Home.route) { inclusive = false }
                 launchSingleTop = true
                 restoreState = true

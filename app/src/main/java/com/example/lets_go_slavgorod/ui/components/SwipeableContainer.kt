@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import com.example.lets_go_slavgorod.utils.Constants
 
 /**
  * Контейнер для обработки горизонтальных свайп-жестов
@@ -33,9 +34,10 @@ fun SwipeableContainer(
     content: @Composable (Int) -> Unit
 ) {
     // Состояние для отслеживания общего расстояния свайпа
-    var totalDragX by remember { mutableStateOf(0f) }
-    var totalDragY by remember { mutableStateOf(0f) }
-    // Флаг для предотвращения множественных срабатываний
+    // Используем mutableFloatStateOf для оптимизации производительности
+    var totalDragX by remember { mutableFloatStateOf(0f) }
+    var totalDragY by remember { mutableFloatStateOf(0f) }
+    // Флаг для предотвращения множественных срабатываний во время одного жеста
     var hasTriggered by remember { mutableStateOf(false) }
     
     Box(
@@ -44,6 +46,7 @@ fun SwipeableContainer(
             .pointerInput(Unit) {
                 detectDragGestures(
                     // Сброс состояния при начале жеста
+                    // Инициализируем все переменные для нового жеста
                     onDragStart = { 
                         totalDragX = 0f
                         totalDragY = 0f
@@ -52,11 +55,12 @@ fun SwipeableContainer(
                     // Обработка завершения жеста и определение направления свайпа
                     onDragEnd = { 
                         // Адаптивный порог свайпа для лучшего UX
-                        val swipeThreshold = size.width * 0.2f // Порог свайпа: 20% ширины экрана
+                        val swipeThreshold = size.width * Constants.SWIPE_THRESHOLD_PERCENT
                         val verticalThreshold = size.height * 0.1f // Порог вертикального движения: 10% высоты экрана
                         
                         if (!hasTriggered) {
                             // Проверяем, что это горизонтальный свайп (не вертикальная прокрутка)
+                            // Условия: горизонтальное движение больше вертикального И превышает порог И вертикальное движение меньше порога
                             val isHorizontalSwipe = kotlin.math.abs(totalDragX) > kotlin.math.abs(totalDragY) && 
                                                   kotlin.math.abs(totalDragX) > swipeThreshold &&
                                                   kotlin.math.abs(totalDragY) < verticalThreshold

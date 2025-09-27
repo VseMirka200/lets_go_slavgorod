@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,14 +36,13 @@ import com.example.lets_go_slavgorod.utils.Constants
 fun BusRouteCard(
     route: BusRoute,
     onRouteClick: (BusRoute) -> Unit,
-    onInfoClick: (BusRoute) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Оптимизация: кэшируем вычисления цвета
     val primaryColor = MaterialTheme.colorScheme.primary
     val boxBackgroundColor = remember(route.color, primaryColor) {
         try {
-            Color(route.color.toColorInt()).copy(alpha = Constants.COLOR_ALPHA)
+            androidx.compose.ui.graphics.Color(route.color.toColorInt()).copy(alpha = Constants.COLOR_ALPHA)
         } catch (_: IllegalArgumentException) {
             primaryColor.copy(alpha = Constants.COLOR_ALPHA)
         }
@@ -85,7 +83,7 @@ fun BusRouteCard(
                 ) {
                     Text(
                         text = route.routeNumber,
-                        color = Color.White,
+                        color = androidx.compose.ui.graphics.Color.White,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -96,20 +94,12 @@ fun BusRouteCard(
 
                 Text(
                     text = route.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(end = Constants.PADDING_SMALL.dp)
-                )
-            }
-
-            IconButton(onClick = { onInfoClick(route) }) {
-                Icon(
-                    imageVector = Icons.Filled.Info,
-                    contentDescription = "Подробная информация о маршруте ${route.name}",
-                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }

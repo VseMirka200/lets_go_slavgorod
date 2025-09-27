@@ -1,5 +1,6 @@
 package com.example.lets_go_slavgorod
 
+// Android системные импорты
 import android.Manifest
 import android.app.AlarmManager
 import android.app.Application
@@ -7,11 +8,14 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+
+// Compose импорты
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,6 +27,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+
+// ViewModel импорты
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,7 +43,6 @@ import com.example.lets_go_slavgorod.ui.navigation.BottomNavigation
 import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.screens.AboutScreen
 import com.example.lets_go_slavgorod.ui.screens.HomeScreen
-import com.example.lets_go_slavgorod.ui.screens.RouteDetailsScreen
 import com.example.lets_go_slavgorod.ui.screens.ScheduleScreen
 import com.example.lets_go_slavgorod.ui.screens.SettingsScreen
 import com.example.lets_go_slavgorod.ui.screens.SwipeableMainScreen
@@ -47,6 +52,8 @@ import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModelFactory
+import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
+import com.example.lets_go_slavgorod.ui.components.UpdateDialogManager
 
 /**
  * Главная активность приложения "Поехали! Славгород"
@@ -120,6 +127,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -142,6 +150,7 @@ class MainActivity : ComponentActivity() {
  * 
  * @param themeViewModel ViewModel для управления темой
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BusScheduleApp(themeViewModel: ThemeViewModel) {
@@ -156,12 +165,27 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
         }
     )
     
+    // ViewModel для управления обновлениями
+    val updateSettingsViewModel: UpdateSettingsViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return UpdateSettingsViewModel(localContext) as T
+            }
+        }
+    )
+    
     val currentAppTheme by themeViewModel.currentTheme.collectAsState()
     val useDarkTheme = when (currentAppTheme) {
         AppTheme.SYSTEM -> isSystemInDarkTheme()
         AppTheme.LIGHT -> false
         AppTheme.DARK -> true
     }
+
+    // Данные о доступном обновлении
+    val availableUpdateVersion by updateSettingsViewModel.availableUpdateVersion.collectAsState(initial = null)
+    val availableUpdateUrl by updateSettingsViewModel.availableUpdateUrl.collectAsState(initial = null)
+    val availableUpdateNotes by updateSettingsViewModel.availableUpdateNotes.collectAsState(initial = null)
 
     lets_go_slavgorodTheme(darkTheme = useDarkTheme) {
         Scaffold(
@@ -175,6 +199,21 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
                 modifier = Modifier.padding(innerPadding),
                 busViewModel = busViewModel,
                 themeViewModel = themeViewModel
+            )
+            
+            // Глобальный диалог обновления
+            UpdateDialogManager(
+                availableUpdateVersion = availableUpdateVersion,
+                availableUpdateUrl = availableUpdateUrl,
+                availableUpdateNotes = availableUpdateNotes,
+                onDownloadUpdate = { url ->
+                    // Открываем ссылку в WebView внутри приложения
+                    val route = Screen.WebView.createRoute(url, "Скачать обновление")
+                    navController.navigate(route)
+                },
+                onClearAvailableUpdate = {
+                    updateSettingsViewModel.clearAvailableUpdate()
+                }
             )
         }
     }
@@ -195,6 +234,7 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
  * @param busViewModel ViewModel для работы с данными маршрутов
  * @param themeViewModel ViewModel для управления темой
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -212,9 +252,10 @@ fun AppNavHost(
             enterTransition = { NavigationAnimations.slideInFromRight },
             exitTransition = { NavigationAnimations.slideOutToLeft }
         ) {
-            HomeScreen(
+            SwipeableMainScreen(
                 navController = navController,
-                viewModel = busViewModel
+                busViewModel = busViewModel,
+                themeViewModel = themeViewModel
             )
         }
 
@@ -248,20 +289,6 @@ fun AppNavHost(
             )
         }
 
-        composable(
-            route = "routeDetails/{routeId}",
-            arguments = listOf(navArgument("routeId") { type = NavType.StringType }),
-            enterTransition = { NavigationAnimations.slideInFromBottom },
-            exitTransition = { NavigationAnimations.slideOutToBottom }
-        ) { backStackEntry ->
-            val routeId = backStackEntry.arguments?.getString("routeId") ?: ""
-            val route = busViewModel.getRouteById(routeId)
-            RouteDetailsScreen(
-                route = route,
-                onBackClick = { navController.popBackStack() },
-                navController = navController
-            )
-        }
 
         composable(
             route = Screen.Settings.route,

@@ -12,23 +12,16 @@
 package com.example.lets_go_slavgorod.updates
 
 import android.content.Context
-import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import java.net.HttpURLConnection
-import kotlin.math.max
 import java.net.URL
+import kotlin.math.max
 
 /**
  * Менеджер для проверки и загрузки обновлений приложения
@@ -73,14 +66,9 @@ class UpdateManager(private val context: Context) {
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
         return connectivityManager?.let { cm ->
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                val network = cm.activeNetwork
-                val capabilities = cm.getNetworkCapabilities(network)
-                capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-            } else {
-                @Suppress("DEPRECATION")
-                cm.activeNetworkInfo?.isConnected == true
-            }
+            val network = cm.activeNetwork
+            val capabilities = cm.getNetworkCapabilities(network)
+            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
         } ?: false
     }
     
@@ -276,17 +264,5 @@ class UpdateManager(private val context: Context) {
             UpdateResult(false, error = "Неожиданная ошибка при проверке обновлений: ${e.message}")
         }
     }
-    
-    /**
-     * Запускает загрузку обновления через браузер
-     */
-    fun downloadUpdate(updateInfo: UpdateInfo) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, updateInfo.downloadUrl.toUri())
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(intent)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error opening download URL", e)
-        }
-    }
+
 }

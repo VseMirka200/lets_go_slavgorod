@@ -1,18 +1,31 @@
 package com.example.lets_go_slavgorod.ui.viewmodel
 
+// Android системные импорты
 import android.app.Application
 import android.util.Log
+
+// ViewModel импорты
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+
+// Модели данных
 import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
 import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.data.model.BusSchedule
 import com.example.lets_go_slavgorod.data.model.FavoriteTime
+
+// Локальная база данных
 import com.example.lets_go_slavgorod.data.local.AppDatabase
 import com.example.lets_go_slavgorod.data.repository.BusRouteRepository
+
+// Уведомления
 import com.example.lets_go_slavgorod.notifications.AlarmScheduler
+
+// Утилиты
 import com.example.lets_go_slavgorod.utils.loge
 import com.example.lets_go_slavgorod.utils.toFavoriteTime
+
+// Coroutines импорты
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -83,9 +96,14 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadInitialRoutes() {
+        val routes = routeRepository.getAllRoutes()
+        Log.d("BusViewModel", "Loading routes: ${routes.size} routes found")
+        routes.forEach { route ->
+            Log.d("BusViewModel", "Route: ${route.id} - ${route.name}")
+        }
         _uiState.update { currentState ->
             currentState.copy(
-                routes = routeRepository.getAllRoutes(),
+                routes = routes,
                 isLoading = false,
                 error = null
             )
@@ -229,57 +247,6 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+    
 
-    fun isFavoriteTime(scheduleId: String): Boolean {
-        return favoriteTimes.value.any { it.id == scheduleId }
-    }
-    
-    /**
-     * Очищает ошибки из состояния UI
-     */
-    fun clearError() {
-        _uiState.update { currentState ->
-            currentState.copy(error = null)
-        }
-    }
-    
-    /**
-     * Обновляет кэш маршрутов
-     */
-    fun refreshCache() {
-        viewModelScope.launch {
-            try {
-                routeRepository.refreshCache()
-                Log.d("BusViewModel", "Cache refreshed successfully")
-            } catch (e: Exception) {
-                Log.e("BusViewModel", "Error refreshing cache", e)
-            }
-        }
-    }
-    
-    /**
-     * Очищает кэш маршрутов
-     */
-    fun clearCache() {
-        try {
-            routeRepository.clearCache()
-            Log.d("BusViewModel", "Cache cleared successfully")
-        } catch (e: Exception) {
-            Log.e("BusViewModel", "Error clearing cache", e)
-        }
-    }
-    
-    /**
-     * Проверяет доступность сети
-     */
-    fun isNetworkAvailable(): Boolean {
-        return routeRepository.isNetworkAvailable()
-    }
-    
-    /**
-     * Получает тип соединения
-     */
-    fun getConnectionType(): String {
-        return routeRepository.getConnectionType()
-    }
 }

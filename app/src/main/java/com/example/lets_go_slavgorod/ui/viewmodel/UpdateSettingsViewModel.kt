@@ -13,6 +13,7 @@
  */
 package com.example.lets_go_slavgorod.ui.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
  * 
  * @param context Контекст приложения для доступа к UpdatePreferences
  */
-class UpdateSettingsViewModel(private val context: Context) : ViewModel() {
+class UpdateSettingsViewModel(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel() {
     
     // Экземпляр для работы с настройками обновлений
     private val updatePreferences = UpdatePreferences(context)
@@ -77,18 +78,7 @@ class UpdateSettingsViewModel(private val context: Context) : ViewModel() {
     private val _updateCheckStatus = MutableStateFlow<String?>(null)
     /** Публичный поток статусных сообщений */
     val updateCheckStatus: StateFlow<String?> = _updateCheckStatus.asStateFlow()
-    
-    /**
-     * Устанавливает состояние автоматической проверки обновлений
-     * 
-     * @param enabled true для включения автоматической проверки, false для отключения
-     */
-    fun setAutoUpdateCheckEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            updatePreferences.setAutoUpdateCheckEnabled(enabled)
-        }
-    }
-    
+
     /**
      * Устанавливает режим обновлений
      * 
@@ -150,14 +140,7 @@ class UpdateSettingsViewModel(private val context: Context) : ViewModel() {
             }
         }
     }
-    
-    /**
-     * Очищает сообщение об ошибке проверки обновлений
-     */
-    fun clearUpdateCheckError() {
-        _updateCheckError.value = null
-    }
-    
+
     /**
      * Очищает статусное сообщение проверки обновлений
      */

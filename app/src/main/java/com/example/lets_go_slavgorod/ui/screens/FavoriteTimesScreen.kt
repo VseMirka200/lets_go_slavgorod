@@ -5,7 +5,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.ExpandLess
@@ -19,15 +20,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.R
 import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import com.example.lets_go_slavgorod.ui.components.ScheduleCard
+import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
+import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteTimesScreen(
     viewModel: BusViewModel,
+    navController: NavController? = null,
     modifier: Modifier = Modifier
 ) {
     val favoriteTimesList by viewModel.favoriteTimes.collectAsState()
@@ -45,38 +50,101 @@ fun FavoriteTimesScreen(
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.favorite_times_screen_title),
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+    SettingsSwipeableContainer(
+        onSwipeToNext = {
+            navController?.navigate(Screen.Settings.route) {
+                popUpTo(Screen.Home.route) { inclusive = false }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+        onSwipeToPrevious = {
+            navController?.navigate(Screen.Home.route) {
+                popUpTo(Screen.Home.route) { inclusive = false }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.favorite_times_screen_title),
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            )
-        }
-    ) { paddingValues ->
+            }
+        ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(bottom = 0.dp)
         ) {
             when {
                 isLoading -> FLoadingState()
                 favoriteTimesList.isEmpty() -> FEmptyState()
                 else -> FavoriteNestedGroupedList(
                     nestedGroupedTimes = nestedGroupedFavoriteTimes,
-                    onToggleFavoriteActiveState = { favoriteTime, isActive ->
+                    onToggleFavoriteActiveState = { favoriteTime: FavoriteTime, isActive: Boolean ->
                         viewModel.updateFavoriteActiveState(favoriteTime, isActive)
                     }
                 )
             }
+        }
+    }
+    }
+}
+
+@Composable
+private fun FLoadingState(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun FEmptyState(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DirectionsBus,
+                contentDescription = stringResource(R.string.empty_state_icon_description_favorites),
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = stringResource(id = R.string.no_favorite_times_title_updated),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = stringResource(id = R.string.no_favorite_times_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -89,27 +157,37 @@ private fun FavoriteNestedGroupedList(
 ) {
     val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
 
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         nestedGroupedTimes.forEach { (routeInfoPair, timesByDeparturePoint) ->
             val (routeNumber, routeName) = routeInfoPair
             val routeKey = "$routeNumber-$routeName"
-
-            item(key = "route_card_$routeKey") {
-                Card(
+            
+            Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(Modifier.padding(bottom = 8.dp)) {
                         Text(
-                            text = routeName?.trim() ?: "",
+                            text = if (routeName.isNotBlank()) {
+                                // Проверяем, содержит ли название уже номер маршрута
+                                if (routeName.contains("№$routeNumber")) {
+                                    routeName.trim()
+                                } else {
+                                    "${routeName.trim()} №$routeNumber"
+                                }
+                            } else {
+                                "Маршрут №$routeNumber"
+                            },
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
+                                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
                             color = MaterialTheme.colorScheme.primary
                         )
 
@@ -135,7 +213,6 @@ private fun FavoriteNestedGroupedList(
                 }
             }
         }
-    }
 }
 
 @Composable
@@ -201,54 +278,12 @@ private fun ExpandableDeparturePointSection(
                         routeNumber = null,
                         routeName = null,
                         isNextUpcoming = false,
+                        allSchedules = listOf(scheduleDisplay), // Передаем расписание для CountdownTimer
+                        hideRouteInfo = true, // Скрываем информацию о маршруте, так как она уже показана в заголовке
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun FLoadingState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun FEmptyState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.DirectionsBus,
-                contentDescription = stringResource(R.string.empty_state_icon_description_favorites),
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = stringResource(id = R.string.no_favorite_times_title_updated),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = stringResource(id = R.string.no_favorite_times_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }

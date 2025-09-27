@@ -26,8 +26,8 @@ object ValidationUtils {
         }
         
         return try {
-            val hour = timeParts[0]?.trim()?.toInt() ?: return false
-            val minute = timeParts[1]?.trim()?.toInt() ?: return false
+            val hour = timeParts[0].trim().toInt()
+            val minute = timeParts[1].trim().toInt()
             
             val isValid = hour in 0..23 && minute in 0..59
             if (!isValid) {
@@ -60,7 +60,7 @@ object ValidationUtils {
             return false
         }
         
-        val isValid = routeId?.trim()?.isNotBlank() ?: false
+        val isValid = routeId.trim().isNotBlank()
         if (!isValid) {
             Log.w(TAG, "Route ID is empty after trimming: '$routeId'")
         }
@@ -76,7 +76,7 @@ object ValidationUtils {
             return false
         }
         
-        val trimmed = stopName?.trim() ?: ""
+        val trimmed = stopName.trim()
         val isValid = trimmed.isNotBlank() && trimmed.length >= 2
         if (!isValid) {
             Log.w(TAG, "Stop name is too short or empty: '$stopName'")
@@ -93,7 +93,7 @@ object ValidationUtils {
             return false
         }
         
-        val trimmed = routeName?.trim() ?: ""
+        val trimmed = routeName.trim()
         val isValid = trimmed.isNotBlank() && trimmed.length >= 3
         if (!isValid) {
             Log.w(TAG, "Route name is too short or empty: '$routeName'")
@@ -110,67 +110,19 @@ object ValidationUtils {
             return false
         }
         
-        val trimmed = routeNumber?.trim() ?: ""
-        val isValid = trimmed.isNotBlank() && trimmed.length >= 1
+        val trimmed = routeNumber.trim()
+        val isValid = trimmed.isNotBlank() && trimmed.isNotEmpty()
         if (!isValid) {
             Log.w(TAG, "Route number is empty: '$routeNumber'")
         }
         return isValid
     }
-    
-    /**
-     * Валидирует URL
-     */
-    fun isValidUrl(url: String?): Boolean {
-        if (url.isNullOrBlank()) {
-            Log.w(TAG, "URL is null or blank")
-            return false
-        }
-        
-        val trimmed = url?.trim() ?: ""
-        val isValid = trimmed.isNotBlank() && 
-                     (trimmed.startsWith("http://") || trimmed.startsWith("https://"))
-        
-        if (!isValid) {
-            Log.w(TAG, "Invalid URL format: '$url'")
-        }
-        return isValid
-    }
-    
-    /**
-     * Валидирует версию приложения
-     */
-    fun isValidVersion(version: String?): Boolean {
-        if (version.isNullOrBlank()) {
-            Log.w(TAG, "Version is null or blank")
-            return false
-        }
-        
-        val trimmed = version?.trim() ?: ""
-        val isValid = trimmed.isNotBlank() && 
-                     trimmed.matches(Regex("^\\d+(\\.\\d+)*$"))
-        
-        if (!isValid) {
-            Log.w(TAG, "Invalid version format: '$version' - expected format: X.Y.Z")
-        }
-        return isValid
-    }
-    
+
     /**
      * Очищает и нормализует строку
      */
     fun sanitizeString(input: String?): String {
         return input?.trim()?.takeIf { it.isNotBlank() } ?: ""
     }
-    
-    /**
-     * Проверяет, является ли строка безопасной для отображения
-     */
-    fun isSafeForDisplay(text: String?): Boolean {
-        if (text.isNullOrBlank()) return true
-        
-        // Проверяем на потенциально опасные символы
-        val dangerousChars = setOf('<', '>', '&', '"', '\'', '\\', '/', '\n', '\r', '\t')
-        return !text.any { it in dangerousChars }
-    }
+
 }

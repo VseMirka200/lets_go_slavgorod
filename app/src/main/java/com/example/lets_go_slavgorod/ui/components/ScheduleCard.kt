@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lets_go_slavgorod.data.model.BusSchedule
+import com.example.lets_go_slavgorod.ui.components.CountdownTimer
 
 @Composable
 fun ScheduleCard(
@@ -23,6 +24,8 @@ fun ScheduleCard(
     routeNumber: String? = null,
     routeName: String? = null,
     isNextUpcoming: Boolean = false,
+    allSchedules: List<BusSchedule> = emptyList(),
+    hideRouteInfo: Boolean = false,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     Card(
@@ -35,7 +38,7 @@ fun ScheduleCard(
     ) {
         Row(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -44,7 +47,7 @@ fun ScheduleCard(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                if (!routeNumber.isNullOrBlank() || !routeName.isNullOrBlank()) {
+                if (!hideRouteInfo && (!routeNumber.isNullOrBlank() || !routeName.isNullOrBlank())) {
                     val routeText = listOfNotNull(routeNumber?.takeIf { it.isNotBlank() }, routeName?.takeIf { it.isNotBlank() })
                         .joinToString(" ")
                         .trim()
@@ -69,17 +72,20 @@ fun ScheduleCard(
                     color = if (isNextUpcoming) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
 
+                // Объединенный элемент: "Ближайший рейс" + обратный отсчет
                 if (isNextUpcoming) {
-                    Text(
-                        text = "Ближайший рейс",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                shape = MaterialTheme.shapes.small
-                            )
-                            .padding(start = 6.dp, end = 6.dp, top = 2.dp, bottom = 2.dp)
+                    CountdownTimer(
+                        schedule = schedule,
+                        allSchedules = allSchedules,
+                        showLabel = true, // Показываем "Ближайший рейс" внутри CountdownTimer
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                } else {
+                    CountdownTimer(
+                        schedule = schedule,
+                        allSchedules = allSchedules,
+                        showLabel = false, // Не показываем "Ближайший рейс" для обычных рейсов
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
 

@@ -3,64 +3,49 @@ package com.example.lets_go_slavgorod.notifications
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.util.Log
 
-@Suppress("DEPRECATION")
+/**
+ * Получатель уведомлений о срабатывании будильника
+ * 
+ * Основные функции:
+ * - Обработка срабатывания будильника для уведомлений
+ * - Отправка уведомлений пользователю
+ * - Логирование событий для отладки
+ * 
+ * @author VseMirka200
+ * @version 1.0
+ */
 class AlarmReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-        Log.i("AlarmReceiver", "onReceive triggered.")
-
-        if (context == null) {
-            Log.e("AlarmReceiver", "Context is null. Cannot proceed.")
-            return
-        }
-        if (intent == null) {
-            Log.e("AlarmReceiver", "Intent is null. Cannot proceed.")
-            return
-        }
-
-        val action = intent.action
-        val extras: Bundle? = intent.extras
-
-        Log.d("AlarmReceiver", "Received alarm. Action: $action")
-        if (extras != null) {
-            Log.d("AlarmReceiver", "Extras content:")
-            for (key in extras.keySet()) {
-                Log.d("AlarmReceiver", "  Key: $key, Value: ${extras.get(key)}")
-            }
-        } else {
-            Log.d("AlarmReceiver", "Extras bundle is null.")
-        }
-
-        val favoriteId = intent.getStringExtra("FAVORITE_ID") ?: ""
-        val routeInfo = intent.getStringExtra("ROUTE_INFO") ?: "Ваш автобус (default)"
-        val departureTimeInfo = intent.getStringExtra("DEPARTURE_TIME_INFO") ?: "неизвестно (default)"
-        val destinationInfo = intent.getStringExtra("DESTINATION_INFO") ?: ""
-        val departurePointInfo = intent.getStringExtra("DEPARTURE_POINT_INFO") ?: ""
-
-        Log.d(
-            "AlarmReceiver",
-            "Parsed data: favoriteId='$favoriteId', routeInfo='$routeInfo', " +
-                    "departureTimeInfo='$departureTimeInfo', destinationInfo='$destinationInfo', " +
-                    "departurePointInfo='$departurePointInfo'"
-        )
-
-        try {
-            Log.d("AlarmReceiver", "Attempting to show notification for favoriteId: $favoriteId")
+    
+    companion object {
+        private const val TAG = "AlarmReceiver"
+    }
+    
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.d(TAG, "Alarm received: ${intent.action}")
+        
+        // Получаем данные из Intent
+        val favoriteId = intent.getStringExtra("FAVORITE_ID")
+        val routeInfo = intent.getStringExtra("ROUTE_INFO")
+        val departureTimeInfo = intent.getStringExtra("DEPARTURE_TIME_INFO")
+        val destinationInfo = intent.getStringExtra("DESTINATION_INFO")
+        val departurePointInfo = intent.getStringExtra("DEPARTURE_POINT_INFO")
+        
+        Log.d(TAG, "Alarm data - favoriteId: $favoriteId, routeInfo: $routeInfo")
+        
+        // Отправляем уведомление
+        if (favoriteId != null) {
             NotificationHelper.showDepartureNotification(
-                context,
-                favoriteId,
-                routeInfo,
-                departureTimeInfo,
-                destinationInfo,
-                departurePointInfo
+                context = context,
+                favoriteTimeId = favoriteId,
+                routeInfo = routeInfo ?: "Маршрут",
+                departureTimeInfo = departureTimeInfo ?: "Время",
+                destinationInfo = destinationInfo ?: "Направление",
+                departurePointInfo = departurePointInfo ?: "Отправление"
             )
-            Log.i("AlarmReceiver", "NotificationHelper.showDepartureNotification was called successfully for favoriteId: $favoriteId.")
-        } catch (e: Exception) {
-            Log.e("AlarmReceiver", "Error calling NotificationHelper.showDepartureNotification for favoriteId: $favoriteId", e)
+        } else {
+            Log.w(TAG, "No favoriteId found in alarm intent")
         }
-
-        Log.d("AlarmReceiver", "Finished processing for favoriteId: $favoriteId.")
     }
 }

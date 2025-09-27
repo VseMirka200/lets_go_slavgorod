@@ -1,18 +1,15 @@
 package com.example.lets_go_slavgorod.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.utils.CacheUtils
 import com.example.lets_go_slavgorod.utils.Constants
-import com.example.lets_go_slavgorod.utils.NetworkUtils
 import com.example.lets_go_slavgorod.utils.createBusRoute
 import com.example.lets_go_slavgorod.utils.logd
 import com.example.lets_go_slavgorod.utils.loge
 import com.example.lets_go_slavgorod.utils.search
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * Репозиторий для управления данными маршрутов автобусов.
@@ -21,8 +18,7 @@ import kotlinx.coroutines.flow.firstOrNull
 class BusRouteRepository(private val context: Context? = null) {
     
     private val _routes = MutableStateFlow<List<BusRoute>>(emptyList())
-    val routes: Flow<List<BusRoute>> = _routes.asStateFlow()
-    
+
     private val routesCache = mutableMapOf<String, BusRoute>()
     
     init {
@@ -77,6 +73,10 @@ class BusRouteRepository(private val context: Context? = null) {
             }
             
             _routes.value = validRoutes
+            Log.d("BusRouteRepository", "Routes set to _routes: ${validRoutes.size} routes")
+            validRoutes.forEach { route ->
+                Log.d("BusRouteRepository", "Route in _routes: ${route.id} - ${route.name}")
+            }
             
             // Сохраняем в кэш, если есть контекст
             if (context != null) {
@@ -102,47 +102,5 @@ class BusRouteRepository(private val context: Context? = null) {
     }
     
     fun getAllRoutes(): List<BusRoute> = _routes.value
-    
-    /**
-     * Проверяет доступность сети
-     */
-    fun isNetworkAvailable(): Boolean {
-        return context?.let { NetworkUtils.isNetworkAvailable(it) } ?: false
-    }
-    
-    /**
-     * Получает тип соединения
-     */
-    fun getConnectionType(): String {
-        return context?.let { NetworkUtils.getConnectionType(it) } ?: "Unknown"
-    }
-    
-    /**
-     * Обновляет кэш маршрутов
-     */
-    suspend fun refreshCache() {
-        if (context != null) {
-            try {
-                val currentRoutes = _routes.value
-                CacheUtils.cacheRoutes(context, currentRoutes)
-                logd("Routes cache refreshed with ${currentRoutes.size} routes")
-            } catch (e: Exception) {
-                loge("Error refreshing routes cache", e)
-            }
-        }
-    }
-    
-    /**
-     * Очищает кэш маршрутов
-     */
-    fun clearCache() {
-        if (context != null) {
-            try {
-                CacheUtils.clearRoutesCache(context)
-                logd("Routes cache cleared")
-            } catch (e: Exception) {
-                loge("Error clearing routes cache", e)
-            }
-        }
-    }
+
 }

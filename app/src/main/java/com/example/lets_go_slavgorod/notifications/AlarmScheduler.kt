@@ -46,10 +46,9 @@ object AlarmScheduler {
      * - SELECTED_DAYS: уведомления в выбранные дни недели
      * 
      * @param context контекст приложения для доступа к настройкам
-     * @param favoriteTime избранное время для проверки
      * @return true если уведомление должно быть отправлено
      */
-    private fun shouldSendNotification(context: Context, favoriteTime: FavoriteTime): Boolean {
+    private fun shouldSendNotification(context: Context): Boolean {
         return try {
             val preferences = runBlocking { context.dataStore.data.first() }
             
@@ -58,7 +57,7 @@ object AlarmScheduler {
             
             val notificationMode = try {
                 NotificationMode.valueOf(notificationModeString)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 Log.w("AlarmScheduler", "Invalid notification mode: $notificationModeString, defaulting to ALL_DAYS")
                 NotificationMode.ALL_DAYS
             }
@@ -83,7 +82,7 @@ object AlarmScheduler {
                     val selectedDays = selectedDaysString.mapNotNull { dayName ->
                         try {
                             DayOfWeek.valueOf(dayName)
-                        } catch (e: IllegalArgumentException) {
+                        } catch (_: IllegalArgumentException) {
                             Log.w("AlarmScheduler", "Invalid day name in settings: $dayName")
                             null
                         }
@@ -121,7 +120,7 @@ object AlarmScheduler {
      * @param favoriteTime избранное время для планирования уведомления
      */
     fun scheduleAlarm(context: Context, favoriteTime: FavoriteTime) {
-        if (!shouldSendNotification(context, favoriteTime)) {
+        if (!shouldSendNotification(context)) {
             Log.d("AlarmScheduler", "Notification skipped for ${favoriteTime.id} due to user settings")
             return
         }
@@ -149,10 +148,10 @@ object AlarmScheduler {
             return
         }
 
-        val routeInfoForNotification = "Автобус №${favoriteTime.routeNumber?.trim() ?: ""}"
-        val departureTimeInfoForNotification = "в ${favoriteTime.departureTime?.trim() ?: ""}"
+        val routeInfoForNotification = "Автобус №${favoriteTime.routeNumber.trim()}"
+        val departureTimeInfoForNotification = "в ${favoriteTime.departureTime.trim()}"
         val destinationInfoForNotification = ""
-        val departurePointStr = favoriteTime.departurePoint?.trim() ?: ""
+        val departurePointStr = favoriteTime.departurePoint.trim()
         val departurePointInfoForNotification = if (departurePointStr.isNotBlank()) {
             "От: $departurePointStr"
         } else {
@@ -183,11 +182,7 @@ object AlarmScheduler {
             context.applicationContext,
             requestCode,
             intent,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         Log.d("AlarmScheduler", "Attempting to schedule alarm for ID ${favoriteTime.id} at ${formatMillis(triggerAtMillis)} (requestCode: $requestCode, action: ${intent.action})")
@@ -280,8 +275,8 @@ object AlarmScheduler {
         val hour: Int
         val minute: Int
         try {
-            hour = timeParts[0]?.trim()?.toInt() ?: return -1L
-            minute = timeParts[1]?.trim()?.toInt() ?: return -1L
+            hour = timeParts[0].trim().toInt()
+            minute = timeParts[1].trim().toInt()
         } catch (nfe: NumberFormatException) {
             Log.e("AlarmScheduler", "Invalid number format in departure time parts: '${favoriteTime.departureTime}' for ID ${favoriteTime.id}", nfe)
             return -1L
@@ -354,7 +349,7 @@ object AlarmScheduler {
             try {
                 cancelAlarm(context, favoriteTime.id)
                 
-                if (shouldSendNotification(context, favoriteTime)) {
+                if (shouldSendNotification(context)) {
                     scheduleAlarm(context, favoriteTime)
                     Log.d("AlarmScheduler", "Rescheduled alarm for ${favoriteTime.id} based on settings")
                 } else {
@@ -370,7 +365,7 @@ object AlarmScheduler {
      * Проверяет и обновляет уведомления при изменении настроек
      */
     fun checkAndUpdateNotifications(context: Context, favoriteTime: FavoriteTime) {
-        if (shouldSendNotification(context, favoriteTime)) {
+        if (shouldSendNotification(context)) {
             scheduleAlarm(context, favoriteTime)
             Log.d("AlarmScheduler", "Notification scheduled for ${favoriteTime.id}")
         } else {

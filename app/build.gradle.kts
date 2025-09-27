@@ -17,7 +17,7 @@ android {
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 10003
-        versionName = "1.1.1"
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -74,6 +74,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)
+    
+    // Timber для улучшенного логирования
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

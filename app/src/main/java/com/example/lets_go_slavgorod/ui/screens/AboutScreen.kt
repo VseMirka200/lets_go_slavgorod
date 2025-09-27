@@ -1,21 +1,41 @@
 package com.example.lets_go_slavgorod.ui.screens
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Feedback
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,14 +43,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import android.util.Log
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.BuildConfig
 import com.example.lets_go_slavgorod.R
 import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
 import com.example.lets_go_slavgorod.ui.navigation.Screen
-import androidx.core.net.toUri
 
 /**
  * Экран "О программе" - отображает информацию о приложении и разработчике
@@ -52,20 +70,16 @@ fun AboutScreen(
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     innerPadding: PaddingValues = PaddingValues()
 ) {
-    val context = LocalContext.current
 
     val developerSectionTitleText = stringResource(id = R.string.developer_section_title) // "Разработал: VseMirka200"
 
     val developerGitHubUrl = stringResource(id = R.string.developer_github_url_value)
-    val linkTextGitHub = stringResource(id = R.string.link_text_github)
 
     // Строки для обратной связи через Telegram
-    val feedbackSectionTitle = stringResource(id = R.string.feedback_section_title)
-    val feedbackLinkText = stringResource(id = R.string.feedback_link_text)
     val feedbackTelegramBotUsername = stringResource(id = R.string.feedback_telegram_bot_username)
 
     val appVersion = BuildConfig.VERSION_NAME
-    val feedbackTelegramUrl = "https://t.me/$feedbackTelegramBotUsername"
+    "https://t.me/$feedbackTelegramBotUsername"
 
     SettingsSwipeableContainer(
         onSwipeToNext = {
@@ -131,7 +145,7 @@ fun AboutScreen(
                 Text(
                 text = "Информация о приложении",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 6.dp)
             )
             AppInfoCard(
                 appName = stringResource(id = R.string.app_name),
@@ -139,38 +153,37 @@ fun AboutScreen(
                 version = appVersion
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
                 // Раздел Ссылки
                 Text(
                 text = "Ссылки",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 6.dp)
             )
             LinksCard(
                 navController = navController,
                 githubUrl = developerGitHubUrl,
-                vkUrl = "https://vk.com/vsemirka200",
-                telegramUrl = feedbackTelegramUrl
+                vkUrl = "https://vk.com/vsemirka200"
             )
                 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
                 // Раздел Обратная связь
                 Text(
                 text = "Обратная связь",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 6.dp)
             )
-            FeedbackCard(navController = navController)
+            FeedbackCard()
             
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
             
             // Раздел Поддержка разработчика
             Text(
                 text = "Поддержка разработчика",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 6.dp)
             )
             SupportCard(navController = navController)
         }
@@ -192,7 +205,8 @@ private fun AppInfoCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -232,15 +246,15 @@ private fun AppInfoCard(
 private fun LinksCard(
     navController: NavController?,
     githubUrl: String,
-    vkUrl: String,
-    telegramUrl: String
+    vkUrl: String
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             LinkItem(
                 navController = navController,
@@ -322,7 +336,8 @@ private fun SupportCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             Text(
                 text = "Если приложение вам нравится, вы можете поддержать его разработку:",
@@ -403,7 +418,8 @@ private fun SupportCard(
                 )
             ) {
                 Column(
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
                     Text(
                         text = "💡 Способы поддержки:",
@@ -427,7 +443,6 @@ private fun SupportCard(
  */
 @Composable
 private fun FeedbackCard(
-    navController: NavController?
 ) {
     val context = LocalContext.current
     val feedbackTelegramBotUsername = stringResource(id = R.string.feedback_telegram_bot_username)
@@ -438,7 +453,8 @@ private fun FeedbackCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             Text(
                 text = "Есть вопросы или предложения? Напишите нам в Telegram!",
@@ -456,7 +472,7 @@ private fun FeedbackCard(
                         val telegramIntent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
                         telegramIntent.setPackage("org.telegram.messenger")
                         context.startActivity(telegramIntent)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         try {
                             // Fallback: открываем в браузере
                             val intent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
@@ -492,7 +508,8 @@ private fun FeedbackCard(
                 )
             ) {
                 Column(
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
                     Text(
                         text = "💬 Что можно сообщить:",
@@ -514,50 +531,3 @@ private fun FeedbackCard(
 }
 
 
-/**
- * Компонент для отображения кликабельной ссылки
- * 
- * Отображает текст как ссылку с подчеркиванием и открывает URL при нажатии.
- * Оптимизирован для вертикального списка ссылок с выравниванием по левому краю.
- * 
- * @param text текст ссылки для отображения
- * @param url URL для открытия при нажатии
- * @param modifier модификатор для настройки внешнего вида
- */
-@Composable
-private fun ClickableLinkText(
-    text: String,
-    url: String,
-    modifier: Modifier = Modifier
-) {
-    val localContext = LocalContext.current
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyMedium.copy(
-            color = MaterialTheme.colorScheme.primary,
-            textDecoration = TextDecoration.Underline,
-        ),
-        textAlign = androidx.compose.ui.text.style.TextAlign.Start,
-        modifier = modifier
-            .clickable {
-            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-            try {
-                localContext.startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                Log.w("AboutScreen", "No application can handle this URL: $url", e)
-                android.widget.Toast.makeText(
-                    localContext,
-                    localContext.getString(R.string.error_no_browser) ?: "Нет браузера",
-                    android.widget.Toast.LENGTH_LONG
-                ).show()
-            } catch (e: Exception) {
-                Log.e("AboutScreen", "Could not open URL: $url", e)
-                android.widget.Toast.makeText(
-                    localContext,
-                    localContext.getString(R.string.error_cant_open_link) ?: "Не удалось открыть ссылку",
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    )
-}

@@ -4,108 +4,104 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.example.lets_go_slavgorod.data.local.AppDatabase
-import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
-import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.example.lets_go_slavgorod.data.local.AppDatabase
+import com.example.lets_go_slavgorod.data.model.FavoriteTime
 
+/**
+ * Получатель уведомлений о загрузке системы
+ * 
+ * Основные функции:
+ * - Восстановление всех активных уведомлений после перезагрузки устройства
+ * - Обработка событий BOOT_COMPLETED и обновления приложения
+ * - Логирование событий для отладки
+ * 
+ * @author VseMirka200
+ * @version 1.0
+ */
 class BootReceiver : BroadcastReceiver() {
     
-    private var coroutineScope: CoroutineScope? = null
+    companion object {
+        private const val TAG = "BootReceiver"
+    }
     
-    override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("BootReceiver", "BootReceiver triggered with action: ${intent?.action}")
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.d(TAG, "Boot event received: ${intent.action}")
         
-        if (context == null) {
-            Log.e("BootReceiver", "Context is null, cannot reschedule alarms")
-            return
-        }
-        
-        val action = intent?.action
-        when (action) {
+        when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
             Intent.ACTION_PACKAGE_REPLACED -> {
-                Log.i("BootReceiver", "System boot or app update detected, rescheduling alarms")
-                coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-                coroutineScope?.launch {
-                    rescheduleAllAlarms(context)
+                Log.d(TAG, "System boot completed or app updated, restoring notifications...")
+                
+                // Восстанавливаем уведомления в фоновом потоке
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        restoreAllNotifications(context)
+                        Log.d(TAG, "All notifications restored successfully")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error restoring notifications", e)
+                    }
                 }
             }
             else -> {
-                Log.w("BootReceiver", "Unknown action: $action")
+                Log.w(TAG, "Unknown boot event: ${intent.action}")
             }
         }
     }
     
-    private suspend fun rescheduleAllAlarms(context: Context) {
+    /**
+     * Восстанавливает все активные уведомления из базы данных
+     * 
+     * @param context контекст приложения
+     */
+    private suspend fun restoreAllNotifications(context: Context) {
         try {
-            Log.d("BootReceiver", "Starting alarm rescheduling process")
+            Log.d(TAG, "Starting notification restoration process...")
             
-            NotificationHelper.createNotificationChannel(context)
-            
-            val database = AppDatabase.getDatabase(context)
+            // Получаем базу данных
+            val database = AppDatabase.getDatabase(context.applicationContext)
             val favoriteTimeDao = database.favoriteTimeDao()
             
+            // Получаем все активные избранные времена
             val favoriteTimeEntities = favoriteTimeDao.getAllFavoriteTimes().firstOrNull() ?: emptyList()
             
-            Log.d("BootReceiver", "Found ${favoriteTimeEntities.size} favorite times in database")
-            
-            var rescheduledCount = 0
-            favoriteTimeEntities
+            val activeFavoriteTimes = favoriteTimeEntities
                 .filter { it.isActive }
-                .forEach { entity: FavoriteTimeEntity ->
-                    try {
-                        val route = getRouteById(context, entity.routeId)
-                        val favoriteTime = FavoriteTime(
-                            id = entity.id,
-                            routeId = entity.routeId,
-                            routeNumber = route?.routeNumber ?: "N/A",
-                            routeName = route?.name ?: "Неизвестный маршрут",
-                            stopName = entity.stopName,
-                            departureTime = entity.departureTime,
-                            dayOfWeek = entity.dayOfWeek,
-                            departurePoint = entity.departurePoint,
-                            isActive = entity.isActive
-                        )
-                        
-                        AlarmScheduler.scheduleAlarm(context, favoriteTime)
-                        rescheduledCount++
-                        Log.d("BootReceiver", "Rescheduled alarm for favorite time: ${entity.id}")
-                    } catch (e: Exception) {
-                        Log.e("BootReceiver", "Error rescheduling alarm for favorite time: ${entity.id}", e)
-                    }
+                .map { entity ->
+                    FavoriteTime(
+                        id = entity.id,
+                        routeId = entity.routeId,
+                        routeNumber = "", // Будет получен из репозитория маршрутов
+                        routeName = "",   // Будет получен из репозитория маршрутов
+                        stopName = entity.stopName,
+                        departureTime = entity.departureTime,
+                        dayOfWeek = entity.dayOfWeek,
+                        departurePoint = entity.departurePoint,
+                        isActive = entity.isActive
+                    )
                 }
             
-            Log.i("BootReceiver", "Successfully rescheduled $rescheduledCount out of ${favoriteTimeEntities.size} favorite times")
+            Log.d(TAG, "Found ${activeFavoriteTimes.size} active favorite times to restore")
+            
+            // Восстанавливаем уведомления для каждого активного избранного времени
+            activeFavoriteTimes.forEach { favoriteTime ->
+                try {
+                    AlarmScheduler.checkAndUpdateNotifications(context.applicationContext, favoriteTime)
+                    Log.d(TAG, "Notification restored for favorite time: ${favoriteTime.id}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error restoring notification for ${favoriteTime.id}", e)
+                }
+            }
+            
+            Log.d(TAG, "Notification restoration completed. Restored ${activeFavoriteTimes.size} notifications.")
             
         } catch (e: Exception) {
-            Log.e("BootReceiver", "Error during alarm rescheduling", e)
-        } finally {
-            coroutineScope?.cancel()
-        }
-    }
-    
-    private suspend fun getRouteById(context: Context, routeId: String): com.example.lets_go_slavgorod.data.model.BusRoute? {
-        return try {
-            com.example.lets_go_slavgorod.data.model.BusRoute(
-                id = routeId,
-                routeNumber = routeId,
-                name = "Автобус №$routeId",
-                description = "Маршрут",
-                travelTime = "~40 минут",
-                pricePrimary = "38₽ город / 55₽ межгород",
-                paymentMethods = "Нал. / Безнал.",
-                color = "#FF6200EE"
-            )
-        } catch (e: Exception) {
-            Log.e("BootReceiver", "Error creating route object for ID: $routeId", e)
-            null
+            Log.e(TAG, "Critical error during notification restoration", e)
         }
     }
 }

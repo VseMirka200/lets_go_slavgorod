@@ -8,7 +8,6 @@ import androidx.room.TypeConverters
 import com.example.lets_go_slavgorod.data.local.dao.FavoriteTimeDao
 import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
 import com.example.lets_go_slavgorod.utils.Constants
-import kotlinx.coroutines.asExecutor
 
 @Database(
     entities = [FavoriteTimeEntity::class],

@@ -2,6 +2,7 @@ package com.example.lets_go_slavgorod
 
 import android.app.Application
 import android.util.Log
+import com.example.lets_go_slavgorod.BuildConfig
 import com.example.lets_go_slavgorod.data.local.UpdatePreferences
 import com.example.lets_go_slavgorod.notifications.NotificationHelper
 import com.example.lets_go_slavgorod.updates.UpdateManager
@@ -9,6 +10,7 @@ import com.example.lets_go_slavgorod.utils.Constants
 import com.example.lets_go_slavgorod.utils.createBusRoute
 import com.example.lets_go_slavgorod.utils.logd
 import com.example.lets_go_slavgorod.utils.loge
+import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -28,6 +30,22 @@ class BusApplication : Application() {
     
     override fun onCreate() {
         super.onCreate()
+        
+        // Инициализируем Timber для логирования
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        } else {
+            // В релизной сборке можно использовать Crashlytics или другие системы
+            Timber.plant(object : Timber.Tree() {
+                override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                    // В релизе логируем только критические ошибки
+                    if (priority >= android.util.Log.ERROR) {
+                        loge("Release", message, t)
+                    }
+                }
+            })
+        }
+        
         logd("Application onCreate() called")
         
         NotificationHelper.createNotificationChannel(this)
@@ -141,6 +159,18 @@ class BusApplication : Application() {
                                 url = result.update.downloadUrl,
                                 notes = result.update.releaseNotes
                             )
+                            
+                            // Показываем уведомление о доступном обновлении
+                            try {
+                                NotificationHelper.showUpdateNotification(
+                                    context = this@BusApplication,
+                                    versionName = result.update.versionName,
+                                    releaseNotes = result.update.releaseNotes
+                                )
+                                logd("Update notification shown for version ${result.update.versionName}")
+                            } catch (e: Exception) {
+                                loge("Error showing update notification", e)
+                            }
                         } else {
                             loge("Invalid update data received: version='${result.update.versionName}', url='${result.update.downloadUrl}'")
                         }

@@ -69,7 +69,7 @@ fun ErrorState(errorMessage: String) {
                 color = MaterialTheme.colorScheme.error
             )
             Text(
-                text = errorMessage.ifEmpty { stringResource(id = R.string.unknown_error) ?: "Неизвестная ошибка" },
+                text = errorMessage.ifEmpty { stringResource(id = R.string.unknown_error) },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -120,7 +120,7 @@ fun RoutesListState(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp),
+        contentPadding = PaddingValues(vertical = 4.dp),
         // Оптимизация: добавляем кэширование элементов
         userScrollEnabled = true
     ) {
@@ -134,9 +134,6 @@ fun RoutesListState(
                 route = route,
                 onRouteClick = { clickedRoute ->
                     navController.navigate("schedule/${clickedRoute.id}")
-                },
-                onInfoClick = { clickedRoute ->
-                    navController.navigate("routeDetails/${clickedRoute.id}")
                 }
             )
         }

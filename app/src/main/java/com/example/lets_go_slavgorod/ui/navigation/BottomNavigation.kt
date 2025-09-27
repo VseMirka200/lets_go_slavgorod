@@ -42,15 +42,19 @@ fun BottomNavigation(navController: NavController) {
                     Log.d("BottomNavigation", "Navigating to: ${screen.route}")
                     navController.navigate(screen.route) {
                         // Специальная обработка для настроек - очищаем весь стек
-                        if (screen.route == Screen.Settings.route) {
-                            popUpTo(0) { inclusive = false }
-                        } else if (screen.route == Screen.Home.route) {
-                            // Для маршрутов - простая навигация
-                            popUpTo(0) { inclusive = false }
-                        } else {
-                            // Очищаем стек навигации при переходе к основным экранам
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                        when (screen.route) {
+                            Screen.Settings.route -> {
+                                popUpTo(0) { inclusive = false }
+                            }
+                            Screen.Home.route -> {
+                                // Для маршрутов - простая навигация
+                                popUpTo(0) { inclusive = false }
+                            }
+                            else -> {
+                                // Очищаем стек навигации при переходе к основным экранам
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
                             }
                         }
                         launchSingleTop = true

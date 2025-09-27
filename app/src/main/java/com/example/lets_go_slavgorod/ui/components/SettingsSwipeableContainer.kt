@@ -23,8 +23,8 @@ fun SettingsSwipeableContainer(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    var totalDragX by remember { mutableStateOf(0f) }
-    var totalDragY by remember { mutableStateOf(0f) }
+    var totalDragX by remember { mutableFloatStateOf(0f) }
+    var totalDragY by remember { mutableFloatStateOf(0f) }
     var hasTriggered by remember { mutableStateOf(false) }
     
     Box(

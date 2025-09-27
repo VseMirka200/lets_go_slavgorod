@@ -1,8 +1,13 @@
 package com.example.lets_go_slavgorod.ui.animations
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 
 object NavigationAnimations {
     
@@ -23,64 +28,6 @@ object NavigationAnimations {
         )
     )
 
-    val slideInFromLeft = slideInHorizontally(
-        initialOffsetX = { fullWidth -> -fullWidth },
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        )
-    )
-
-    val slideOutToRight = slideOutHorizontally(
-        targetOffsetX = { fullWidth -> fullWidth },
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        )
-    )
-    
-    // Анимация для модальных экранов (Schedule, RouteDetails, About)
-    val fadeIn = fadeIn(
-        animationSpec = tween(
-            durationMillis = 250,
-            easing = FastOutSlowInEasing
-        )
-    )
-    
-    val fadeOut = fadeOut(
-        animationSpec = tween(
-            durationMillis = 200,
-            easing = FastOutSlowInEasing
-        )
-    )
-    
-    // Анимация масштабирования для About экрана
-    val scaleIn = scaleIn(
-        initialScale = 0.8f,
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        )
-    ) + fadeIn(
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        )
-    )
-    
-    val scaleOut = scaleOut(
-        targetScale = 0.8f,
-        animationSpec = tween(
-            durationMillis = 250,
-            easing = FastOutSlowInEasing
-        )
-    ) + fadeOut(
-        animationSpec = tween(
-            durationMillis = 250,
-            easing = FastOutSlowInEasing
-        )
-    )
-    
     // Анимация для переходов к деталям маршрута
     val slideInFromBottom = slideInVertically(
         initialOffsetY = { fullHeight -> fullHeight },

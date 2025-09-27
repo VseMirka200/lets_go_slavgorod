@@ -3,15 +3,11 @@ package com.example.lets_go_slavgorod.ui.screens
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.lets_go_slavgorod.ui.components.SwipeableContainer
 import com.example.lets_go_slavgorod.ui.navigation.Screen
-import com.example.lets_go_slavgorod.ui.navigation.bottomNavItems
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 
@@ -46,9 +42,10 @@ fun SwipeableMainScreen(
     val currentScreenRoute = currentRoute?.destination?.route
     
     // Вычисляем текущий индекс на основе маршрута (только Главная и Избранное)
-    val currentIndex = when {
-        currentScreenRoute == Screen.FavoriteTimes.route -> 1 // Избранное
-        currentScreenRoute == Screen.Home.route -> 0 // Главная
+    // Используем when для более читаемого кода
+    val currentIndex = when (currentScreenRoute) {
+        Screen.FavoriteTimes.route -> 1 // Избранное
+        Screen.Home.route -> 0 // Главная
         else -> 0 // По умолчанию главная
     }
     
@@ -78,15 +75,6 @@ fun SwipeableMainScreen(
                         restoreState = true
                     }
                 }
-                2 -> {
-                    // С настроек на маршруты (циклично)
-                    Log.d("SwipeableMainScreen", "Navigating from Settings to Home")
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(0) { inclusive = false }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
             }
         },
         // Обработка свайпа вправо (в обратном порядке)
@@ -111,15 +99,6 @@ fun SwipeableMainScreen(
                         restoreState = true
                     }
                 }
-                2 -> {
-                    // С настроек на избранное
-                    Log.d("SwipeableMainScreen", "Navigating from Settings to FavoriteTimes")
-                    navController.navigate(Screen.FavoriteTimes.route) {
-                        popUpTo(0) { inclusive = false }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
             }
         },
         modifier = modifier.fillMaxSize()
@@ -131,7 +110,8 @@ fun SwipeableMainScreen(
                 viewModel = busViewModel
             )
             1 -> FavoriteTimesScreen(
-                viewModel = busViewModel
+                viewModel = busViewModel,
+                navController = navController
             )
         }
     }

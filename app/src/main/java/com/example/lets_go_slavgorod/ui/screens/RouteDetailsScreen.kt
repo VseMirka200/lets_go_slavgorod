@@ -6,7 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -120,71 +120,74 @@ fun RouteDetailsScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        route?.name ?: stringResource(R.string.route_details_title),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_description)
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            route?.name ?: stringResource(R.string.route_details_title),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = route?.color?.let {
-                        try {
-                            Color(it.toColorInt())
-                        } catch (_: IllegalArgumentException) {
-                            MaterialTheme.colorScheme.primaryContainer
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                Icons.Default.ArrowBack,
+                                contentDescription = stringResource(R.string.back_button_description)
+                            )
                         }
-                    } ?: MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = route?.color?.let {
+                            try {
+                                Color(it.toColorInt())
+                            } catch (_: IllegalArgumentException) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            }
+                        } ?: MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 )
-            )
-        },
-        modifier = modifier
-    ) { paddingValues ->
-        if (route == null) {
-            Box(
+            },
+            contentWindowInsets = WindowInsets(0),
+            modifier = modifier
+        ) { paddingValues ->
+            if (route == null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(stringResource(R.string.route_info_not_found))
+                }
+                return@Scaffold
+            }
+
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
             ) {
-                Text(stringResource(R.string.route_info_not_found))
+                RouteNumberHeader(
+                    routeNumber = route.routeNumber,
+                    colorString = route.color,
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                DetailItem(stringResource(R.string.detail_label_name), route.name)
+                DetailItem(stringResource(R.string.detail_label_description), route.description)
+                DetailItem(stringResource(R.string.detail_label_detailedPrice), route.pricePrimary)
+                DetailItem(stringResource(R.string.detail_label_travel_time), route.travelTime)
+                DetailItem(
+                    stringResource(R.string.detail_label_price_paymentMethods),
+                    route.paymentMethods
+                )
             }
-            return@Scaffold
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            RouteNumberHeader(
-                routeNumber = route.routeNumber,
-                colorString = route.color,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-
-            DetailItem(stringResource(R.string.detail_label_name), route.name)
-            DetailItem(stringResource(R.string.detail_label_description), route.description)
-            DetailItem(stringResource(R.string.detail_label_detailedPrice), route.pricePrimary)
-            DetailItem(stringResource(R.string.detail_label_travel_time), route.travelTime)
-            DetailItem(stringResource(R.string.detail_label_price_paymentMethods), route.paymentMethods)
         }
     }
-}
-
 }

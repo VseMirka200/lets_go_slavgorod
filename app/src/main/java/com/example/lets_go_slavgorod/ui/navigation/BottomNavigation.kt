@@ -47,7 +47,7 @@ fun BottomNavigation(navController: NavController) {
                                 popUpTo(0) { inclusive = false }
                             }
                             Screen.Home.route -> {
-                                // Для маршрутов - простая навигация
+                                // Для маршрутов - очищаем стек и переходим к главной
                                 popUpTo(0) { inclusive = false }
                             }
                             else -> {

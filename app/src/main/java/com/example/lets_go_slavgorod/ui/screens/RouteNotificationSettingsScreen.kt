@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -62,7 +63,8 @@ fun RouteNotificationSettingsScreen(
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
-        }
+        },
+        contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
         Column(
             modifier = modifier
@@ -182,44 +184,6 @@ fun RouteNotificationSettingsScreen(
                                 )
                             }
                         }
-                    }
-                }
-            }
-            
-            // Информация о маршруте
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Информация о маршруте",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    
-                    Text(
-                        text = "Маршрут: ${route.name}",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    
-                    route.travelTime?.let { time ->
-                        Text(
-                            text = "Время в пути: $time",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    
-                    route.pricePrimary?.let { price ->
-                        Text(
-                            text = "Стоимость: $price",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
                 }
             }

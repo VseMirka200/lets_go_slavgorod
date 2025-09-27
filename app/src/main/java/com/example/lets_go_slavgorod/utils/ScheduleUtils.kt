@@ -77,7 +77,6 @@ object ScheduleUtils {
             BusSchedule("102_slav_35", "102", "Рынок (Славгород)", "20:00", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
             BusSchedule("102_slav_36", "102", "Рынок (Славгород)", "20:30", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
             BusSchedule("102_slav_37", "102", "Рынок (Славгород)", "21:00", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
-            BusSchedule("102_slav_38", "102", "Рынок (Славгород)", "23:23", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
 
 
             // Отправление из МСЧ-128 (Яровое)

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -133,7 +134,11 @@ fun RoutesListState(
             BusRouteCard(
                 route = route,
                 onRouteClick = { clickedRoute ->
-                    navController.navigate("schedule/${clickedRoute.id}")
+                    Log.d("HomeScreen", "Route clicked: ${clickedRoute.id} - ${clickedRoute.name}")
+                    navController.navigate("schedule/${clickedRoute.id}") {
+                        // Убеждаемся, что навигация работает корректно
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -155,12 +160,22 @@ fun HomeScreen(
         onSwipeToNext = {
             // Свайп влево - переход к избранному
             Log.d("HomeScreen", "Swipe left detected, navigating to FavoriteTimes")
-            navController.navigate(Screen.FavoriteTimes.route)
+            try {
+                navController.navigate(Screen.FavoriteTimes.route)
+                Log.d("HomeScreen", "Navigation to FavoriteTimes completed")
+            } catch (e: Exception) {
+                Log.e("HomeScreen", "Navigation to FavoriteTimes failed", e)
+            }
         },
         onSwipeToPrevious = {
             // Свайп вправо - переход к настройкам
             Log.d("HomeScreen", "Swipe right detected, navigating to Settings")
-            navController.navigate(Screen.Settings.route)
+            try {
+                navController.navigate(Screen.Settings.route)
+                Log.d("HomeScreen", "Navigation to Settings completed")
+            } catch (e: Exception) {
+                Log.e("HomeScreen", "Navigation to Settings failed", e)
+            }
         },
         modifier = modifier.fillMaxSize()
     ) {
@@ -179,7 +194,8 @@ fun HomeScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
-        }
+        },
+        contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
         Column(
             modifier = modifier
@@ -203,6 +219,5 @@ fun HomeScreen(
             }
         }
     }
-}
-
+    }
 }

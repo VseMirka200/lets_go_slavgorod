@@ -46,14 +46,14 @@ fun SettingsSwipeableContainer(
                         
                         if (!hasTriggered) {
                             // Улучшенные условия для свайпа
-                            val minSwipeDistance = 120f // Уменьшено для более чувствительного свайпа
-                            val maxVerticalMovement = 80f // Уменьшено для более точного определения
-                            val maxSwipeDuration = 800L // Максимальная длительность свайпа
-                            val minSwipeDuration = 100L // Минимальная длительность свайпа
+                            val minSwipeDistance = 80f // Еще более чувствительный свайп
+                            val maxVerticalMovement = 100f // Больше допуск для вертикального движения
+                            val maxSwipeDuration = 1000L // Увеличена максимальная длительность
+                            val minSwipeDuration = 50L // Уменьшена минимальная длительность
                             
                             val isHorizontalSwipe = kotlin.math.abs(totalDragX) > minSwipeDistance &&
                                                    kotlin.math.abs(totalDragY) < maxVerticalMovement &&
-                                                   kotlin.math.abs(totalDragX) > kotlin.math.abs(totalDragY) * 1.5f &&
+                                                   kotlin.math.abs(totalDragX) > kotlin.math.abs(totalDragY) * 1.2f &&
                                                    dragDuration <= maxSwipeDuration &&
                                                    dragDuration >= minSwipeDuration
                             
@@ -88,7 +88,7 @@ fun SettingsSwipeableContainer(
                             val currentVertical = kotlin.math.abs(totalDragY)
                             
                             // Если уже достаточно движения для определения свайпа
-                            if (currentDistance > 80f && currentDistance > currentVertical * 1.2f) {
+                            if (currentDistance > 60f && currentDistance > currentVertical * 1.1f) {
                                 when {
                                     totalDragX > 0 -> {
                                         Log.d("SettingsSwipeableContainer", "Swipe right in progress")

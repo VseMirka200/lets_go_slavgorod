@@ -156,7 +156,7 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
         getApplication<Application>().dataStore.data
             .map { preferences ->
                 val dayNames = preferences[stringSetPreferencesKey("${ROUTE_SELECTED_DAYS_KEY.name}$routeId")]
-                    ?: selectedNotificationDays.value
+                    ?: selectedNotificationDays.value.map { it.name }.toSet()
                 dayNames.mapNotNull { dayName ->
                     try {
                         DayOfWeek.valueOf(dayName)

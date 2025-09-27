@@ -8,10 +8,11 @@ import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -69,7 +70,7 @@ fun WebViewScreen(
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Назад"
                             )
                         }
@@ -80,83 +81,84 @@ fun WebViewScreen(
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 )
-            }
+            },
+            contentWindowInsets = WindowInsets(0)
         ) { paddingValues ->
             Box(
                 modifier = modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-            AndroidView(
-                factory = { context ->
-                    WebView(context).apply {
-                        settings.apply {
-                            javaScriptEnabled = true
-                            domStorageEnabled = true
-                            loadWithOverviewMode = true
-                            useWideViewPort = true
-                            builtInZoomControls = true
-                            displayZoomControls = false
-                        }
-                        
-                        webViewClient = object : WebViewClient() {
-                            override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
-                                super.onPageStarted(view, url, favicon)
-                                isLoading = true
-                                hasError = false
+                AndroidView(
+                    factory = { context ->
+                        WebView(context).apply {
+                            settings.apply {
+                                javaScriptEnabled = true
+                                domStorageEnabled = true
+                                loadWithOverviewMode = true
+                                useWideViewPort = true
+                                builtInZoomControls = true
+                                displayZoomControls = false
                             }
                             
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                super.onPageFinished(view, url)
-                                isLoading = false
+                            webViewClient = object : WebViewClient() {
+                                override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                                    super.onPageStarted(view, url, favicon)
+                                    isLoading = true
+                                    hasError = false
+                                }
+                                
+                                override fun onPageFinished(view: WebView?, url: String?) {
+                                    super.onPageFinished(view, url)
+                                    isLoading = false
+                                }
+                                
+                                override fun onReceivedError(
+                                    view: WebView?,
+                                    request: WebResourceRequest?,
+                                    error: WebResourceError?
+                                ) {
+                                    super.onReceivedError(view, request, error)
+                                    isLoading = false
+                                    hasError = true
+                                }
                             }
                             
-                            override fun onReceivedError(
-                                view: WebView?,
-                                request: WebResourceRequest?,
-                                error: WebResourceError?
-                            ) {
-                                super.onReceivedError(view, request, error)
-                                isLoading = false
-                                hasError = true
-                            }
+                            loadUrl(url)
                         }
-                        
-                        loadUrl(url)
-                    }
-                },
-                modifier = Modifier.fillMaxSize()
-            )
-            
-            // Индикатор загрузки
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        CircularProgressIndicator()
-                        Text(
-                            text = "Загрузка...",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-            
-            // Состояние ошибки
-            if (hasError) {
-                ErrorScreen(
-                    onRetry = {
-                        hasError = false
-                        isLoading = true
                     },
                     modifier = Modifier.fillMaxSize()
                 )
-            }
+                
+                // Индикатор загрузки
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = androidx.compose.ui.Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            CircularProgressIndicator()
+                            Text(
+                                text = "Загрузка...",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+                
+                // Состояние ошибки
+                if (hasError) {
+                    ErrorScreen(
+                        onRetry = {
+                            hasError = false
+                            isLoading = true
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     } else {
@@ -168,7 +170,7 @@ fun WebViewScreen(
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Назад"
                             )
                         }
@@ -179,7 +181,8 @@ fun WebViewScreen(
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 )
-            }
+            },
+            contentWindowInsets = WindowInsets(0)
         ) { paddingValues ->
             Box(
                 modifier = modifier

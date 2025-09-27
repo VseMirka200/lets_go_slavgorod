@@ -132,7 +132,7 @@ object AlarmScheduler {
      * @param favoriteTime избранное время для планирования уведомления
      */
     fun scheduleAlarm(context: Context, favoriteTime: FavoriteTime) {
-        if (!shouldSendNotification(context)) {
+        if (!shouldSendNotification(context, favoriteTime.routeId)) {
             Log.d("AlarmScheduler", "Notification skipped for ${favoriteTime.id} due to user settings")
             return
         }
@@ -316,7 +316,9 @@ object AlarmScheduler {
         // Проверяем, нужно ли учитывать день недели или планировать на каждый день
         val shouldCheckDayOfWeek = try {
             val preferences = runBlocking { context.dataStore.data.first() }
-            val notificationModeString = preferences[stringPreferencesKey("notification_mode")] 
+            // Проверяем индивидуальные настройки маршрута
+            val routeMode = preferences[stringPreferencesKey("route_notification_mode_${favoriteTime.routeId}")]
+            val notificationModeString = routeMode ?: preferences[stringPreferencesKey("notification_mode")] 
                 ?: NotificationMode.ALL_DAYS.name
             val notificationMode = NotificationMode.valueOf(notificationModeString)
             notificationMode != NotificationMode.ALL_DAYS
@@ -361,7 +363,7 @@ object AlarmScheduler {
             try {
                 cancelAlarm(context, favoriteTime.id)
                 
-                if (shouldSendNotification(context)) {
+                if (shouldSendNotification(context, favoriteTime.routeId)) {
                     scheduleAlarm(context, favoriteTime)
                     Log.d("AlarmScheduler", "Rescheduled alarm for ${favoriteTime.id} based on settings")
                 } else {
@@ -377,7 +379,7 @@ object AlarmScheduler {
      * Проверяет и обновляет уведомления при изменении настроек
      */
     fun checkAndUpdateNotifications(context: Context, favoriteTime: FavoriteTime) {
-        if (shouldSendNotification(context)) {
+        if (shouldSendNotification(context, favoriteTime.routeId)) {
             scheduleAlarm(context, favoriteTime)
             Log.d("AlarmScheduler", "Notification scheduled for ${favoriteTime.id}")
         } else {
@@ -389,7 +391,7 @@ object AlarmScheduler {
     private fun formatMillis(millis: Long): String {
         return try {
             if (millis <= 0) return "Invalid or Past Millis"
-            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(millis)
+            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(millis)
         } catch (e: Exception) {
             Log.e("AlarmScheduler", "Error formatting millis: $millis", e)
             "Error formatting timestamp"

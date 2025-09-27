@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Info
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,7 +49,6 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.BuildConfig
 import com.example.lets_go_slavgorod.R
-import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
 import com.example.lets_go_slavgorod.ui.navigation.Screen
 
 /**
@@ -71,7 +72,8 @@ fun AboutScreen(
     innerPadding: PaddingValues = PaddingValues()
 ) {
 
-    val developerSectionTitleText = stringResource(id = R.string.developer_section_title) // "Разработал: VseMirka200"
+    val developerSectionTitleText =
+        stringResource(id = R.string.developer_section_title) // "Разработал: VseMirka200"
 
     val developerGitHubUrl = stringResource(id = R.string.developer_github_url_value)
 
@@ -79,74 +81,48 @@ fun AboutScreen(
     val feedbackTelegramBotUsername = stringResource(id = R.string.feedback_telegram_bot_username)
 
     val appVersion = BuildConfig.VERSION_NAME
-    "https://t.me/$feedbackTelegramBotUsername"
 
-    SettingsSwipeableContainer(
-        onSwipeToNext = {
-            // Свайп влево - переход к маршрутам
-            Log.d("AboutScreen", "Swipe left detected, navigating to Home")
-            if (navController != null) {
-                try {
-                    navController.navigate(Screen.Home.route)
-                    Log.d("AboutScreen", "Navigation to Home completed")
-                } catch (e: Exception) {
-                    Log.e("AboutScreen", "Navigation to Home failed", e)
-                }
-            } else {
-                Log.e("AboutScreen", "navController is null, cannot navigate")
-            }
-        },
-        onSwipeToPrevious = {
-            // Свайп вправо - переход к избранному
-            Log.d("AboutScreen", "Swipe right detected, navigating to FavoriteTimes")
-            if (navController != null) {
-                try {
-                    navController.navigate(Screen.FavoriteTimes.route)
-                    Log.d("AboutScreen", "Navigation to FavoriteTimes completed")
-                } catch (e: Exception) {
-                    Log.e("AboutScreen", "Navigation to FavoriteTimes failed", e)
-                }
-            } else {
-                Log.e("AboutScreen", "navController is null, cannot navigate")
-            }
-        },
-        modifier = modifier.fillMaxSize()
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(id = R.string.about_screen_title),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Назад"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.about_screen_title),
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                     )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Назад"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                windowInsets = WindowInsets(0)
             )
-        )
-            Column(
+        },
+        contentWindowInsets = WindowInsets(0)
+    ) { innerPadding ->
+        Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                    .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            ) {
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
             // Раздел Информация о приложении
-                Text(
+            Text(
                 text = "Информация о приложении",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 6.dp)
             )
+
             AppInfoCard(
                 appName = stringResource(id = R.string.app_name),
                 developer = developerSectionTitleText,
@@ -155,39 +131,41 @@ fun AboutScreen(
 
             Spacer(Modifier.height(16.dp))
 
-                // Раздел Ссылки
-                Text(
+            // Раздел Ссылки
+            Text(
                 text = "Ссылки",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 6.dp)
             )
+
             LinksCard(
                 navController = navController,
                 githubUrl = developerGitHubUrl,
                 vkUrl = "https://vk.com/vsemirka200"
             )
-                
+
             Spacer(Modifier.height(16.dp))
 
-                // Раздел Обратная связь
-                Text(
+            // Раздел Обратная связь
+            Text(
                 text = "Обратная связь",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 6.dp)
             )
+
             FeedbackCard()
-            
+
             Spacer(Modifier.height(16.dp))
-            
+
             // Раздел Поддержка разработчика
             Text(
                 text = "Поддержка разработчика",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 6.dp)
             )
+
             SupportCard(navController = navController)
         }
-    }
     }
 }
 
@@ -228,9 +206,9 @@ private fun AppInfoCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-            Text(
+                    Text(
                         text = "Версия: $version",
-                style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -442,12 +420,11 @@ private fun SupportCard(
  * Карточка обратной связи
  */
 @Composable
-private fun FeedbackCard(
-) {
+private fun FeedbackCard() {
     val context = LocalContext.current
     val feedbackTelegramBotUsername = stringResource(id = R.string.feedback_telegram_bot_username)
     val telegramBotUrl = "https://t.me/$feedbackTelegramBotUsername"
-    
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -461,9 +438,9 @@ private fun FeedbackCard(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(Modifier.height(16.dp))
-            
+
             // Кнопка обратной связи
             Button(
                 onClick = {
@@ -498,9 +475,9 @@ private fun FeedbackCard(
                 Spacer(Modifier.width(8.dp))
                 Text("Обратная связь")
             }
-            
+
             Spacer(Modifier.height(12.dp))
-            
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -519,8 +496,8 @@ private fun FeedbackCard(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "• Ошибки в приложении\n" +
-                                "• Предложения по улучшению\n" +
-                                "• Вопросы по расписанию",
+                               "• Предложения по улучшению\n" +
+                               "• Вопросы по расписанию",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -529,5 +506,3 @@ private fun FeedbackCard(
         }
     }
 }
-
-

@@ -107,25 +107,6 @@ fun ScheduleScreen(
         getNextUpcomingScheduleId(schedulesSovhoz)
     }
 
-    SettingsSwipeableContainer(
-        onSwipeToNext = {
-            Log.d("ScheduleScreen", "Swipe left detected - navigating to Favorites")
-            navController?.navigate(Screen.FavoriteTimes.route) {
-                popUpTo(Screen.Home.route) { inclusive = false }
-                launchSingleTop = true
-                restoreState = true
-            }
-        },
-        onSwipeToPrevious = {
-            Log.d("ScheduleScreen", "Swipe right detected - navigating to Settings")
-            navController?.navigate(Screen.Settings.route) {
-                popUpTo(Screen.Home.route) { inclusive = false }
-                launchSingleTop = true
-                restoreState = true
-            }
-        },
-        modifier = Modifier.fillMaxSize()
-    ) {
         Scaffold(
             topBar = {
                 ScheduleHeader(
@@ -143,7 +124,7 @@ fun ScheduleScreen(
                 Column(modifier = Modifier.padding(paddingValues)) {
                     RouteDetailsSummaryCard(
                         route = route,
-                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 15.dp)
                     )
                     ScheduleList(
                         route = route,
@@ -161,7 +142,6 @@ fun ScheduleScreen(
             }
         }
     }
-}
 
 /**
  * Определяет ID ближайшего рейса из списка расписаний
@@ -170,7 +150,7 @@ private fun getNextUpcomingScheduleId(schedules: List<BusSchedule>): String? {
     if (schedules.isEmpty()) return null
     
     val currentTime = Calendar.getInstance()
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    val timeFormat = SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
     
     // Находим все рейсы, которые еще не прошли сегодня
     val upcomingToday = schedules.filter { schedule ->

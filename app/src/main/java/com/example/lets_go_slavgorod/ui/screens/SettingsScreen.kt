@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +25,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.AlertDialog
@@ -32,7 +32,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -65,12 +64,7 @@ import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.R
 import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
 import com.example.lets_go_slavgorod.ui.navigation.Screen
-import java.time.DayOfWeek
-import java.time.format.TextStyle
-import java.util.Locale
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
-import com.example.lets_go_slavgorod.ui.viewmodel.NotificationMode
-import com.example.lets_go_slavgorod.ui.viewmodel.NotificationSettingsViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateMode
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
@@ -80,13 +74,11 @@ import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
  * 
  * Содержит настройки для:
  * - Темы приложения (светлая/темная/системная)
- * - Уведомлений (режимы: все дни/будни/выбранные дни/отключено)
  * - Обновлений (автоматические/ручные/отключено)
  * - О программе (информация о приложении, ссылки, обратная связь, поддержка)
  * 
  * @param modifier модификатор для настройки внешнего вида
  * @param themeViewModel ViewModel для управления темой приложения
- * @param notificationSettingsViewModel ViewModel для настроек уведомлений
  * @param updateSettingsViewModel ViewModel для настроек обновлений (опционально)
  */
 @RequiresApi(Build.VERSION_CODES.O)
@@ -96,7 +88,6 @@ fun SettingsScreen(
     navController: NavController? = null,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     themeViewModel: ThemeViewModel = viewModel(),
-    notificationSettingsViewModel: NotificationSettingsViewModel = viewModel(),
     updateSettingsViewModel: UpdateSettingsViewModel? = null,
 ) {
     val context = LocalContext.current
@@ -112,12 +103,6 @@ fun SettingsScreen(
     var showThemeDropdown by remember { mutableStateOf(false) }
     val themeOptions = remember { AppTheme.entries.toTypedArray() }
 
-    val currentNotificationMode by notificationSettingsViewModel.currentNotificationMode.collectAsState()
-    var showNotificationModeDropdown by remember { mutableStateOf(false) }
-    val notificationModeOptions = remember { NotificationMode.entries.toTypedArray() }
-
-    var showSelectDaysDialog by remember { mutableStateOf(false) }
-    val selectedDaysFromVM by notificationSettingsViewModel.selectedNotificationDays.collectAsState()
     
     // Update settings state
     val currentUpdateMode by updateSettingsVM.currentUpdateMode.collectAsState(initial = UpdateMode.AUTOMATIC)
@@ -132,31 +117,12 @@ fun SettingsScreen(
     val availableUpdateNotes by updateSettingsVM.availableUpdateNotes.collectAsState(initial = null)
     
 
-
     SettingsSwipeableContainer(
         onSwipeToNext = {
-            // Свайп влево - переход к маршрутам
-            Log.d("SettingsScreen", "Swipe left detected, navigating to Home")
-            Log.d("SettingsScreen", "navController is null: ${navController == null}")
+            // Свайп влево - переход к избранному
+            Log.d("SettingsScreen", "Swipe left detected, navigating to FavoriteTimes")
             if (navController != null) {
                 try {
-                    // Простая навигация без сложных параметров
-                    navController.navigate(Screen.Home.route)
-                    Log.d("SettingsScreen", "Navigation to Home completed")
-                } catch (e: Exception) {
-                    Log.e("SettingsScreen", "Navigation to Home failed", e)
-                }
-            } else {
-                Log.e("SettingsScreen", "navController is null, cannot navigate")
-            }
-        },
-        onSwipeToPrevious = {
-            // Свайп вправо - переход к избранному
-            Log.d("SettingsScreen", "Swipe right detected, navigating to FavoriteTimes")
-            Log.d("SettingsScreen", "navController is null: ${navController == null}")
-            if (navController != null) {
-                try {
-                    // Простая навигация без сложных параметров
                     navController.navigate(Screen.FavoriteTimes.route)
                     Log.d("SettingsScreen", "Navigation to FavoriteTimes completed")
                 } catch (e: Exception) {
@@ -166,36 +132,52 @@ fun SettingsScreen(
                 Log.e("SettingsScreen", "navController is null, cannot navigate")
             }
         },
+        onSwipeToPrevious = {
+            // Свайп вправо - переход к маршрутам
+            Log.d("SettingsScreen", "Swipe right detected, navigating to Home")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.Home.route)
+                    Log.d("SettingsScreen", "Navigation to Home completed")
+                } catch (e: Exception) {
+                    Log.e("SettingsScreen", "Navigation to Home failed", e)
+                }
+            } else {
+                Log.e("SettingsScreen", "navController is null, cannot navigate")
+            }
+        },
         modifier = modifier.fillMaxSize()
     ) {
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.settings_screen_title),
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.settings_screen_title),
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                     )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            }
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-            ) {
+            )
+        },
+        contentWindowInsets = WindowInsets(0)
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
             Text(
                 text = stringResource(R.string.settings_section_theme_title),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+            
             ThemeSettingsCard(
                 currentAppTheme = currentAppTheme,
                 showThemeDropdown = showThemeDropdown,
@@ -209,31 +191,11 @@ fun SettingsScreen(
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = stringResource(R.string.settings_section_notifications_title),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            NotificationSettingsCard(
-                currentNotificationMode = currentNotificationMode,
-                showNotificationModeDropdown = showNotificationModeDropdown,
-                onShowNotificationModeDropdownChange = { showNotificationModeDropdown = it },
-                notificationModeOptions = notificationModeOptions,
-                onNotificationModeSelected = { mode ->
-                    if (mode == NotificationMode.SELECTED_DAYS) {
-                        showSelectDaysDialog = true
-                    } else {
-                        notificationSettingsViewModel.setNotificationMode(mode)
-                    }
-                }
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            Text(
                 text = "Обновления",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+            
             UpdateSettingsCard(
                 currentUpdateMode = currentUpdateMode,
                 showUpdateModeDropdown = showUpdateModeDropdown,
@@ -280,29 +242,15 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+            
             AboutNavigationCard(
                 navController = navController
             )
-            
-
         }
     }
-
-
-    if (showSelectDaysDialog) {
-        SelectDaysDialog(
-            currentlySelectedDays = selectedDaysFromVM,
-            onDismissRequest = { showSelectDaysDialog = false },
-            onConfirm = { newSelectedDays ->
-                showSelectDaysDialog = false
-                notificationSettingsViewModel.setSelectedNotificationDays(newSelectedDays)
-                Log.d("SettingsScreen", "Selected days confirmed: $newSelectedDays")
-            }
-        )
     }
-    }
-
 }
+
 
 /**
  * Карточка настроек темы приложения
@@ -406,174 +354,6 @@ fun ThemeSettingsCard(
     }
 }
 
-/**
- * Карточка настроек уведомлений
- * 
- * Позволяет настроить режим уведомлений:
- * - Все дни: уведомления каждый день
- * - Только будни: уведомления с понедельника по пятницу
- * - Выбранные дни: уведомления в выбранные дни недели
- * - Отключено: уведомления не приходят
- * 
- * @param currentNotificationMode текущий режим уведомлений
- * @param showNotificationModeDropdown флаг отображения выпадающего меню
- * @param onShowNotificationModeDropdownChange callback для изменения состояния меню
- * @param notificationModeOptions доступные режимы уведомлений
- * @param onNotificationModeSelected callback для выбора режима
- */
-@Composable
-fun NotificationSettingsCard(
-    currentNotificationMode: NotificationMode,
-    showNotificationModeDropdown: Boolean,
-    onShowNotificationModeDropdownChange: (Boolean) -> Unit,
-    notificationModeOptions: Array<NotificationMode>,
-    onNotificationModeSelected: (NotificationMode) -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onShowNotificationModeDropdownChange(true) }
-                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.Notifications,
-                        contentDescription = stringResource(R.string.settings_notification_icon_desc),
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(Modifier.width(16.dp))
-                    Text(
-                        text = stringResource(R.string.settings_notification_mode_label),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = stringResource(
-                            when (currentNotificationMode) {
-                                NotificationMode.WEEKDAYS -> R.string.notification_mode_weekdays
-                                NotificationMode.ALL_DAYS -> R.string.notification_mode_all_days
-                                NotificationMode.SELECTED_DAYS -> R.string.notification_mode_selected_days
-                                NotificationMode.DISABLED -> R.string.notification_mode_disabled
-                            }
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Icon(
-                        imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = stringResource(R.string.settings_select_notification_mode_desc),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            DropdownMenu(
-                expanded = showNotificationModeDropdown,
-                onDismissRequest = { onShowNotificationModeDropdownChange(false) },
-            ) {
-                notificationModeOptions.forEach { mode ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                stringResource(
-                                    when (mode) {
-                                        NotificationMode.WEEKDAYS -> R.string.notification_mode_weekdays
-                                        NotificationMode.ALL_DAYS -> R.string.notification_mode_all_days
-                                        NotificationMode.SELECTED_DAYS -> R.string.notification_mode_selected_days
-                                        NotificationMode.DISABLED -> R.string.notification_mode_disabled
-                                    }
-                                ),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        },
-                        onClick = {
-                            onNotificationModeSelected(mode)
-                            onShowNotificationModeDropdownChange(false)
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun SelectDaysDialog(
-    currentlySelectedDays: Set<DayOfWeek>,
-    onDismissRequest: () -> Unit,
-    onConfirm: (Set<DayOfWeek>) -> Unit,
-) {
-    val daysOfWeek = remember { DayOfWeek.entries.toList() }
-    val tempSelectedDays = remember { mutableStateOf(currentlySelectedDays) }
-
-    LaunchedEffect(currentlySelectedDays) {
-        tempSelectedDays.value = currentlySelectedDays
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(R.string.dialog_select_days_title)) },
-        text = {
-            Column {
-                daysOfWeek.forEach { day ->
-                    val isChecked = tempSelectedDays.value.contains(day)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                val currentSelection = tempSelectedDays.value.toMutableSet()
-                                if (isChecked) {
-                                    currentSelection.remove(day)
-                                } else {
-                                    currentSelection.add(day)
-                                }
-                                tempSelectedDays.value = currentSelection
-                            }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = isChecked,
-                            onCheckedChange = null
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = day.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
-                                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(tempSelectedDays.value) }) {
-                Text(stringResource(R.string.dialog_button_confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(R.string.dialog_button_cancel))
-            }
-        }
-    )
-}
 
 @Composable
 fun UpdateSettingsCard(
@@ -992,7 +772,7 @@ private fun formatLastCheckTime(timestamp: Long): String {
         diff < 3600_000 -> "${diff / 60_000} мин. назад" // менее часа
         diff < 86400_000 -> "${diff / 3600_000} ч. назад" // менее суток
         else -> {
-            val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+            val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault())
             dateFormat.format(java.util.Date(timestamp))
         }
     }

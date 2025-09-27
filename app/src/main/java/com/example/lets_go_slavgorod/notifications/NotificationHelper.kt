@@ -111,7 +111,7 @@ object NotificationHelper {
 
         val smallIconResId = R.drawable.ic_stat_directions_bus
         val largeIconResId = R.drawable.ic_stat_directions_bus
-        val combinedTitleText = "$routeInfo ${departureTimeInfo.lowercase(Locale.getDefault())}"
+        val combinedTitleText = "$routeInfo ${departureTimeInfo.lowercase(java.util.Locale.getDefault())}"
         val subTextParts = mutableListOf<String>()
         if (departurePointInfo.isNotBlank()) {
             subTextParts.add(departurePointInfo)

@@ -1,5 +1,6 @@
 package com.example.lets_go_slavgorod.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -53,17 +54,31 @@ fun FavoriteTimesScreen(
 
     SettingsSwipeableContainer(
         onSwipeToNext = {
-            navController?.navigate(Screen.Settings.route) {
-                popUpTo(Screen.Home.route) { inclusive = false }
-                launchSingleTop = true
-                restoreState = true
+            // Свайп влево - переход к настройкам
+            Log.d("FavoriteTimesScreen", "Swipe left detected, navigating to Settings")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.Settings.route)
+                    Log.d("FavoriteTimesScreen", "Navigation to Settings completed")
+                } catch (e: Exception) {
+                    Log.e("FavoriteTimesScreen", "Navigation to Settings failed", e)
+                }
+            } else {
+                Log.e("FavoriteTimesScreen", "navController is null, cannot navigate")
             }
         },
         onSwipeToPrevious = {
-            navController?.navigate(Screen.Home.route) {
-                popUpTo(Screen.Home.route) { inclusive = false }
-                launchSingleTop = true
-                restoreState = true
+            // Свайп вправо - переход к маршрутам
+            Log.d("FavoriteTimesScreen", "Swipe right detected, navigating to Home")
+            if (navController != null) {
+                try {
+                    navController.navigate(Screen.Home.route)
+                    Log.d("FavoriteTimesScreen", "Navigation to Home completed")
+                } catch (e: Exception) {
+                    Log.e("FavoriteTimesScreen", "Navigation to Home failed", e)
+                }
+            } else {
+                Log.e("FavoriteTimesScreen", "navController is null, cannot navigate")
             }
         },
         modifier = modifier.fillMaxSize()
@@ -83,7 +98,8 @@ fun FavoriteTimesScreen(
                         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 )
-            }
+            },
+            contentWindowInsets = WindowInsets(0)
         ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -103,7 +119,6 @@ fun FavoriteTimesScreen(
                 )
             }
         }
-    }
     }
 }
 
@@ -280,7 +295,14 @@ private fun ExpandableDeparturePointSection(
             Column(modifier = Modifier.padding(bottom = if (schedulesInGroup.isNotEmpty()) 8.dp else 0.dp)) {
                 schedulesInGroup.forEachIndexed { index, favoriteTime ->
                     if (index > 0) {
-                        HorizontalDivider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp))
+                        HorizontalDivider(
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 4.dp,
+                                bottom = 4.dp
+                            )
+                        )
                     }
                     val scheduleDisplay = com.example.lets_go_slavgorod.data.model.BusSchedule(
                         id = favoriteTime.id,
@@ -302,10 +324,16 @@ private fun ExpandableDeparturePointSection(
                         isNextUpcoming = false,
                         allSchedules = listOf(scheduleDisplay), // Передаем расписание для CountdownTimer
                         hideRouteInfo = true, // Скрываем информацию о маршруте, так как она уже показана в заголовке
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 8.dp,
+                            bottom = 8.dp
+                        )
                     )
                 }
             }
         }
+    }
     }
 }

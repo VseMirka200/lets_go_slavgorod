@@ -23,7 +23,7 @@ object TimeUtils {
     /**
      * Форматирует время в читаемый вид
      */
-    private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    private val timeFormat = SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
     
     /**
      * Вычисляет время до ближайшего рейса

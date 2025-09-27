@@ -57,6 +57,10 @@ import com.example.lets_go_slavgorod.ui.viewmodel.NotificationSettingsViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModelFactory
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
+import com.example.lets_go_slavgorod.notifications.AlarmScheduler
+import com.example.lets_go_slavgorod.data.local.AppDatabase
+import com.example.lets_go_slavgorod.data.model.FavoriteTime
+import kotlinx.coroutines.flow.firstOrNull
 import com.example.lets_go_slavgorod.ui.components.UpdateDialogManager
 
 /**
@@ -131,6 +135,45 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Восстанавливает уведомления после перезапуска приложения
+     * 
+     * Вызывается при запуске приложения для восстановления всех активных уведомлений
+     * в соответствии с текущими настройками пользователя
+     */
+    private suspend fun restoreNotifications() {
+        try {
+            Log.d("MainActivity", "Restoring notifications after app restart")
+            
+            val database = AppDatabase.getDatabase(this)
+            val favoriteTimeDao = database.favoriteTimeDao()
+            
+            val favoriteTimeEntities = favoriteTimeDao.getAllFavoriteTimes().firstOrNull() ?: emptyList()
+            
+            val activeFavoriteTimes = favoriteTimeEntities
+                .filter { entity -> entity.isActive }
+                .map { entity ->
+                    FavoriteTime(
+                        id = entity.id,
+                        routeId = entity.routeId,
+                        routeNumber = "N/A",
+                        routeName = "Маршрут",
+                        stopName = entity.stopName,
+                        departureTime = entity.departureTime,
+                        dayOfWeek = entity.dayOfWeek,
+                        departurePoint = entity.departurePoint,
+                        isActive = entity.isActive
+                    )
+                }
+            
+            AlarmScheduler.updateAllAlarmsBasedOnSettings(this, activeFavoriteTimes)
+            Log.d("MainActivity", "Restored ${activeFavoriteTimes.size} active notifications")
+            
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error restoring notifications", e)
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,6 +186,8 @@ class MainActivity : ComponentActivity() {
         // Запрашиваем разрешения асинхронно, чтобы не блокировать UI
         lifecycleScope.launch {
             askNotificationPermission()
+            // Восстанавливаем уведомления после перезапуска приложения
+            restoreNotifications()
         }
     }
 }
@@ -298,7 +343,9 @@ fun AppNavHost(
             exitTransition = { NavigationAnimations.slideOutToBottomSchedule }
         ) { backStackEntry ->
             val routeId = backStackEntry.arguments?.getString("routeId") ?: ""
+            Log.d("MainActivity", "Navigating to schedule for routeId: $routeId")
             val route = busViewModel.getRouteById(routeId)
+            Log.d("MainActivity", "Found route: ${route?.name} (${route?.id})")
             ScheduleScreen(
                 route = route,
                 onBackClick = { navController.popBackStack() },

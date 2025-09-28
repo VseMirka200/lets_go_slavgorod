@@ -29,9 +29,9 @@
 - **Автоматические обновления** - система проверки и установки обновлений
 ## 📱 Скриншоты
 <div align="center">
-  <img width="300" alt="Главный экран" src="materials/screenshot/1.jpg"/>
-  <img width="300" alt="Расписание маршрута" src="materials/screenshot/2.jpg"/>
-  <img width="300" alt="Настройки уведомлений" src="materials/screenshot/3.jpg"/>
+  <img width="150" alt="Главный экран" src="materials/screenshot/1.jpg"/>
+  <img width="150" alt="Расписание маршрута" src="materials/screenshot/2.jpg"/>
+  <img width="150" alt="Настройки уведомлений" src="materials/screenshot/3.jpg"/>
 </div>
 
 ## 🛠 Технологии

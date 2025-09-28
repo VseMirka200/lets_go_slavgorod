@@ -81,9 +81,9 @@ class TimeUtilsTest {
     fun `getNextDeparture should return closest schedule`() {
         // Given
         val schedules = listOf(
-            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, departurePoint = "Славгород (Рынок)")
+            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, notes = null, departurePoint = "Славгород (Рынок)")
         )
         val currentTime = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 9)
@@ -97,15 +97,15 @@ class TimeUtilsTest {
 
         // Then
         assertNotNull(result)
-        assertEquals("2", result.id) // 10:30 is the next departure
-        assertEquals("10:30", result.departureTime)
+        assertEquals("2", result?.id) // 10:30 is the next departure
+        assertEquals("10:30", result?.departureTime)
     }
 
     @Test
     fun `getNextDeparture should return null when no future schedules`() {
         // Given
         val schedules = listOf(
-            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, notes = null, departurePoint = "Славгород (Рынок)"),
             BusSchedule("2", "102", "Славгород (Рынок)", "09:00", 1, departurePoint = "Славгород (Рынок)")
         )
         val currentTime = Calendar.getInstance().apply {
@@ -126,9 +126,9 @@ class TimeUtilsTest {
     fun `isNextDeparture should return true for next departure`() {
         // Given
         val schedules = listOf(
-            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, departurePoint = "Славгород (Рынок)")
+            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, notes = null, departurePoint = "Славгород (Рынок)")
         )
         val currentTime = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 9)
@@ -149,9 +149,9 @@ class TimeUtilsTest {
     fun `isNextDeparture should return false for non-next departure`() {
         // Given
         val schedules = listOf(
-            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, departurePoint = "Славгород (Рынок)")
+            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, notes = null, departurePoint = "Славгород (Рынок)")
         )
         val currentTime = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 9)
@@ -220,8 +220,8 @@ class TimeUtilsTest {
 
         // Then
         assertNotNull(result)
-        assertEquals(29, result!!.first) // 29 минут
-        assertEquals(30, result.second) // 30 секунд
+        assertEquals(29, result?.first) // 29 минут
+        assertEquals(30, result?.second) // 30 секунд
     }
 
     @Test
@@ -245,30 +245,30 @@ class TimeUtilsTest {
     @Test
     fun `formatTimeUntilDepartureWithExactTime should format with exact time`() {
         // Test cases for different time formats with exact time
-        assertEquals("Сейчас (10:00)", TimeUtils.formatTimeUntilDepartureWithExactTime(0, "10:00"))
-        assertEquals("Через 1 минуту (10:01)", TimeUtils.formatTimeUntilDepartureWithExactTime(1, "10:01"))
-        assertEquals("Через 5 мин (10:05)", TimeUtils.formatTimeUntilDepartureWithExactTime(5, "10:05"))
-        assertEquals("Через 30 мин (10:30)", TimeUtils.formatTimeUntilDepartureWithExactTime(30, "10:30"))
-        assertEquals("Через 1 ч (11:00)", TimeUtils.formatTimeUntilDepartureWithExactTime(60, "11:00"))
-        assertEquals("Через 1 ч 30 мин (11:30)", TimeUtils.formatTimeUntilDepartureWithExactTime(90, "11:30"))
-        assertEquals("Через 2 ч (12:00)", TimeUtils.formatTimeUntilDepartureWithExactTime(120, "12:00"))
+        assertEquals("Сейчас (10-00)", TimeUtils.formatTimeUntilDepartureWithExactTime(0, "10:00"))
+        assertEquals("Через 1 минуту (10-01)", TimeUtils.formatTimeUntilDepartureWithExactTime(1, "10:01"))
+        assertEquals("Через 5 мин (10-05)", TimeUtils.formatTimeUntilDepartureWithExactTime(5, "10:05"))
+        assertEquals("Через 30 мин (10-30)", TimeUtils.formatTimeUntilDepartureWithExactTime(30, "10:30"))
+        assertEquals("Через 1 ч (11-00)", TimeUtils.formatTimeUntilDepartureWithExactTime(60, "11:00"))
+        assertEquals("Через 1 ч 30 мин (11-30)", TimeUtils.formatTimeUntilDepartureWithExactTime(90, "11:30"))
+        assertEquals("Через 2 ч (12-00)", TimeUtils.formatTimeUntilDepartureWithExactTime(120, "12:00"))
     }
 
     @Test
     fun `formatTimeUntilDepartureWithSeconds should format with seconds`() {
         // Test cases for different time formats with seconds
-        assertEquals("Сейчас (10:00)", TimeUtils.formatTimeUntilDepartureWithSeconds(0, 0, "10:00"))
-        assertEquals("Через 30 сек (10:00)", TimeUtils.formatTimeUntilDepartureWithSeconds(0, 30, "10:00"))
-        assertEquals("Через 1 мин 30 сек (10:01)", TimeUtils.formatTimeUntilDepartureWithSeconds(1, 30, "10:01"))
-        assertEquals("Через 5 мин 45 сек (10:05)", TimeUtils.formatTimeUntilDepartureWithSeconds(5, 45, "10:05"))
-        assertEquals("Через 30 мин (10:30)", TimeUtils.formatTimeUntilDepartureWithSeconds(30, 0, "10:30"))
-        assertEquals("Через 1 ч (11:00)", TimeUtils.formatTimeUntilDepartureWithSeconds(60, 0, "11:00"))
-        assertEquals("Через 1 ч 30 мин (11:30)", TimeUtils.formatTimeUntilDepartureWithSeconds(90, 0, "11:30"))
-        assertEquals("Через 2 ч (12:00)", TimeUtils.formatTimeUntilDepartureWithSeconds(120, 0, "12:00"))
+        assertEquals("Сейчас (10-00)", TimeUtils.formatTimeUntilDepartureWithSeconds(0, 0, "10:00"))
+        assertEquals("Через 30 сек (10-00)", TimeUtils.formatTimeUntilDepartureWithSeconds(0, 30, "10:00"))
+        assertEquals("Через 1 мин 30 сек (10-01)", TimeUtils.formatTimeUntilDepartureWithSeconds(1, 30, "10:01"))
+        assertEquals("Через 5 мин 45 сек (10-05)", TimeUtils.formatTimeUntilDepartureWithSeconds(5, 45, "10:05"))
+        assertEquals("Через 30 мин (10-30)", TimeUtils.formatTimeUntilDepartureWithSeconds(30, 0, "10:30"))
+        assertEquals("Через 1 ч (11-00)", TimeUtils.formatTimeUntilDepartureWithSeconds(60, 0, "11:00"))
+        assertEquals("Через 1 ч 30 мин (11-30)", TimeUtils.formatTimeUntilDepartureWithSeconds(90, 0, "11:30"))
+        assertEquals("Через 2 ч (12-00)", TimeUtils.formatTimeUntilDepartureWithSeconds(120, 0, "12:00"))
     }
 
     @Test
-    fun `getNextDeparture should find next day departure at 22:40`() {
+    fun `getNextDeparture should find next day departure at 22-40`() {
         // Given - время 22:40, все рейсы уже прошли
         val currentTime = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 22)
@@ -278,11 +278,11 @@ class TimeUtilsTest {
         }
         
         val schedules = listOf(
-            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("4", "102", "Славгород (Рынок)", "15:30", 1, departurePoint = "Славгород (Рынок)"),
-            BusSchedule("5", "102", "Славгород (Рынок)", "18:00", 1, departurePoint = "Славгород (Рынок)")
+            BusSchedule("1", "102", "Славгород (Рынок)", "08:00", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("2", "102", "Славгород (Рынок)", "10:30", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("3", "102", "Славгород (Рынок)", "13:00", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("4", "102", "Славгород (Рынок)", "15:30", 1, notes = null, departurePoint = "Славгород (Рынок)"),
+            BusSchedule("5", "102", "Славгород (Рынок)", "18:00", 1, notes = null, departurePoint = "Славгород (Рынок)")
         )
 
         // When
@@ -290,7 +290,7 @@ class TimeUtilsTest {
 
         // Then
         assertNotNull(result)
-        assertEquals("08:00", result.departureTime) // Первый рейс завтра
+        assertEquals("08:00", result?.departureTime) // Первый рейс завтра
     }
 
     @Test

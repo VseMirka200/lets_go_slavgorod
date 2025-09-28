@@ -53,8 +53,8 @@ class TimeUtilsCountdownTest {
         val timeWithSeconds = TimeUtils.getTimeUntilDepartureWithSeconds(futureTime, currentTime)
         
         assertNotNull("Should return time with seconds for future time", timeWithSeconds)
-        assertEquals("Should return 5 minutes", 5, timeWithSeconds.first)
-        assertEquals("Should return 0 seconds", 0, timeWithSeconds.second)
+        assertEquals("Should return 5 minutes", 5, timeWithSeconds?.first)
+        assertEquals("Should return 0 seconds", 0, timeWithSeconds?.second)
     }
     
     @Test
@@ -84,8 +84,8 @@ class TimeUtilsCountdownTest {
         currentTime.set(Calendar.MILLISECOND, 0)
         
         val schedules = listOf(
-            com.example.lets_go_slavgorod.data.model.BusSchedule("1", "1", "Test", "10:30", 1),
-            com.example.lets_go_slavgorod.data.model.BusSchedule("2", "1", "Test", "11:00", 1)
+            com.example.lets_go_slavgorod.data.model.BusSchedule("1", "1", "Test", "10:30", 1, notes = null, departurePoint = "Test Point"),
+            com.example.lets_go_slavgorod.data.model.BusSchedule("2", "1", "Test", "11:00", 1, notes = null, departurePoint = "Test Point")
         )
         
         val isNext = TimeUtils.isNextDeparture(schedules[0], schedules, currentTime)
@@ -102,13 +102,13 @@ class TimeUtilsCountdownTest {
         currentTime.set(Calendar.MILLISECOND, 0)
         
         val schedules = listOf(
-            com.example.lets_go_slavgorod.data.model.BusSchedule("1", "1", "Test", "10:30", 1),
-            com.example.lets_go_slavgorod.data.model.BusSchedule("2", "1", "Test", "11:00", 1)
+            com.example.lets_go_slavgorod.data.model.BusSchedule("1", "1", "Test", "10:30", 1, notes = null, departurePoint = "Test Point"),
+            com.example.lets_go_slavgorod.data.model.BusSchedule("2", "1", "Test", "11:00", 1, notes = null, departurePoint = "Test Point")
         )
         
         val nextDeparture = TimeUtils.getNextDeparture(schedules, currentTime)
         
         assertNotNull("Should return next departure", nextDeparture)
-        assertEquals("Should return closest schedule", "1", nextDeparture.id)
+        assertEquals("Should return closest schedule", "1", nextDeparture?.id)
     }
 }

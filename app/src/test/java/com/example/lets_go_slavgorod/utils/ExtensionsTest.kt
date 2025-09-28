@@ -93,20 +93,20 @@ class ExtensionsTest {
     }
 
     @Test
-    fun `searchOptimized should return same results as search`() {
+    fun `search should work with case insensitive queries`() {
         // Given
         val routes = listOf(
             BusRoute("1", "102", "Славгород-Яровое", "Описание 1", travelTime = "30 мин", paymentMethods = "Наличные"),
             BusRoute("2", "103", "Славгород-Барнаул", "Описание 2", travelTime = "2 часа", paymentMethods = "Карта")
         )
-        val query = "Славгород"
+        val query = "славгород"
 
         // When
         val searchResult = routes.search(query)
-        val optimizedResult = routes.searchOptimized(query)
 
         // Then
-        assertEquals(searchResult.size, optimizedResult.size)
-        assertEquals(searchResult, optimizedResult)
+        assertEquals(2, searchResult.size)
+        assertTrue("Should find both routes", searchResult.any { it.routeNumber == "102" })
+        assertTrue("Should find both routes", searchResult.any { it.routeNumber == "103" })
     }
 }

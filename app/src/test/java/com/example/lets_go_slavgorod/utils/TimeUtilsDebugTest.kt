@@ -10,7 +10,7 @@ import java.util.*
 class TimeUtilsDebugTest {
     
     @Test
-    fun `test 23:34 time calculation`() {
+    fun `test 23-34 time calculation`() {
         val currentTime = Calendar.getInstance()
         // Устанавливаем время на 22:00 для тестирования
         currentTime.set(Calendar.HOUR_OF_DAY, 22)
@@ -31,7 +31,7 @@ class TimeUtilsDebugTest {
     }
     
     @Test
-    fun `test current time with 23:34`() {
+    fun `test current time with 23-34`() {
         val currentTime = Calendar.getInstance()
         val departureTime = "23:34"
         val minutes = TimeUtils.getTimeUntilDeparture(departureTime, currentTime)

@@ -44,10 +44,12 @@ class CountdownIntegrationTest {
         assertTrue("Should have valid departure time", nextDeparture?.departureTime?.isNotEmpty() == true)
         
         // Проверяем время до отправления
-        val timeUntilDeparture = TimeUtils.getTimeUntilDeparture(
-            departureTime = nextDeparture?.departureTime ?: "",
-            currentTime = currentTime
-        )
+        val timeUntilDeparture = nextDeparture?.let { schedule ->
+            TimeUtils.getTimeUntilDeparture(
+                departureTime = schedule.departureTime,
+                currentTime = currentTime
+            )
+        }
         
         assertNotNull("Should calculate time until departure", timeUntilDeparture)
         assertTrue("Time until departure should be positive", timeUntilDeparture!! > 0)
@@ -66,7 +68,7 @@ class CountdownIntegrationTest {
                 assertTrue("Time until departure should be positive for $time", minutes > 0)
                 
                 // Проверяем форматирование
-                val formatted = TimeUtils.formatTimeUntilDepartureWithExactTime(minutes)
+                val formatted = TimeUtils.formatTimeUntilDepartureWithExactTime(minutes, time)
                 assertNotNull("Should format time for $time", formatted)
                 assertTrue("Formatted time should contain minutes for $time", formatted.contains(minutes.toString()))
             }
@@ -91,13 +93,14 @@ class CountdownIntegrationTest {
                     if (timeWithSeconds != null) {
                         TimeUtils.formatTimeUntilDepartureWithSeconds(
                             timeWithSeconds.first, 
-                            timeWithSeconds.second
+                            timeWithSeconds.second,
+                            nextDeparture.departureTime
                         )
                     } else {
-                        TimeUtils.formatTimeUntilDepartureWithExactTime(timeUntilDeparture)
+                        TimeUtils.formatTimeUntilDepartureWithExactTime(timeUntilDeparture, nextDeparture.departureTime)
                     }
                 } else {
-                    TimeUtils.formatTimeUntilDepartureWithExactTime(timeUntilDeparture)
+                    TimeUtils.formatTimeUntilDepartureWithExactTime(timeUntilDeparture, nextDeparture.departureTime)
                 }
                 
                 assertNotNull("Should format time for next departure", formatted)

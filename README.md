@@ -3,7 +3,6 @@
 [![Скачать APK](https://img.shields.io/badge/Скачать-APK-success?style=for-the-badge&logo=android)](https://github.com/VseMirka200/lets_go_slavgorod/releases)
 [![Версия](https://img.shields.io/badge/Версия-v1.05-blue?style=for-the-badge)](https://github.com/VseMirka200/lets_go_slavgorod/releases)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-green?style=for-the-badge&logo=android)](https://github.com/VseMirka200/lets_go_slavgorod)
-[![Kotlin](https://img.shields.io/badge/Kotlin-100%25-purple?style=for-the-badge&logo=kotlin)](https://github.com/VseMirka200/lets_go_slavgorod)
 
 > 🎯 **Современное приложение для просмотра расписания автобусов в городе Славгороде**
 

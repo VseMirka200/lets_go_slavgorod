@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
@@ -66,7 +67,12 @@ fun WebViewScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(title) },
+                    title = { 
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
@@ -79,7 +85,8 @@ fun WebViewScreen(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    ),
+                    windowInsets = WindowInsets(0)
                 )
             },
             contentWindowInsets = WindowInsets(0)
@@ -166,7 +173,12 @@ fun WebViewScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(title) },
+                    title = { 
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
@@ -179,7 +191,8 @@ fun WebViewScreen(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    ),
+                    windowInsets = WindowInsets(0)
                 )
             },
             contentWindowInsets = WindowInsets(0)

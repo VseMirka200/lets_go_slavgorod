@@ -85,7 +85,8 @@ fun RouteNotificationSettingsScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                windowInsets = WindowInsets(0)
             )
         },
         contentWindowInsets = WindowInsets(0)

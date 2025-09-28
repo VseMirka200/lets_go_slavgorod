@@ -233,7 +233,8 @@ fun HomeScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                windowInsets = WindowInsets(0)
             )
         },
         contentWindowInsets = WindowInsets(0)

@@ -43,7 +43,7 @@ fun ScheduleHeader(
         title = {
             Text(
                 text = route?.name ?: "Расписание",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -58,6 +58,7 @@ fun ScheduleHeader(
             titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
+        windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
         modifier = modifier
     )
 }

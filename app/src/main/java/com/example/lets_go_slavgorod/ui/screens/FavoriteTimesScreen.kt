@@ -83,7 +83,8 @@ fun FavoriteTimesScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                windowInsets = WindowInsets(0)
             )
         },
         contentWindowInsets = WindowInsets(0)

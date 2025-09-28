@@ -78,7 +78,7 @@ fun AboutScreen(
 
     // Строки для обратной связи через Telegram
 
-    val appVersion = "v1.06" // Временное решение до сборки проекта
+    val appVersion = "v1.05" // Временное решение до сборки проекта
 
     Scaffold(
         topBar = {

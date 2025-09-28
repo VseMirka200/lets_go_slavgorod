@@ -58,6 +58,8 @@
 ---
 
 <div align="center">
+
 **Сделано с ❤️ командой энтузиастов для жителей Славгорода**
+
 [![GitHub stars](https://img.shields.io/github/stars/VseMirka200/lets_go_slavgorod?style=social)](https://github.com/VseMirka200/lets_go_slavgorod/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/VseMirka200/lets_go_slavgorod?style=social)](https://github.com/VseMirka200/lets_go_slavgorod/network)

@@ -28,33 +28,6 @@ object NavigationAnimations {
         )
     )
 
-    // Анимация для переходов к деталям маршрута
-    val slideInFromBottom = slideInVertically(
-        initialOffsetY = { fullHeight -> fullHeight },
-        animationSpec = tween(
-            durationMillis = 350,
-            easing = FastOutSlowInEasing
-        )
-    ) + fadeIn(
-        animationSpec = tween(
-            durationMillis = 350,
-            easing = FastOutSlowInEasing
-        )
-    )
-    
-    val slideOutToBottom = slideOutVertically(
-        targetOffsetY = { fullHeight -> fullHeight },
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        )
-    ) + fadeOut(
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        )
-    )
-    
     // Анимация для расписания
     val slideInFromBottomSchedule = slideInVertically(
         initialOffsetY = { fullHeight -> fullHeight / 2 },

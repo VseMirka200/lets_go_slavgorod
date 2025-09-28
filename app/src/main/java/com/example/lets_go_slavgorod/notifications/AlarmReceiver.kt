@@ -3,7 +3,7 @@ package com.example.lets_go_slavgorod.notifications
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import timber.log.Timber
 
 /**
  * Получатель уведомлений о срабатывании будильника
@@ -18,12 +18,10 @@ import android.util.Log
  */
 class AlarmReceiver : BroadcastReceiver() {
     
-    companion object {
-        private const val TAG = "AlarmReceiver"
-    }
-    
+    companion object;
+
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(TAG, "Alarm received: ${intent.action}")
+        Timber.d("Alarm received: ${intent.action}")
         
         // Получаем данные из Intent
         val favoriteId = intent.getStringExtra("FAVORITE_ID")
@@ -32,20 +30,41 @@ class AlarmReceiver : BroadcastReceiver() {
         val destinationInfo = intent.getStringExtra("DESTINATION_INFO")
         val departurePointInfo = intent.getStringExtra("DEPARTURE_POINT_INFO")
         
-        Log.d(TAG, "Alarm data - favoriteId: $favoriteId, routeInfo: $routeInfo")
+        Timber.d("Alarm data - favoriteId: $favoriteId, routeInfo: $routeInfo")
         
-        // Отправляем уведомление
+        // Отправляем уведомление с улучшенной обработкой данных
         if (favoriteId != null) {
+            // Улучшенная обработка routeInfo
+            val safeRouteInfo = if (routeInfo.isNullOrBlank()) {
+                "Автобус"
+            } else {
+                routeInfo
+            }
+            
+            val safeDepartureTimeInfo = if (departureTimeInfo.isNullOrBlank()) {
+                "Время отправления"
+            } else {
+                departureTimeInfo
+            }
+            
+            val safeDeparturePointInfo = if (departurePointInfo.isNullOrBlank()) {
+                "Пункт отправления"
+            } else {
+                departurePointInfo
+            }
+            
+            Timber.d("Sending notification with: routeInfo='$safeRouteInfo', departureTime='$safeDepartureTimeInfo'")
+            
             NotificationHelper.showDepartureNotification(
                 context = context,
                 favoriteTimeId = favoriteId,
-                routeInfo = routeInfo ?: "Маршрут",
-                departureTimeInfo = departureTimeInfo ?: "Время",
-                destinationInfo = destinationInfo ?: "Направление",
-                departurePointInfo = departurePointInfo ?: "Отправление"
+                routeInfo = safeRouteInfo,
+                departureTimeInfo = safeDepartureTimeInfo,
+                destinationInfo = destinationInfo ?: "",
+                departurePointInfo = safeDeparturePointInfo
             )
         } else {
-            Log.w(TAG, "No favoriteId found in alarm intent")
+            Timber.w("No favoriteId found in alarm intent")
         }
     }
 }

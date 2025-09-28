@@ -3,6 +3,7 @@ package com.example.lets_go_slavgorod.utils
 import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
 import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import com.example.lets_go_slavgorod.data.model.BusRoute
+import com.example.lets_go_slavgorod.data.repository.BusRouteRepository
 import timber.log.Timber
 
 /**
@@ -57,28 +58,10 @@ fun logd(message: String) {
     Timber.d(message)
 }
 
-/**
- * Логирует информационное сообщение (Timber)
- * 
- * @param message информационное сообщение
- */
-fun logi(message: String) {
-    Timber.i(message)
-}
-
-/**
- * Логирует предупреждение (Timber)
- * 
- * @param message сообщение-предупреждение
- */
-fun logw(message: String) {
-    Timber.w(message)
-}
 
 /**
  * Преобразует FavoriteTimeEntity в FavoriteTime
  * 
- * @param entity сущность из базы данных
  * @param routeRepository репозиторий маршрутов (не используется, но требуется для совместимости)
  * @return модель данных FavoriteTime
  */
@@ -89,15 +72,24 @@ fun FavoriteTimeEntity.toFavoriteTime(routeRepository: Any? = null): FavoriteTim
     
     if (routeRepository != null) {
         try {
-            val routes = (routeRepository as com.example.lets_go_slavgorod.data.repository.BusRouteRepository).getAllRoutes()
+            val routes = (routeRepository as BusRouteRepository).getAllRoutes()
             val route = routes.find { it.id == this.routeId }
             route?.let {
-                routeNumber = it.id
+                routeNumber = it.routeNumber
                 routeName = it.name
+                Timber.d("Found route info: number='$routeNumber', name='$routeName'")
+            } ?: run {
+                Timber.w("Route not found for routeId: ${this.routeId}")
             }
         } catch (e: Exception) {
             loge("Error getting route info", e)
         }
+    }
+    
+    // Fallback: если routeNumber пустой, используем routeId как номер маршрута
+    if (routeNumber.isBlank()) {
+        routeNumber = this.routeId ?: "Неизвестный"
+        Timber.w("Using routeId as fallback routeNumber: '$routeNumber'")
     }
     
     return FavoriteTime(

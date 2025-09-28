@@ -11,10 +11,11 @@
 
 package com.example.lets_go_slavgorod.updates
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
+import timber.log.Timber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -37,7 +38,6 @@ import kotlin.math.max
 class UpdateManager(private val context: Context) {
     
     companion object {
-        private const val TAG = "UpdateManager"
         private const val GITHUB_API_URL = "https://api.github.com/repos/VseMirka200/lets_go_slavgorod/releases/latest"
         private const val TIMEOUT_MS = 10000L
     }
@@ -75,6 +75,7 @@ class UpdateManager(private val context: Context) {
     /**
      * Получает информацию о последнем релизе с GitHub API
      */
+    @SuppressLint("TimberArgCount")
     private suspend fun fetchLatestRelease(): UpdateInfo? = withContext(Dispatchers.IO) {
         var connection: HttpURLConnection? = null
         try {
@@ -91,13 +92,13 @@ class UpdateManager(private val context: Context) {
             }
             
             val responseCode = connection.responseCode
-            Log.d(TAG, "GitHub API response code: $responseCode")
+            Timber.d("GitHub API response code: $responseCode")
             
             when (responseCode) {
                 HttpURLConnection.HTTP_OK -> {
                     val response = connection.inputStream.bufferedReader().use { it.readText() }
                     if (response.isBlank()) {
-                        Log.w(TAG, "Empty response from GitHub API")
+                        Timber.w("Empty response from GitHub API")
                         return@withContext null
                     }
                     
@@ -114,50 +115,50 @@ class UpdateManager(private val context: Context) {
                     
                     // Валидация полученных данных
                     if (versionName.isBlank()) {
-                        Log.w(TAG, "Empty version name in response")
+                        Timber.w("Empty version name in response")
                         return@withContext null
                     }
                     
-                    Log.d(TAG, "Successfully parsed release info: version=$versionName, hasDownloadUrl=${downloadUrl.isNotBlank()}")
+                    Timber.d("Successfully parsed release info: version=$versionName, hasDownloadUrl=${downloadUrl.isNotBlank()}")
                     UpdateInfo(versionName, downloadUrl, releaseNotes)
                 }
                 HttpURLConnection.HTTP_NOT_FOUND -> {
-                    Log.w(TAG, "Repository not found (404)")
+                    Timber.w("Repository not found (404)")
                     null
                 }
                 HttpURLConnection.HTTP_FORBIDDEN -> {
-                    Log.w(TAG, "Access forbidden (403) - rate limit or permissions")
+                    Timber.w("Access forbidden (403) - rate limit or permissions")
                     null
                 }
                 HttpURLConnection.HTTP_UNAVAILABLE -> {
-                    Log.w(TAG, "Service unavailable (503)")
+                    Timber.w("Service unavailable (503)")
                     null
                 }
                 else -> {
-                    Log.w(TAG, "GitHub API returned unexpected error code: $responseCode")
+                    Timber.w("GitHub API returned unexpected error code: $responseCode")
                     null
                 }
             }
         } catch (e: java.net.SocketTimeoutException) {
-            Log.e(TAG, "Timeout while fetching latest release", e)
+            Timber.e(e, "Timeout while fetching latest release")
             null
         } catch (e: java.net.UnknownHostException) {
-            Log.e(TAG, "Unknown host while fetching latest release", e)
+            Timber.e(e, "Unknown host while fetching latest release")
             null
         } catch (e: java.net.ConnectException) {
-            Log.e(TAG, "Connection failed while fetching latest release", e)
+            Timber.e(e, "Connection failed while fetching latest release")
             null
         } catch (e: org.json.JSONException) {
-            Log.e(TAG, "JSON parsing error while fetching latest release", e)
+            Timber.e(e, "JSON parsing error while fetching latest release")
             null
         } catch (e: Exception) {
-            Log.e(TAG, "Unexpected error while fetching latest release", e)
+            Timber.e(e, "Unexpected error while fetching latest release")
             null
         } finally {
             try {
                 connection?.disconnect()
             } catch (e: Exception) {
-                Log.w(TAG, "Error disconnecting from GitHub API", e)
+                Timber.w(e, "Error disconnecting from GitHub API")
             }
         }
     }
@@ -182,7 +183,7 @@ class UpdateManager(private val context: Context) {
             }
             false
         } catch (e: Exception) {
-            Log.e(TAG, "Error comparing versions", e)
+            Timber.e(e, "Error comparing versions")
             false
         }
     }
@@ -203,7 +204,7 @@ class UpdateManager(private val context: Context) {
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             packageInfo.versionName
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting current version", e)
+            Timber.e(e, "Error getting current version")
             "1.0.0"
         }.toString()
     }
@@ -214,53 +215,53 @@ class UpdateManager(private val context: Context) {
     suspend fun checkForUpdatesWithResult(): UpdateResult = withContext(Dispatchers.IO) {
         try {
             if (!isNetworkAvailable()) {
-                Log.w(TAG, "No network connection available")
+                Timber.w("No network connection available")
                 return@withContext UpdateResult(false, error = "Нет интернет-соединения")
             }
             
             val currentVersion = getCurrentVersion()
-            Log.d(TAG, "Current version: $currentVersion")
+            Timber.d("Current version: $currentVersion")
             
             val latestRelease = withTimeoutOrNull(TIMEOUT_MS) {
                 fetchLatestRelease()
             }
             
             if (latestRelease == null) {
-                Log.w(TAG, "Failed to fetch latest release information")
+                Timber.w("Failed to fetch latest release information")
                 return@withContext UpdateResult(false, error = "Не удалось получить информацию об обновлениях")
             }
             
             // Валидация полученных данных
             if (latestRelease.versionName.isBlank()) {
-                Log.w(TAG, "Invalid version name received: '${latestRelease.versionName}'")
+                Timber.w("Invalid version name received: '${latestRelease.versionName}'")
                 return@withContext UpdateResult(false, error = "Получена некорректная информация о версии")
             }
             
             if (latestRelease.downloadUrl.isBlank()) {
-                Log.w(TAG, "No download URL available for version: ${latestRelease.versionName}")
+                Timber.w("No download URL available for version: ${latestRelease.versionName}")
                 return@withContext UpdateResult(false, error = "Ссылка для загрузки недоступна")
             }
             
-            Log.d(TAG, "Latest version: ${latestRelease.versionName}")
+            Timber.d("Latest version: ${latestRelease.versionName}")
             
             if (compareVersions(currentVersion, latestRelease.versionName)) {
-                Log.i(TAG, "Update available: ${latestRelease.versionName}")
+                Timber.i("Update available: ${latestRelease.versionName}")
                 UpdateResult(true, latestRelease)
             } else {
-                Log.i(TAG, "No updates available")
+                Timber.i("No updates available")
                 UpdateResult(true, null)
             }
         } catch (e: java.net.SocketTimeoutException) {
-            Log.e(TAG, "Network timeout during update check", e)
+            Timber.e(e, "Network timeout during update check")
             UpdateResult(false, error = "Превышено время ожидания. Проверьте соединение.")
         } catch (e: java.net.UnknownHostException) {
-            Log.e(TAG, "Unknown host during update check", e)
+            Timber.e(e, "Unknown host during update check")
             UpdateResult(false, error = "Не удалось подключиться к серверу обновлений")
         } catch (e: java.net.ConnectException) {
-            Log.e(TAG, "Connection failed during update check", e)
+            Timber.e(e, "Connection failed during update check")
             UpdateResult(false, error = "Ошибка подключения к серверу")
         } catch (e: Exception) {
-            Log.e(TAG, "Unexpected error during update check", e)
+            Timber.e(e, "Unexpected error during update check")
             UpdateResult(false, error = "Неожиданная ошибка при проверке обновлений: ${e.message}")
         }
     }

@@ -1,6 +1,6 @@
 package com.example.lets_go_slavgorod.ui.navigation
 
-import android.util.Log
+import timber.log.Timber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -39,15 +39,11 @@ fun BottomNavigation(navController: NavController) {
                 label = { Text(screen.title) },
                 selected = currentScreenRoute == screen.route,
                 onClick = {
-                    Log.d("BottomNavigation", "Navigating to: ${screen.route}")
+                    Timber.d("Navigating to: ${screen.route}")
                     navController.navigate(screen.route) {
                         // Специальная обработка для настроек - очищаем весь стек
                         when (screen.route) {
                             Screen.Settings.route -> {
-                                popUpTo(0) { inclusive = false }
-                            }
-                            Screen.Home.route -> {
-                                // Для маршрутов - очищаем стек и переходим к главной
                                 popUpTo(0) { inclusive = false }
                             }
                             else -> {

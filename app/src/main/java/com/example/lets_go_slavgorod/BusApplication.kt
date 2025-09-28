@@ -1,16 +1,22 @@
 package com.example.lets_go_slavgorod
 
 import android.app.Application
-import android.util.Log
-import com.example.lets_go_slavgorod.BuildConfig
+import androidx.multidex.MultiDex
+import androidx.multidex.MultiDexApplication
+import timber.log.Timber
+import com.example.lets_go_slavgorod.data.local.AppDatabase
+import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
 import com.example.lets_go_slavgorod.data.local.UpdatePreferences
+import com.example.lets_go_slavgorod.data.model.BusRoute
+import com.example.lets_go_slavgorod.data.model.FavoriteTime
+import com.example.lets_go_slavgorod.data.repository.BusRouteRepository
+import com.example.lets_go_slavgorod.notifications.AlarmScheduler
 import com.example.lets_go_slavgorod.notifications.NotificationHelper
 import com.example.lets_go_slavgorod.updates.UpdateManager
 import com.example.lets_go_slavgorod.utils.Constants
 import com.example.lets_go_slavgorod.utils.createBusRoute
 import com.example.lets_go_slavgorod.utils.logd
 import com.example.lets_go_slavgorod.utils.loge
-import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,26 +26,56 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 /**
- * Главный класс приложения "Lets Go Slavgorod"
+ * Главный класс приложения "Поехали! Славгород"
+ * 
+ * Оптимизированное приложение для просмотра расписания автобусов в городе Славгороде.
+ * Обеспечивает быстрый запуск, эффективную работу и удобный пользовательский интерфейс.
  * 
  * Основные функции:
- * - Инициализация Timber для логирования
- * - Создание каналов уведомлений
- * - Автоматическая проверка обновлений при запуске
- * - Управление жизненным циклом корутин
+ * - Быстрая инициализация с минимальной задержкой запуска
+ * - Оптимизированная система логирования (Timber)
+ * - Автоматическое создание каналов уведомлений
+ * - Фоновая проверка обновлений приложения
+ * - Восстановление запланированных уведомлений после перезагрузки
+ * - Управление жизненным циклом корутин для асинхронных задач
+ * 
+ * Оптимизации производительности:
+ * - Асинхронная инициализация тяжелых компонентов
+ * - Кэширование данных для быстрого доступа
+ * - Минимизация блокирующих операций в главном потоке
+ * - Эффективное управление памятью
  * 
  * @author VseMirka200
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
-class BusApplication : Application() {
+class BusApplication : MultiDexApplication() {
     
-    /** Область видимости корутин для фоновых задач приложения */
+    // =====================================================================================
+    //                              ОБЛАСТЬ ВИДИМОСТИ КОРУТИН
+    // =====================================================================================
+    
+    /**
+     * Область видимости корутин для фоновых задач приложения
+     * 
+     * Использует SupervisorJob для независимого выполнения задач:
+     * - Ошибка в одной корутине не влияет на другие
+     * - Dispatchers.IO для операций ввода-вывода
+     * - Автоматическая отмена при завершении приложения
+     */
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    
+    // =====================================================================================
+    //                              ЖИЗНЕННЫЙ ЦИКЛ ПРИЛОЖЕНИЯ
+    // =====================================================================================
     
     /**
      * Вызывается при завершении работы приложения
-     * Отменяет все активные корутины
+     * 
+     * Отменяет все активные корутины для корректного завершения работы:
+     * - Предотвращает утечки памяти
+     * - Останавливает фоновые задачи
+     * - Освобождает ресурсы
      */
     override fun onTerminate() {
         super.onTerminate()
@@ -49,16 +85,63 @@ class BusApplication : Application() {
     /**
      * Инициализация приложения при запуске
      * 
-     * Выполняет:
-     * - Настройку системы логирования (синхронно)
-     * - Создание каналов уведомлений (синхронно)
-     * - Восстановление запланированных уведомлений (асинхронно)
-     * - Автоматическую проверку обновлений (асинхронно)
+     * Оптимизированная последовательность инициализации для быстрого запуска:
+     * 1. Критически важные компоненты (синхронно)
+     * 2. Тяжелые операции (асинхронно в фоне)
+     * 
+     * Приоритеты инициализации:
+     * - MultiDex: поддержка больших приложений
+     * - Timber: система логирования
+     * - NotificationHelper: каналы уведомлений
+     * - Фоновые задачи: восстановление уведомлений, проверка обновлений
      */
     override fun onCreate() {
         super.onCreate()
         
-        // Инициализируем Timber для логирования (быстро)
+        // =====================================================================================
+        //                              КРИТИЧЕСКИ ВАЖНЫЕ КОМПОНЕНТЫ
+        // =====================================================================================
+        
+        // Инициализируем MultiDex для поддержки core library desugaring
+        MultiDex.install(this)
+        
+        // Инициализируем Timber для логирования (быстро, синхронно)
+        initializeLogging()
+        
+        // Создаем каналы для уведомлений (быстро, синхронно)
+        NotificationHelper.createNotificationChannel(this)
+        
+        // =====================================================================================
+        //                              ФОНОВЫЕ ЗАДАЧИ
+        // =====================================================================================
+        
+        // Запускаем тяжелые операции в фоне (не блокируют UI)
+        applicationScope.launch {
+            // Восстанавливаем запланированные уведомления
+            rescheduleAlarmsOnStartup()
+            
+            // Запускаем автоматическую проверку обновлений
+            startAutomaticUpdateCheck()
+        }
+    }
+    
+    // =====================================================================================
+    //                              СИСТЕМА ЛОГИРОВАНИЯ
+    // =====================================================================================
+    
+    /**
+     * Инициализация системы логирования
+     * 
+     * Оптимизированная настройка логирования для максимальной производительности:
+     * - Debug: полное логирование для разработки
+     * - Release: только критические ошибки для продакшена
+     * 
+     * Преимущества:
+     * - Минимальное влияние на производительность в релизе
+     * - Подробная отладочная информация в debug режиме
+     * - Автоматическая фильтрация по приоритету
+     */
+    private fun initializeLogging() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {
@@ -73,33 +156,32 @@ class BusApplication : Application() {
         }
         
         logd("Application onCreate() called")
-        
-        // Создаем каналы для уведомлений (быстро)
-        NotificationHelper.createNotificationChannel(this)
-        
-        // Запускаем тяжелые операции в фоне (не блокируют UI)
-        applicationScope.launch {
-            // Восстанавливаем запланированные уведомления
-            rescheduleAlarmsOnStartup()
-            
-            // Запускаем автоматическую проверку обновлений
-            startAutomaticUpdateCheck()
-        }
     }
+    
+    // =====================================================================================
+    //                              ВОССТАНОВЛЕНИЕ УВЕДОМЛЕНИЙ
+    // =====================================================================================
     
     /**
      * Восстанавливает запланированные уведомления при запуске приложения
      * 
-     * Это необходимо для случаев:
-     * - После перезагрузки устройства
-     * - После обновления приложения
-     * - После очистки данных приложения
+     * Критически важная функция для обеспечения непрерывности работы уведомлений.
+     * Необходима для случаев:
+     * - После перезагрузки устройства (система сбрасывает все AlarmManager)
+     * - После обновления приложения (новые компоненты требуют переинициализации)
+     * - После очистки данных приложения (восстановление из базы данных)
+     * 
+     * Алгоритм восстановления:
+     * 1. Получение всех активных избранных времен из базы данных
+     * 2. Валидация данных маршрутов
+     * 3. Планирование уведомлений через AlarmScheduler
+     * 4. Логирование результатов для отладки
      */
     private suspend fun rescheduleAlarmsOnStartup() {
         try {
             logd("Starting alarm rescheduling on app startup")
             
-            val database = com.example.lets_go_slavgorod.data.local.AppDatabase.getDatabase(this@BusApplication)
+            val database = AppDatabase.getDatabase(this@BusApplication)
             val favoriteTimeDao = database.favoriteTimeDao()
             
             val favoriteTimeEntities = favoriteTimeDao.getAllFavoriteTimes().firstOrNull() ?: emptyList()
@@ -109,10 +191,10 @@ class BusApplication : Application() {
             var rescheduledCount = 0
             favoriteTimeEntities
                 .filter { it.isActive }
-                .forEach { entity: com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity ->
+                .forEach { entity: FavoriteTimeEntity ->
                     try {
                         val route = getRouteById(entity.routeId)
-                        val favoriteTime = com.example.lets_go_slavgorod.data.model.FavoriteTime(
+                        val favoriteTime = FavoriteTime(
                             id = entity.id,
                             routeId = entity.routeId,
                             routeNumber = route?.routeNumber ?: "N/A",
@@ -124,18 +206,18 @@ class BusApplication : Application() {
                             isActive = entity.isActive
                         )
                         
-                        com.example.lets_go_slavgorod.notifications.AlarmScheduler.scheduleAlarm(this@BusApplication, favoriteTime)
+                        AlarmScheduler.scheduleAlarm(this@BusApplication, favoriteTime)
                         rescheduledCount++
-                        Log.d("BusApplication", "Rescheduled alarm for favorite time: ${entity.id}")
+                        Timber.d("Rescheduled alarm for favorite time: ${entity.id}")
                     } catch (e: Exception) {
-                        Log.e("BusApplication", "Error rescheduling alarm for favorite time: ${entity.id}", e)
+                        Timber.e(e, "Error rescheduling alarm for favorite time: ${entity.id}")
                     }
                 }
             
-            Log.i("BusApplication", "Successfully rescheduled $rescheduledCount out of ${favoriteTimeEntities.size} favorite times on startup")
+            Timber.i("Successfully rescheduled $rescheduledCount out of ${favoriteTimeEntities.size} favorite times on startup")
             
         } catch (e: Exception) {
-            Log.e("BusApplication", "Error during alarm rescheduling on startup", e)
+            Timber.e(e, "Error during alarm rescheduling on startup")
         }
     }
     
@@ -150,9 +232,9 @@ class BusApplication : Application() {
      * 2. Если не найден, создает fallback объект с базовой информацией
      * 3. Возвращает null только при критической ошибке
      */
-    private fun getRouteById(routeId: String): com.example.lets_go_slavgorod.data.model.BusRoute? {
+    private fun getRouteById(routeId: String): BusRoute? {
         return try {
-            val repository = com.example.lets_go_slavgorod.data.repository.BusRouteRepository()
+            val repository = BusRouteRepository()
             repository.getRouteById(routeId) ?: run {
                 // Создаем fallback объект для неизвестных маршрутов
                 createBusRoute(

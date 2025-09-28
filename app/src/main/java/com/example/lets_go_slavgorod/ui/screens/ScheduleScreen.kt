@@ -2,28 +2,30 @@
 
 package com.example.lets_go_slavgorod.ui.screens
 
-import android.util.Log
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.data.model.BusSchedule
-import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
-import com.example.lets_go_slavgorod.ui.components.schedule.ScheduleHeader
 import com.example.lets_go_slavgorod.ui.components.schedule.RouteDetailsSummaryCard
+import com.example.lets_go_slavgorod.ui.components.schedule.ScheduleHeader
 import com.example.lets_go_slavgorod.ui.components.schedule.ScheduleList
-import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 import com.example.lets_go_slavgorod.utils.ScheduleUtils
-import kotlinx.coroutines.delay
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 const val STOP_SLAVGORD_RYNOK = "Рынок (Славгород)"
 const val STOP_YAROVOE_MCHS = "МСЧ-128 (Яровое)"
@@ -45,13 +47,12 @@ const val STOP_SOVHOZ = "совхоз"
 fun ScheduleScreen(
     route: BusRoute?,
     onBackClick: () -> Unit,
-    viewModel: BusViewModel,
-    navController: androidx.navigation.NavController? = null
+    viewModel: BusViewModel
 ) {
     val allSchedulesForRoute = remember(route) {
         if (route != null) {
             val schedules = ScheduleUtils.generateSchedules(route.id)
-            Log.d("ScheduleScreen", "Generated ${schedules.size} schedules for route ${route.id}")
+            Timber.d("Generated ${schedules.size} schedules for route ${route.id}")
             schedules
         } else {
             emptyList()
@@ -62,7 +63,7 @@ fun ScheduleScreen(
         val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_SLAVGORD_RYNOK }
             .sortedBy { it.departureTime }
-        Log.d("ScheduleScreen", "Slavgorod schedules: ${filtered.size}")
+        Timber.d("Slavgorod schedules: ${filtered.size}")
         filtered
     }
 
@@ -70,7 +71,7 @@ fun ScheduleScreen(
         val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_YAROVOE_MCHS }
             .sortedBy { it.departureTime }
-        Log.d("ScheduleScreen", "Yarovoe schedules: ${filtered.size}")
+        Timber.d("Yarovoe schedules: ${filtered.size}")
         filtered
     }
 
@@ -78,7 +79,7 @@ fun ScheduleScreen(
         val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_VOKZAL }
             .sortedBy { it.departureTime }
-        Log.d("ScheduleScreen", "Vokzal schedules: ${filtered.size}")
+        Timber.d("Vokzal schedules: ${filtered.size}")
         filtered
     }
 
@@ -86,7 +87,7 @@ fun ScheduleScreen(
         val filtered = allSchedulesForRoute
             .filter { it.departurePoint == STOP_SOVHOZ }
             .sortedBy { it.departureTime }
-        Log.d("ScheduleScreen", "Sovhoz schedules: ${filtered.size}")
+        Timber.d("Sovhoz schedules: ${filtered.size}")
         filtered
     }
 
@@ -168,20 +169,20 @@ private fun getNextUpcomingScheduleId(schedules: List<BusSchedule>): String? {
                 false
             }
         } catch (e: Exception) {
-            Log.e("ScheduleScreen", "Error parsing time: ${schedule.departureTime}", e)
+            Timber.e(e, "Error parsing time: ${schedule.departureTime}")
             false
         }
     }
     
     // Если есть рейсы сегодня, возвращаем ближайший
     if (upcomingToday.isNotEmpty()) {
-        Log.d("ScheduleScreen", "Found ${upcomingToday.size} upcoming departures today. Next: ${upcomingToday.first().departureTime}")
+        Timber.d("Found ${upcomingToday.size} upcoming departures today. Next: ${upcomingToday.first().departureTime}")
         return upcomingToday.first().id
     }
     
     // Если рейсов сегодня больше нет, возвращаем первый рейс завтра
     val firstTomorrow = schedules.firstOrNull()
-    Log.d("ScheduleScreen", "No departures today. First tomorrow: ${firstTomorrow?.departureTime}")
+    Timber.d("No departures today. First tomorrow: ${firstTomorrow?.departureTime}")
     return firstTomorrow?.id
 }
 

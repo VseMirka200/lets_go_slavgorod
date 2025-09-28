@@ -8,13 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.lets_go_slavgorod.MainActivity
 import com.example.lets_go_slavgorod.R
-import java.util.Locale
+import timber.log.Timber
 
 /**
  * Вспомогательный класс для работы с уведомлениями
@@ -22,7 +21,14 @@ import java.util.Locale
  * Основные функции:
  * - Создание канала уведомлений
  * - Отображение уведомлений о времени отправления автобусов
+ * - Отображение уведомлений об обновлениях приложения
  * - Обработка разрешений для уведомлений
+ * - Использование кастомных иконок приложения
+ * 
+ * Иконки уведомлений:
+ * - ic_notification_app - для уведомлений о времени отправления
+ * - ic_notification_update - для уведомлений об обновлениях
+ * - ic_launcher_foreground - большая иконка приложения
  */
 object NotificationHelper {
     // ID канала уведомлений
@@ -69,7 +75,7 @@ object NotificationHelper {
             }
             notificationManager.createNotificationChannel(updateChannel)
             
-            Log.d("NotificationHelper", "Notification channels created: $CHANNEL_ID, $UPDATE_CHANNEL_ID")
+            Timber.d("Notification channels created: $CHANNEL_ID, $UPDATE_CHANNEL_ID")
         }
     }
 
@@ -109,9 +115,22 @@ object NotificationHelper {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        // Временно используем стандартную иконку до исправления проблем с линковкой
         val smallIconResId = R.drawable.ic_stat_directions_bus
-        val largeIconResId = R.drawable.ic_stat_directions_bus
-        val combinedTitleText = "$routeInfo ${departureTimeInfo.lowercase(java.util.Locale.getDefault())}"
+        val largeIconResId = R.drawable.ic_launcher_foreground
+        
+        // Используем стандартную иконку
+        val finalSmallIcon = smallIconResId
+        
+        Timber.d("Notification icon: smallIcon=$smallIconResId, largeIcon=$largeIconResId")
+        
+        // Улучшенная обработка routeInfo для уведомления
+        val safeRouteInfo = routeInfo.ifBlank {
+            "Автобус"
+        }
+        
+        val combinedTitleText = "$safeRouteInfo ${departureTimeInfo.lowercase(java.util.Locale.getDefault())}"
+        
         val subTextParts = mutableListOf<String>()
         if (departurePointInfo.isNotBlank()) {
             subTextParts.add(departurePointInfo)
@@ -119,9 +138,23 @@ object NotificationHelper {
         subTextParts.add("Не опаздывайте!")
 
         val contentSubText = subTextParts.joinToString(separator = ". ")
+        
+        Timber.d("Notification title: '$combinedTitleText' (routeInfo: '$routeInfo' -> '$safeRouteInfo')")
+        Timber.d("Notification content: '$contentSubText'")
+        Timber.d("Notification data: favoriteTimeId='$favoriteTimeId', routeInfo='$routeInfo', departureTime='$departureTimeInfo'")
+        // Обработка большой иконки с fallback
+        val largeIcon = try {
+            android.graphics.BitmapFactory.decodeResource(context.resources, largeIconResId)
+        } catch (e: Exception) {
+            Timber.w("Failed to load large icon, using null: ${e.message}")
+            null
+        }
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(smallIconResId)
-            .setLargeIcon(android.graphics.BitmapFactory.decodeResource(context.resources, largeIconResId))
+            .setSmallIcon(finalSmallIcon)
+            .apply {
+                largeIcon?.let { setLargeIcon(it) }
+            }
             .setContentTitle(combinedTitleText)
             .setContentText(contentSubText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -135,14 +168,14 @@ object NotificationHelper {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                Log.w("NotificationHelper", "POST_NOTIFICATIONS permission not granted for favoriteTimeId: $favoriteTimeId. Notification will not be shown on Android 13+.")
+                Timber.w("POST_NOTIFICATIONS permission not granted for favoriteTimeId: $favoriteTimeId. Notification will not be shown on Android 13+.")
                 return
             }
         }
 
         notificationManager.notify(uniqueRequestId, notification)
 
-        Log.i("NotificationHelper", "Notification shown with ID $uniqueRequestId for $favoriteTimeId. Combined Title: '$combinedTitleText', SubText: '$contentSubText'")
+        Timber.i("Notification shown with ID $uniqueRequestId for $favoriteTimeId. Combined Title: '$combinedTitleText', SubText: '$contentSubText'")
     }
 
     /**
@@ -172,13 +205,28 @@ object NotificationHelper {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val smallIconResId = R.drawable.ic_stat_directions_bus
+        // Временно используем стандартную иконку до исправления проблем с линковкой
+        val smallIconResId = R.drawable.ic_launcher_foreground
         val title = "Доступно обновление $versionName"
         val contentText = releaseNotes?.takeIf { it.isNotBlank() } 
             ?: "Доступна новая версия приложения с улучшениями и исправлениями."
 
+        // Используем стандартную иконку
+        val finalSmallIcon = smallIconResId
+
+        // Обработка большой иконки для уведомлений об обновлениях
+        val largeIcon = try {
+            android.graphics.BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground)
+        } catch (e: Exception) {
+            Timber.w("Failed to load large icon for update notification, using null: ${e.message}")
+            null
+        }
+
         val notification = NotificationCompat.Builder(context, UPDATE_CHANNEL_ID)
-            .setSmallIcon(smallIconResId)
+            .setSmallIcon(finalSmallIcon)
+            .apply {
+                largeIcon?.let { setLargeIcon(it) }
+            }
             .setContentTitle(title)
             .setContentText(contentText)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -196,13 +244,13 @@ object NotificationHelper {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                Log.w("NotificationHelper", "POST_NOTIFICATIONS permission not granted for update notification. Notification will not be shown on Android 13+.")
+                Timber.w("POST_NOTIFICATIONS permission not granted for update notification. Notification will not be shown on Android 13+.")
                 return
             }
         }
 
         notificationManager.notify(UPDATE_NOTIFICATION_ID, notification)
 
-        Log.i("NotificationHelper", "Update notification shown for version $versionName")
+        Timber.i("Update notification shown for version $versionName")
     }
 }

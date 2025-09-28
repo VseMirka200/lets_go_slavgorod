@@ -3,14 +3,14 @@ package com.example.lets_go_slavgorod.notifications
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import com.example.lets_go_slavgorod.data.local.AppDatabase
+import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
+import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.example.lets_go_slavgorod.data.local.AppDatabase
-import com.example.lets_go_slavgorod.data.model.FavoriteTime
+import timber.log.Timber
 
 /**
  * Получатель уведомлений о загрузке системы
@@ -25,31 +25,29 @@ import com.example.lets_go_slavgorod.data.model.FavoriteTime
  */
 class BootReceiver : BroadcastReceiver() {
     
-    companion object {
-        private const val TAG = "BootReceiver"
-    }
-    
+    companion object;
+
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(TAG, "Boot event received: ${intent.action}")
+        Timber.d("Boot event received: ${intent.action}")
         
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
             Intent.ACTION_PACKAGE_REPLACED -> {
-                Log.d(TAG, "System boot completed or app updated, restoring notifications...")
+                Timber.d("System boot completed or app updated, restoring notifications...")
                 
                 // Восстанавливаем уведомления в фоновом потоке
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         restoreAllNotifications(context)
-                        Log.d(TAG, "All notifications restored successfully")
+                        Timber.d("All notifications restored successfully")
                     } catch (e: Exception) {
-                        Log.e(TAG, "Error restoring notifications", e)
+                        Timber.e(e, "Error restoring notifications")
                     }
                 }
             }
             else -> {
-                Log.w(TAG, "Unknown boot event: ${intent.action}")
+                Timber.w("Unknown boot event: ${intent.action}")
             }
         }
     }
@@ -61,7 +59,7 @@ class BootReceiver : BroadcastReceiver() {
      */
     private suspend fun restoreAllNotifications(context: Context) {
         try {
-            Log.d(TAG, "Starting notification restoration process...")
+            Timber.d("Starting notification restoration process...")
             
             // Получаем базу данных
             val database = AppDatabase.getDatabase(context.applicationContext)
@@ -72,7 +70,7 @@ class BootReceiver : BroadcastReceiver() {
             
             val activeFavoriteTimes = favoriteTimeEntities
                 .filter { it.isActive }
-                .map { entity ->
+                .map { entity: FavoriteTimeEntity ->
                     FavoriteTime(
                         id = entity.id,
                         routeId = entity.routeId,
@@ -86,22 +84,22 @@ class BootReceiver : BroadcastReceiver() {
                     )
                 }
             
-            Log.d(TAG, "Found ${activeFavoriteTimes.size} active favorite times to restore")
+            Timber.d("Found ${activeFavoriteTimes.size} active favorite times to restore")
             
             // Восстанавливаем уведомления для каждого активного избранного времени
             activeFavoriteTimes.forEach { favoriteTime ->
                 try {
                     AlarmScheduler.checkAndUpdateNotifications(context.applicationContext, favoriteTime)
-                    Log.d(TAG, "Notification restored for favorite time: ${favoriteTime.id}")
+                    Timber.d("Notification restored for favorite time: ${favoriteTime.id}")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error restoring notification for ${favoriteTime.id}", e)
+                    Timber.e(e, "Error restoring notification for ${favoriteTime.id}")
                 }
             }
             
-            Log.d(TAG, "Notification restoration completed. Restored ${activeFavoriteTimes.size} notifications.")
+            Timber.d("Notification restoration completed. Restored ${activeFavoriteTimes.size} notifications.")
             
         } catch (e: Exception) {
-            Log.e(TAG, "Critical error during notification restoration", e)
+            Timber.e(e, "Critical error during notification restoration")
         }
     }
 }

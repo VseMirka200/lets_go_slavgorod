@@ -2,7 +2,6 @@ package com.example.lets_go_slavgorod.ui.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +23,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Update
@@ -36,6 +37,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +48,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,12 +63,12 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.R
-import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
 import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateMode
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
+import timber.log.Timber
 
 /**
  * Экран настроек приложения
@@ -117,37 +118,7 @@ fun SettingsScreen(
     val availableUpdateNotes by updateSettingsVM.availableUpdateNotes.collectAsState(initial = null)
     
 
-    SettingsSwipeableContainer(
-        onSwipeToNext = {
-            // Свайп влево - переход к избранному
-            Log.d("SettingsScreen", "Swipe left detected, navigating to FavoriteTimes")
-            if (navController != null) {
-                try {
-                    navController.navigate(Screen.FavoriteTimes.route)
-                    Log.d("SettingsScreen", "Navigation to FavoriteTimes completed")
-                } catch (e: Exception) {
-                    Log.e("SettingsScreen", "Navigation to FavoriteTimes failed", e)
-                }
-            } else {
-                Log.e("SettingsScreen", "navController is null, cannot navigate")
-            }
-        },
-        onSwipeToPrevious = {
-            // Свайп вправо - переход к маршрутам
-            Log.d("SettingsScreen", "Swipe right detected, navigating to Home")
-            if (navController != null) {
-                try {
-                    navController.navigate(Screen.Home.route)
-                    Log.d("SettingsScreen", "Navigation to Home completed")
-                } catch (e: Exception) {
-                    Log.e("SettingsScreen", "Navigation to Home failed", e)
-                }
-            } else {
-                Log.e("SettingsScreen", "navController is null, cannot navigate")
-            }
-        },
-        modifier = modifier.fillMaxSize()
-    ) {
+    // Убраны свайпы - используем обычный контейнер
         Scaffold(
         topBar = {
             TopAppBar(
@@ -247,7 +218,6 @@ fun SettingsScreen(
                 navController = navController
             )
         }
-    }
     }
 }
 
@@ -355,6 +325,32 @@ fun ThemeSettingsCard(
 }
 
 
+/**
+ * Единая карточка настроек обновлений
+ * 
+ * Объединяет все функции управления обновлениями в одном месте:
+ * - Выбор режима обновлений
+ * - Ручная проверка обновлений
+ * - Отображение статуса и результатов
+ * - Управление доступными обновлениями
+ * 
+ * @param currentUpdateMode текущий режим обновлений
+ * @param showUpdateModeDropdown флаг отображения выпадающего меню
+ * @param onShowUpdateModeDropdownChange callback для изменения состояния меню
+ * @param updateModeOptions доступные режимы обновлений
+ * @param onUpdateModeSelected callback для выбора режима
+ * @param isCheckingUpdates флаг процесса проверки обновлений
+ * @param updateCheckError ошибка проверки обновлений
+ * @param updateCheckStatus статус проверки обновлений
+ * @param lastUpdateCheckTime время последней проверки
+ * @param availableUpdateVersion версия доступного обновления
+ * @param availableUpdateUrl ссылка для скачивания обновления
+ * @param availableUpdateNotes описание изменений в обновлении
+ * @param onCheckForUpdates callback для запуска проверки обновлений
+ * @param onClearAvailableUpdate callback для очистки информации об обновлении
+ * @param onClearUpdateStatus callback для очистки статуса
+ * @param onDownloadUpdate callback для скачивания обновления
+ */
 @Composable
 fun UpdateSettingsCard(
     currentUpdateMode: UpdateMode,
@@ -374,12 +370,35 @@ fun UpdateSettingsCard(
     onClearUpdateStatus: () -> Unit,
     onDownloadUpdate: (String) -> Unit,
 ) {
-    Column {
-        // Основная карточка с выпадающим меню режима обновлений
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
+            // Заголовок раздела
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Update,
+                    contentDescription = "Обновления",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = "Настройки обновлений",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            
+            Spacer(Modifier.height(16.dp))
+            
+            // Выбор режима обновлений
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -387,210 +406,229 @@ fun UpdateSettingsCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onShowUpdateModeDropdownChange(true) }
-                        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
+                        .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Filled.Update,
-                            contentDescription = "Режим обновлений",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(Modifier.width(16.dp))
+                    Column {
                         Text(
-                            text = "Режим:",
+                            text = "Режим обновлений",
                             style = MaterialTheme.typography.bodyLarge
                         )
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
                         Text(
                             text = when (currentUpdateMode) {
-                                UpdateMode.AUTOMATIC -> "Автоматически"
-                                UpdateMode.MANUAL -> "Вручную"
+                                UpdateMode.AUTOMATIC -> "Автоматическая проверка"
+                                UpdateMode.MANUAL -> "Только ручная проверка"
                                 UpdateMode.DISABLED -> "Отключено"
                             },
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Выбрать режим обновлений",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                DropdownMenu(
-                    expanded = showUpdateModeDropdown,
-                    onDismissRequest = { onShowUpdateModeDropdownChange(false) },
-                ) {
-                    updateModeOptions.forEach { mode ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    when (mode) {
-                                        UpdateMode.AUTOMATIC -> "Автоматически"
-                                        UpdateMode.MANUAL -> "Вручную"
-                                        UpdateMode.DISABLED -> "Отключено"
-                                    },
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            },
-                            onClick = {
-                                onUpdateModeSelected(mode)
-                                onShowUpdateModeDropdownChange(false)
-                            }
-                        )
-                    }
-                }
-            }
-        }
-        
-        // Дополнительная карточка для ручной проверки (если режим не отключен)
-        if (currentUpdateMode != UpdateMode.DISABLED) {
-            Spacer(Modifier.height(8.dp))
-            
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Проверка обновлений",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Button(
-                            onClick = onCheckForUpdates,
-                            enabled = !isCheckingUpdates,
-                            modifier = Modifier.height(36.dp)
-                        ) {
-                            if (isCheckingUpdates) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text("Проверяем...")
-                            } else {
-                                Text("Проверить")
-                            }
-                        }
-                    }
-                    
-                    // Показываем время последней проверки, если есть
-                    if (lastUpdateCheckTime > 0L) {
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = "Последняя проверка: ${formatLastCheckTime(lastUpdateCheckTime)}",
-                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    
-                    // Показываем статус проверки обновлений
-                    updateCheckStatus?.let { status ->
-                        Spacer(Modifier.height(8.dp))
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (status.contains("последняя версия")) {
-                                    MaterialTheme.colorScheme.primaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.secondaryContainer
-                                }
-                            )
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        imageVector = if (status.contains("последняя версия")) {
-                                            Icons.Filled.CheckCircle
-                                        } else {
-                                            Icons.Filled.Update
-                                        },
-                                        contentDescription = "Статус обновления",
-                                        tint = if (status.contains("последняя версия")) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            MaterialTheme.colorScheme.secondary
-                                        },
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = "Выбрать режим",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                
+                // Выпадающее меню
+                if (showUpdateModeDropdown) {
+                    DropdownMenu(
+                        expanded = showUpdateModeDropdown,
+                        onDismissRequest = { onShowUpdateModeDropdownChange(false) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        updateModeOptions.forEach { mode ->
+                            DropdownMenuItem(
+                                text = {
                                     Text(
-                                        text = status,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = if (status.contains("последняя версия")) {
-                                            MaterialTheme.colorScheme.onPrimaryContainer
-                                        } else {
-                                            MaterialTheme.colorScheme.onSecondaryContainer
+                                        text = when (mode) {
+                                            UpdateMode.AUTOMATIC -> "Автоматическая проверка"
+                                            UpdateMode.MANUAL -> "Только ручная проверка"
+                                            UpdateMode.DISABLED -> "Отключено"
                                         }
                                     )
+                                },
+                                onClick = {
+                                    onUpdateModeSelected(mode)
+                                    onShowUpdateModeDropdownChange(false)
                                 }
-                                IconButton(
-                                    onClick = onClearUpdateStatus,
-                                    modifier = Modifier.size(24.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Close,
-                                        contentDescription = "Закрыть",
-                                        tint = if (status.contains("последняя версия")) {
-                                            MaterialTheme.colorScheme.onPrimaryContainer
-                                        } else {
-                                            MaterialTheme.colorScheme.onSecondaryContainer
-                                        },
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
+                            )
+                        }
+                    }
+                }
+            }
+            
+            // Разделитель
+            if (currentUpdateMode != UpdateMode.DISABLED) {
+                Spacer(Modifier.height(16.dp))
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+                Spacer(Modifier.height(16.dp))
+                
+                // Ручная проверка обновлений
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "Проверка обновлений",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        if (lastUpdateCheckTime > 0L) {
+                            Text(
+                                text = "Последняя проверка: ${formatLastCheckTime(lastUpdateCheckTime)}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = onCheckForUpdates,
+                        enabled = !isCheckingUpdates,
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        if (isCheckingUpdates) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Проверяем...")
+                        } else {
+                            Text("Проверить")
+                        }
+                    }
+                }
+                
+                // Показываем статус проверки обновлений
+                updateCheckStatus?.let { status ->
+                    Spacer(Modifier.height(12.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (status.contains("последняя версия")) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.secondaryContainer
+                            }
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = if (status.contains("последняя версия")) {
+                                        Icons.Filled.CheckCircle
+                                    } else {
+                                        Icons.Filled.Update
+                                    },
+                                    contentDescription = "Статус обновления",
+                                    tint = if (status.contains("последняя версия")) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.secondary
+                                    },
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = status,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (status.contains("последняя версия")) {
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    } else {
+                                        MaterialTheme.colorScheme.onSecondaryContainer
+                                    }
+                                )
+                            }
+                            IconButton(
+                                onClick = onClearUpdateStatus,
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = "Закрыть",
+                                    tint = if (status.contains("последняя версия")) {
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    } else {
+                                        MaterialTheme.colorScheme.onSecondaryContainer
+                                    },
+                                    modifier = Modifier.size(16.dp)
+                                )
                             }
                         }
                     }
-                    
-                    // Показываем ошибку, если есть
-                    updateCheckError?.let { error ->
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = error,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error
+                }
+                
+                // Показываем ошибку, если есть
+                updateCheckError?.let { error ->
+                    Spacer(Modifier.height(12.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
                         )
-                    }
-                    
-                    // Показываем доступное обновление, если есть
-                    availableUpdateVersion?.let { version ->
-                        Spacer(Modifier.height(8.dp))
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer
-                            )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp)
+                            Icon(
+                                imageVector = Icons.Filled.Error,
+                                contentDescription = "Ошибка",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                }
+                
+                // Показываем доступное обновление, если есть
+                availableUpdateVersion?.let { version ->
+                    Spacer(Modifier.height(12.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Download,
+                                    contentDescription = "Обновление",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
                                 Text(
                                     text = "Доступно обновление $version",
                                     style = MaterialTheme.typography.bodyMedium.copy(
@@ -598,38 +636,44 @@ fun UpdateSettingsCard(
                                     ),
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
-                                
-                                availableUpdateNotes?.let { notes ->
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        text = notes,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                            }
+                            
+                            availableUpdateNotes?.let { notes ->
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    text = notes,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                            
+                            Spacer(Modifier.height(12.dp))
+                            
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        availableUpdateUrl?.let { url ->
+                                            onDownloadUpdate(url)
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Download,
+                                        contentDescription = "Скачать",
+                                        modifier = Modifier.size(16.dp)
                                     )
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("Скачать")
                                 }
                                 
-                                Spacer(Modifier.height(8.dp))
-                                
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                OutlinedButton(
+                                    onClick = onClearAvailableUpdate,
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    Button(
-                                        onClick = {
-                                            availableUpdateUrl?.let { url ->
-                                                onDownloadUpdate(url)
-                                            }
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text("Скачать")
-                                    }
-                                    
-                                    OutlinedButton(
-                                        onClick = onClearAvailableUpdate,
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text("Позже")
-                                    }
+                                    Text("Позже")
                                 }
                             }
                         }
@@ -640,125 +684,6 @@ fun UpdateSettingsCard(
     }
 }
 
-/**
- * Диалог предложения обновления приложения
- * 
- * Показывается пользователю при обнаружении новой версии приложения.
- * Предлагает скачать обновление или отложить это действие.
- * 
- * @param versionName версия доступного обновления
- * @param releaseNotes описание изменений в обновлении
- * @param downloadUrl ссылка для скачивания обновления
- * @param onDismissRequest callback для закрытия диалога без действий
- * @param onDownload callback для скачивания обновления
- * @param onLater callback для отложения обновления
- */
-@Composable
-fun UpdateAvailableDialog(
-    versionName: String,
-    releaseNotes: String?,
-    downloadUrl: String,
-    onDismissRequest: () -> Unit,
-    onDownload: (String) -> Unit,
-    onLater: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Update,
-                    contentDescription = "Обновление",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "Доступно обновление",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Доступна новая версия приложения:",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-                        Text(
-                            text = "Версия $versionName",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        
-                        if (!releaseNotes.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Что нового:",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.SemiBold
-                                ),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = releaseNotes,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                    }
-                }
-                
-                Text(
-                    text = "Рекомендуем обновиться для получения новых функций и исправлений.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onDownload(downloadUrl) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Update,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Обновиться")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onLater
-            ) {
-                Text("Позже")
-            }
-        }
-    )
-}
 
 /**
  * Форматирует время последней проверки обновлений в читаемый вид

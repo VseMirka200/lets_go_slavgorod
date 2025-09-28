@@ -90,6 +90,7 @@
     <string name="links_section_title">Ссылки:</string>
     <string name="link_text_github">GitHub</string>
     <string name="developer_github_url_value">https://github.com/VseMirka200/lets_go_slavgorod</string>
+    <string name="developer_vk_url_value">https://vk.com/vsemirka200</string>
     <string name="error_no_browser">Не удалось открыть ссылку. Проверьте, установлен ли браузер.</string>
     <string name="feedback_section_title">Обратная связь</string>
     <string name="feedback_link_text">Написать в Telegram</string>
@@ -97,5 +98,19 @@
     <string name="error_no_telegram_app">Приложение Telegram не установлено.</string>
     <string name="error_cant_open_link">Не удалось открыть ссылку.</string>
     <string name="app_version_label">Версия: %1$s</string>
+
+    <!-- ===================================================================================== -->
+    <!--                                    ДИАЛОГ ПРЕДУПРЕЖДЕНИЯ                              -->
+    <!-- ===================================================================================== -->
+    <string name="disclaimer_title">Важное уведомление</string>
+    <string name="disclaimer_warning_icon">Предупреждение</string>
+    <string name="disclaimer_info_icon">Информация</string>
+    <string name="disclaimer_main_text">Это приложение НЕ является официальным приложением ООО \"Транспорт\".</string>
+    <string name="disclaimer_description_text">Данное приложение было разработано командой энтузиастов для удобного просмотра расписания автобусов в городе Славгороде.</string>
+    <string name="disclaimer_purpose_text">Приложение создано исключительно в информационных целях и не имеет официального отношения к транспортной компании.</string>
+    <string name="disclaimer_accuracy_text">За актуальностью расписания и точностью информации обращайтесь к официальным источникам ООО \"Транспорт\".</string>
+    <string name="disclaimer_dont_show_again">Не показывать это сообщение снова</string>
+    <string name="disclaimer_button_understand">Понятно</string>
+    <string name="disclaimer_button_close">Закрыть</string>
 
 </resources>

@@ -1,8 +1,9 @@
 package com.example.lets_go_slavgorod.utils
 
-import com.example.lets_go_slavgorod.data.model.BusSchedule
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * Тесты для ScheduleUtils

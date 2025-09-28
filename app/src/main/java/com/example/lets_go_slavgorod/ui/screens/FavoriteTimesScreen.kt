@@ -1,6 +1,7 @@
 package com.example.lets_go_slavgorod.ui.screens
 
-import android.util.Log
+import android.annotation.SuppressLint
+import timber.log.Timber
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -15,7 +16,6 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,83 +24,70 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.R
+import com.example.lets_go_slavgorod.data.model.BusSchedule
 import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import com.example.lets_go_slavgorod.ui.components.ScheduleCard
-import com.example.lets_go_slavgorod.ui.components.SettingsSwipeableContainer
 import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 
+@SuppressLint("LogNotTimber")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteTimesScreen(
     viewModel: BusViewModel,
     navController: NavController? = null,
-    modifier: Modifier = Modifier
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     val favoriteTimesList by viewModel.favoriteTimes.collectAsState()
     val isLoading = false
 
     val groupedByRoute = remember(favoriteTimesList) {
-        favoriteTimesList.groupBy {
-            it.routeNumber to it.routeName
+        favoriteTimesList.groupBy { favoriteTime ->
+            // Нормализуем данные для группировки, чтобы избежать дублирования
+            val routeNumber = favoriteTime.routeNumber.trim()
+            val routeName = favoriteTime.routeName.trim()
+            
+            // Создаем уникальный ключ для группировки
+            val normalizedRouteName = if (routeName.isNotBlank()) {
+                if (routeName.contains("№$routeNumber") || routeName.contains("$routeNumber")) {
+                    routeName
+                } else {
+                    "$routeName №$routeNumber"
+                }
+            } else {
+                "Маршрут №$routeNumber"
+            }
+            
+            routeNumber to normalizedRouteName
         }
     }
 
+    // Убираем группировку по точкам отправления - показываем только времена
     val nestedGroupedFavoriteTimes = remember(groupedByRoute) {
         groupedByRoute.mapValues { (_, timesInRoute) ->
-            timesInRoute.groupBy { it.departurePoint }
+            // Группируем все времена в одну группу для каждого маршрута
+            mapOf("Все времена" to timesInRoute)
         }
     }
 
-    SettingsSwipeableContainer(
-        onSwipeToNext = {
-            // Свайп влево - переход к настройкам
-            Log.d("FavoriteTimesScreen", "Swipe left detected, navigating to Settings")
-            if (navController != null) {
-                try {
-                    navController.navigate(Screen.Settings.route)
-                    Log.d("FavoriteTimesScreen", "Navigation to Settings completed")
-                } catch (e: Exception) {
-                    Log.e("FavoriteTimesScreen", "Navigation to Settings failed", e)
-                }
-            } else {
-                Log.e("FavoriteTimesScreen", "navController is null, cannot navigate")
-            }
-        },
-        onSwipeToPrevious = {
-            // Свайп вправо - переход к маршрутам
-            Log.d("FavoriteTimesScreen", "Swipe right detected, navigating to Home")
-            if (navController != null) {
-                try {
-                    navController.navigate(Screen.Home.route)
-                    Log.d("FavoriteTimesScreen", "Navigation to Home completed")
-                } catch (e: Exception) {
-                    Log.e("FavoriteTimesScreen", "Navigation to Home failed", e)
-                }
-            } else {
-                Log.e("FavoriteTimesScreen", "navController is null, cannot navigate")
-            }
-        },
-        modifier = modifier.fillMaxSize()
-    ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.favorite_times_screen_title),
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.favorite_times_screen_title),
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                     )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            },
-            contentWindowInsets = WindowInsets(0)
-        ) { paddingValues ->
+            )
+        },
+        contentWindowInsets = WindowInsets(0)
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -123,7 +110,7 @@ fun FavoriteTimesScreen(
 }
 
 @Composable
-private fun FLoadingState(modifier: Modifier = Modifier) {
+fun FLoadingState(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -133,11 +120,9 @@ private fun FLoadingState(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FEmptyState(modifier: Modifier = Modifier) {
+fun FEmptyState(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -167,16 +152,20 @@ private fun FEmptyState(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FavoriteNestedGroupedList(
-    modifier: Modifier = Modifier,
+fun FavoriteNestedGroupedList(
     nestedGroupedTimes: Map<Pair<String, String>, Map<String, List<FavoriteTime>>>,
     onToggleFavoriteActiveState: (favoriteTime: FavoriteTime, isActive: Boolean) -> Unit,
     navController: NavController? = null
 ) {
     val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
+    
+    // Оптимизация: кэшируем вычисления
+    val routeKeys = remember(nestedGroupedTimes.keys) {
+        nestedGroupedTimes.keys.map { (routeNumber, routeName) -> "$routeNumber-$routeName" }
+    }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -184,88 +173,82 @@ private fun FavoriteNestedGroupedList(
     ) {
         nestedGroupedTimes.forEach { (routeInfoPair, timesByDeparturePoint) ->
             val (routeNumber, routeName) = routeInfoPair
-            val routeKey = "$routeNumber-$routeName"
+            val routeKey = remember(routeNumber, routeName) { "$routeNumber-$routeName" }
             
             Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Column(Modifier.padding(bottom = 8.dp)) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = routeName, // routeName уже нормализован при группировке
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        IconButton(
+                            onClick = { 
+                                navController?.navigate("route_notifications/${routeNumber}")
+                            }
                         ) {
-                            Text(
-                                text = if (routeName.isNotBlank()) {
-                                    // Проверяем, содержит ли название уже номер маршрута
-                                    if (routeName.contains("№$routeNumber")) {
-                                        routeName.trim()
-                                    } else {
-                                        "${routeName.trim()} №$routeNumber"
-                                    }
-                                } else {
-                                    "Маршрут №$routeNumber"
-                                },
-                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.weight(1f)
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Настройки уведомлений",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    // Показываем все времена для маршрута без группировки по точкам отправления
+                    timesByDeparturePoint.forEach { (_, timesInDepartureGroup) ->
+                        timesInDepartureGroup.forEach { favoriteTime ->
+                            val scheduleDisplay = BusSchedule(
+                                id = favoriteTime.id,
+                                routeId = favoriteTime.routeId ?: "",
+                                departureTime = favoriteTime.departureTime,
+                                dayOfWeek = favoriteTime.dayOfWeek,
+                                stopName = favoriteTime.stopName,
+                                departurePoint = favoriteTime.departurePoint
                             )
                             
-                            // Кнопка настроек уведомлений для маршрута
-                            IconButton(
-                                onClick = { 
-                                    navController?.navigate("route_notifications/${routeNumber}")
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Настройки уведомлений",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-
-                        timesByDeparturePoint.forEach { (departurePoint, timesInDepartureGroup) ->
-                            val departureGroupKey = "${routeKey}_${departurePoint}"
-                            if (!expandedStates.containsKey(departureGroupKey)) {
-                                expandedStates[departureGroupKey] = true
-                            }
-                            val isExpanded = expandedStates[departureGroupKey] ?: true
-
-                            ExpandableDeparturePointSection(
-                                departurePoint = departurePoint,
-                                schedulesInGroup = timesInDepartureGroup,
-                                isExpanded = isExpanded,
-                                onToggleExpand = { expandedStates[departureGroupKey] = !isExpanded },
-                                onToggleFavoriteActiveState = onToggleFavoriteActiveState
+                            ScheduleCard(
+                                schedule = scheduleDisplay,
+                                isFavorite = favoriteTime.isActive,
+                                onFavoriteClick = {
+                                    onToggleFavoriteActiveState(favoriteTime, !favoriteTime.isActive)
+                                },
+                                routeNumber = null, // Скрываем номер маршрута, так как он уже в заголовке
+                                routeName = null,   // Скрываем название маршрута, так как оно уже в заголовке
+                                hideRouteInfo = true, // Скрываем всю информацию о маршруте
+                                isNextUpcoming = false, // Обычный стиль для избранных
+                                allSchedules = emptyList(), // Пустой список для обычного стиля
+                                modifier = Modifier.padding(vertical = 4.dp)
                             )
-                            if (timesByDeparturePoint.keys.last() != departurePoint && timesByDeparturePoint.size > 1) {
-                                HorizontalDivider(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp))
-                            }
                         }
                     }
                 }
             }
         }
+    }
 }
 
 @Composable
-private fun ExpandableDeparturePointSection(
-    modifier: Modifier = Modifier,
+fun ExpandableDeparturePointSection(
     departurePoint: String,
     schedulesInGroup: List<FavoriteTime>,
     isExpanded: Boolean,
     onToggleExpand: () -> Unit,
     onToggleFavoriteActiveState: (favoriteTime: FavoriteTime, isActive: Boolean) -> Unit
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .animateContentSize()
-    ) {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -274,66 +257,48 @@ private fun ExpandableDeparturePointSection(
                     indication = null,
                     onClick = onToggleExpand
                 )
-                .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Отправление из $departurePoint",
+                text = departurePoint,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Icon(
-                imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                 contentDescription = if (isExpanded) "Свернуть" else "Развернуть",
                 tint = MaterialTheme.colorScheme.primary
             )
         }
 
         AnimatedVisibility(visible = isExpanded) {
-            Column(modifier = Modifier.padding(bottom = if (schedulesInGroup.isNotEmpty()) 8.dp else 0.dp)) {
-                schedulesInGroup.forEachIndexed { index, favoriteTime ->
-                    if (index > 0) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(
-                                start = 16.dp,
-                                end = 16.dp,
-                                top = 4.dp,
-                                bottom = 4.dp
-                            )
-                        )
-                    }
-                    val scheduleDisplay = com.example.lets_go_slavgorod.data.model.BusSchedule(
+            Column(
+                modifier = Modifier.animateContentSize()
+            ) {
+                schedulesInGroup.forEach { favoriteTime ->
+                    val scheduleDisplay = BusSchedule(
                         id = favoriteTime.id,
-                        routeId = favoriteTime.routeId,
-                        stopName = favoriteTime.stopName,
+                        routeId = favoriteTime.routeId ?: "",
                         departureTime = favoriteTime.departureTime,
                         dayOfWeek = favoriteTime.dayOfWeek,
-                        departurePoint = favoriteTime.departurePoint,
-                        notes = null
+                        stopName = favoriteTime.stopName,
+                        departurePoint = favoriteTime.departurePoint
                     )
+                    
                     ScheduleCard(
                         schedule = scheduleDisplay,
                         isFavorite = favoriteTime.isActive,
                         onFavoriteClick = {
                             onToggleFavoriteActiveState(favoriteTime, !favoriteTime.isActive)
                         },
-                        routeNumber = null,
-                        routeName = null,
-                        isNextUpcoming = false,
-                        allSchedules = listOf(scheduleDisplay), // Передаем расписание для CountdownTimer
-                        hideRouteInfo = true, // Скрываем информацию о маршруте, так как она уже показана в заголовке
-                        modifier = Modifier.padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 8.dp,
-                            bottom = 8.dp
-                        )
+                        routeNumber = favoriteTime.routeNumber,
+                        routeName = favoriteTime.routeName,
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
             }
         }
-    }
     }
 }

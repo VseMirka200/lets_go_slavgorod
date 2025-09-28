@@ -1,27 +1,25 @@
 package com.example.lets_go_slavgorod.utils
 
-import android.util.Log
+import timber.log.Timber
 import java.util.Calendar
 
 /**
  * Утилиты для валидации данных в приложении
  */
 object ValidationUtils {
-    
-    private const val TAG = "ValidationUtils"
-    
+
     /**
      * Валидирует время в формате HH:MM
      */
     fun isValidTime(time: String): Boolean {
         if (time.isBlank()) {
-            Log.w(TAG, "Time is blank")
+            Timber.w("Time is blank")
             return false
         }
         
         val timeParts = time.split(":")
         if (timeParts.size != 2) {
-            Log.w(TAG, "Invalid time format: '$time' - expected HH:MM")
+            Timber.w("Invalid time format: '$time' - expected HH:MM")
             return false
         }
         
@@ -31,11 +29,11 @@ object ValidationUtils {
             
             val isValid = hour in 0..23 && minute in 0..59
             if (!isValid) {
-                Log.w(TAG, "Invalid time values: hour=$hour, minute=$minute")
+                Timber.w("Invalid time values: hour=$hour, minute=$minute")
             }
             isValid
         } catch (e: NumberFormatException) {
-            Log.w(TAG, "Invalid number format in time: '$time'", e)
+            Timber.w(e, "Invalid number format in time: '$time'")
             false
         }
     }
@@ -46,7 +44,7 @@ object ValidationUtils {
     fun isValidDayOfWeek(dayOfWeek: Int): Boolean {
         val isValid = dayOfWeek in Calendar.SUNDAY..Calendar.SATURDAY
         if (!isValid) {
-            Log.w(TAG, "Invalid day of week: $dayOfWeek - expected ${Calendar.SUNDAY}-${Calendar.SATURDAY}")
+            Timber.w("Invalid day of week: $dayOfWeek - expected ${Calendar.SUNDAY}-${Calendar.SATURDAY}")
         }
         return isValid
     }
@@ -56,13 +54,13 @@ object ValidationUtils {
      */
     fun isValidRouteId(routeId: String?): Boolean {
         if (routeId.isNullOrBlank()) {
-            Log.w(TAG, "Route ID is null or blank")
+            Timber.w("Route ID is null or blank")
             return false
         }
         
         val isValid = routeId.trim().isNotBlank()
         if (!isValid) {
-            Log.w(TAG, "Route ID is empty after trimming: '$routeId'")
+            Timber.w("Route ID is empty after trimming: '$routeId'")
         }
         return isValid
     }
@@ -72,14 +70,14 @@ object ValidationUtils {
      */
     fun isValidStopName(stopName: String?): Boolean {
         if (stopName.isNullOrBlank()) {
-            Log.w(TAG, "Stop name is null or blank")
+            Timber.w("Stop name is null or blank")
             return false
         }
         
         val trimmed = stopName.trim()
         val isValid = trimmed.isNotBlank() && trimmed.length >= 2
         if (!isValid) {
-            Log.w(TAG, "Stop name is too short or empty: '$stopName'")
+            Timber.w("Stop name is too short or empty: '$stopName'")
         }
         return isValid
     }
@@ -89,14 +87,14 @@ object ValidationUtils {
      */
     fun isValidRouteName(routeName: String?): Boolean {
         if (routeName.isNullOrBlank()) {
-            Log.w(TAG, "Route name is null or blank")
+            Timber.w("Route name is null or blank")
             return false
         }
         
         val trimmed = routeName.trim()
         val isValid = trimmed.isNotBlank() && trimmed.length >= 3
         if (!isValid) {
-            Log.w(TAG, "Route name is too short or empty: '$routeName'")
+            Timber.w("Route name is too short or empty: '$routeName'")
         }
         return isValid
     }
@@ -106,14 +104,14 @@ object ValidationUtils {
      */
     fun isValidRouteNumber(routeNumber: String?): Boolean {
         if (routeNumber.isNullOrBlank()) {
-            Log.w(TAG, "Route number is null or blank")
+            Timber.w("Route number is null or blank")
             return false
         }
         
         val trimmed = routeNumber.trim()
         val isValid = trimmed.isNotBlank() && trimmed.isNotEmpty()
         if (!isValid) {
-            Log.w(TAG, "Route number is empty: '$routeNumber'")
+            Timber.w("Route number is empty: '$routeNumber'")
         }
         return isValid
     }

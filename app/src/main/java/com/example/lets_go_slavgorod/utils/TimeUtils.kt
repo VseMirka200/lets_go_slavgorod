@@ -1,6 +1,8 @@
 package com.example.lets_go_slavgorod.utils
 
-import android.util.Log
+import android.annotation.SuppressLint
+import timber.log.Timber
+import com.example.lets_go_slavgorod.data.model.BusSchedule
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,13 +19,12 @@ import java.util.*
  * @version 1.0
  */
 object TimeUtils {
-    
-    private const val TAG = "TimeUtils"
-    
+
     /**
      * Форматирует время в читаемый вид
      */
-    private val timeFormat = SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+    @SuppressLint("ConstantLocale")
+    private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     
     /**
      * Вычисляет время до ближайшего рейса
@@ -34,7 +35,7 @@ object TimeUtils {
      */
     fun getTimeUntilDeparture(departureTime: String, currentTime: Calendar = Calendar.getInstance()): Int? {
         return try {
-            Log.d(TAG, "Calculating time until departure: $departureTime")
+            Timber.d("Calculating time until departure: $departureTime")
             val departureCalendar = parseTime(departureTime)
             val current = currentTime.clone() as Calendar
             
@@ -42,28 +43,28 @@ object TimeUtils {
             current.set(Calendar.SECOND, 0)
             current.set(Calendar.MILLISECOND, 0)
             
-            Log.d(TAG, "Current time: ${current.get(Calendar.HOUR_OF_DAY)}:${current.get(Calendar.MINUTE)}")
-            Log.d(TAG, "Departure time: ${departureCalendar.get(Calendar.HOUR_OF_DAY)}:${departureCalendar.get(Calendar.MINUTE)}")
+            Timber.d("Current time: ${current.get(Calendar.HOUR_OF_DAY)}:${current.get(Calendar.MINUTE)}")
+            Timber.d("Departure time: ${departureCalendar.get(Calendar.HOUR_OF_DAY)}:${departureCalendar.get(Calendar.MINUTE)}")
             
             // Если время отправления уже прошло сегодня, считаем его на завтра
             if (departureCalendar.before(current)) {
-                Log.d(TAG, "Departure time is in the past, adding one day")
+                Timber.d("Departure time is in the past, adding one day")
                 departureCalendar.add(Calendar.DAY_OF_MONTH, 1)
             }
             
             val diffInMillis = departureCalendar.timeInMillis - current.timeInMillis
             val diffInMinutes = (diffInMillis / (1000 * 60)).toInt()
             
-            Log.d(TAG, "Time difference in minutes: $diffInMinutes")
+            Timber.d("Time difference in minutes: $diffInMinutes")
             
             if (diffInMinutes >= 0) {
                 diffInMinutes
             } else {
-                Log.d(TAG, "Departure time is in the past, returning null")
+                Timber.d("Departure time is in the past, returning null")
                 null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error calculating time until departure", e)
+            Timber.e(e, "Error calculating time until departure")
             null
         }
     }
@@ -96,7 +97,7 @@ object TimeUtils {
                 null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error calculating time until departure with seconds", e)
+            Timber.e(e, "Error calculating time until departure with seconds")
             null
         }
     }
@@ -123,7 +124,7 @@ object TimeUtils {
             }
             calendar
         } catch (e: Exception) {
-            Log.e(TAG, "Error parsing time: $timeString", e)
+            Timber.e(e, "Error parsing time: $timeString")
             Calendar.getInstance()
         }
     }
@@ -155,7 +156,6 @@ object TimeUtils {
      * Форматирует время до отправления с точным временем
      * 
      * @param minutes количество минут до отправления
-     * @param departureTime время отправления
      * @return отформатированная строка с точным временем
      */
     fun formatTimeUntilDepartureWithExactTime(minutes: Int, departureTime: String): String {
@@ -180,7 +180,6 @@ object TimeUtils {
      * 
      * @param minutes количество минут до отправления
      * @param seconds количество секунд до отправления
-     * @param departureTime время отправления
      * @return отформатированная строка с секундами
      */
     fun formatTimeUntilDepartureWithSeconds(minutes: Int, seconds: Int, departureTime: String): String {
@@ -210,7 +209,7 @@ object TimeUtils {
      * @param currentTime текущее время
      * @return ближайший рейс или null
      */
-    fun getNextDeparture(schedules: List<com.example.lets_go_slavgorod.data.model.BusSchedule>, currentTime: Calendar = Calendar.getInstance()): com.example.lets_go_slavgorod.data.model.BusSchedule? {
+    fun getNextDeparture(schedules: List<BusSchedule>, currentTime: Calendar = Calendar.getInstance()): BusSchedule? {
         if (schedules.isEmpty()) return null
         
         // Находим ближайший рейс среди всех расписаний
@@ -250,8 +249,8 @@ object TimeUtils {
      * @return true если это ближайший рейс
      */
     fun isNextDeparture(
-        schedule: com.example.lets_go_slavgorod.data.model.BusSchedule,
-        allSchedules: List<com.example.lets_go_slavgorod.data.model.BusSchedule>,
+        schedule: BusSchedule,
+        allSchedules: List<BusSchedule>,
         currentTime: Calendar = Calendar.getInstance()
     ): Boolean {
         val nextDeparture = getNextDeparture(allSchedules, currentTime)
@@ -266,7 +265,7 @@ object TimeUtils {
      * @return отформатированное время до отправления или null
      */
     fun getFormattedTimeUntilDeparture(
-        schedule: com.example.lets_go_slavgorod.data.model.BusSchedule,
+        schedule: BusSchedule,
         currentTime: Calendar = Calendar.getInstance()
     ): String? {
         val minutes = getTimeUntilDeparture(schedule.departureTime, currentTime)

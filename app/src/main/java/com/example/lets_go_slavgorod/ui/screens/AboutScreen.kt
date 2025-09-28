@@ -2,11 +2,9 @@ package com.example.lets_go_slavgorod.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,7 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Info
@@ -28,12 +26,12 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -47,9 +45,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
-import com.example.lets_go_slavgorod.BuildConfig
+// import com.example.lets_go_slavgorod.BuildConfig
 import com.example.lets_go_slavgorod.R
 import com.example.lets_go_slavgorod.ui.navigation.Screen
+import timber.log.Timber
 
 /**
  * Экран "О программе" - отображает информацию о приложении и разработчике
@@ -68,19 +67,18 @@ import com.example.lets_go_slavgorod.ui.navigation.Screen
 fun AboutScreen(
     navController: NavController? = null,
     onBackClick: () -> Unit = {},
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
-    innerPadding: PaddingValues = PaddingValues()
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
 
     val developerSectionTitleText =
         stringResource(id = R.string.developer_section_title) // "Разработал: VseMirka200"
 
     val developerGitHubUrl = stringResource(id = R.string.developer_github_url_value)
+    val developerVkUrl = stringResource(id = R.string.developer_vk_url_value)
 
     // Строки для обратной связи через Telegram
-    val feedbackTelegramBotUsername = stringResource(id = R.string.feedback_telegram_bot_username)
 
-    val appVersion = BuildConfig.VERSION_NAME
+    val appVersion = "v1.06" // Временное решение до сборки проекта
 
     Scaffold(
         topBar = {
@@ -94,7 +92,7 @@ fun AboutScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Назад"
                         )
                     }
@@ -141,7 +139,7 @@ fun AboutScreen(
             LinksCard(
                 navController = navController,
                 githubUrl = developerGitHubUrl,
-                vkUrl = "https://vk.com/vsemirka200"
+                vkUrl = developerVkUrl
             )
 
             Spacer(Modifier.height(16.dp))
@@ -277,7 +275,7 @@ private fun LinkItem(
                     try {
                         context.startActivity(intent)
                     } catch (e: Exception) {
-                        Log.e("AboutScreen", "Could not open URL: $url", e)
+                        Timber.e(e, "Could not open URL: $url")
                     }
                 }
             }
@@ -343,7 +341,7 @@ private fun SupportCard(
                             try {
                                 context.startActivity(intent)
                             } catch (e: Exception) {
-                                Log.e("AboutScreen", "Could not open CloudTips", e)
+                                Timber.e(e, "Could not open CloudTips")
                             }
                         }
                     },
@@ -371,7 +369,7 @@ private fun SupportCard(
                             try {
                                 context.startActivity(intent)
                             } catch (e: Exception) {
-                                Log.e("AboutScreen", "Could not open GitHub", e)
+                                Timber.e(e, "Could not open GitHub")
                             }
                         }
                     },
@@ -455,7 +453,7 @@ private fun FeedbackCard() {
                             val intent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
                             context.startActivity(intent)
                         } catch (e2: Exception) {
-                            Log.e("AboutScreen", "Could not open Telegram bot", e2)
+                            Timber.e(e2, "Could not open Telegram bot")
                             // Показываем сообщение пользователю
                             android.widget.Toast.makeText(
                                 context,

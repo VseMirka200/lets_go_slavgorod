@@ -1,7 +1,7 @@
 package com.example.lets_go_slavgorod.ui.viewmodel
 
 import android.app.Application
-import android.util.Log
+import timber.log.Timber
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.datastore.preferences.core.edit
@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.example.lets_go_slavgorod.data.local.dataStore
 import com.example.lets_go_slavgorod.data.local.AppDatabase
+import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
 import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import com.example.lets_go_slavgorod.notifications.AlarmScheduler
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,7 +51,6 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
         val SELECTED_DAYS_KEY = stringSetPreferencesKey("selected_notification_days")
         val ROUTE_NOTIFICATION_MODE_KEY = stringPreferencesKey("route_notification_mode_")
         val ROUTE_SELECTED_DAYS_KEY = stringSetPreferencesKey("route_selected_days_")
-        const val TAG = "NotificationSettingsVM"
     }
 
     val currentNotificationMode: StateFlow<NotificationMode> =
@@ -60,7 +60,7 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                 try {
                     NotificationMode.valueOf(modeName)
                 } catch (_: IllegalArgumentException) {
-                    Log.w(TAG, "Invalid notification mode in DataStore: $modeName, defaulting to ALL_DAYS")
+                    Timber.w("Invalid notification mode in DataStore: $modeName, defaulting to ALL_DAYS")
                     NotificationMode.ALL_DAYS
                 }
             }
@@ -78,7 +78,7 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                     try {
                         DayOfWeek.valueOf(dayName)
                     } catch (_: IllegalArgumentException) {
-                        Log.w(TAG, "Invalid day name in DataStore: $dayName")
+                        Timber.w("Invalid day name in DataStore: $dayName")
                         null
                     }
                 }.toSet()
@@ -88,46 +88,6 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = emptySet()
             )
-
-    fun setNotificationMode(mode: NotificationMode) {
-        viewModelScope.launch {
-            try {
-                getApplication<Application>().dataStore.edit { settings ->
-                    settings[NOTIFICATION_MODE_KEY] = mode.name
-                    if (mode != NotificationMode.SELECTED_DAYS) {
-                        settings.remove(SELECTED_DAYS_KEY)
-                        Log.d(TAG, "Selected notification days cleared due to mode change to ${mode.name}.")
-                    }
-                }
-                Log.d(TAG, "Notification mode set to: ${mode.name} and saved.")
-                
-                // Обновляем все активные уведомления
-                updateAllActiveAlarms()
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to save notification mode or clear days", e)
-            }
-        }
-    }
-
-    fun setSelectedNotificationDays(days: Set<DayOfWeek>) {
-        viewModelScope.launch {
-            try {
-                val dayNames = days.map { it.name }.toSet()
-                getApplication<Application>().dataStore.edit { settings ->
-                    settings[SELECTED_DAYS_KEY] = dayNames
-                }
-                Log.d(TAG, "Selected notification days saved: $dayNames")
-                if (currentNotificationMode.value != NotificationMode.SELECTED_DAYS) {
-                    setNotificationMode(NotificationMode.SELECTED_DAYS)
-                } else {
-                    // Обновляем все активные уведомления
-                    updateAllActiveAlarms()
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to save selected notification days", e)
-            }
-        }
-    }
 
     /**
      * Получает настройки уведомлений для конкретного маршрута
@@ -183,10 +143,10 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                         settings.remove(stringSetPreferencesKey("${ROUTE_SELECTED_DAYS_KEY.name}$routeId"))
                     }
                 }
-                Log.d(TAG, "Route $routeId notification mode set to: ${mode.name}")
+                Timber.d("Route $routeId notification mode set to: ${mode.name}")
                 updateAllActiveAlarms()
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to save route notification mode", e)
+                Timber.e(e, "Failed to save route notification mode")
             }
         }
     }
@@ -201,10 +161,10 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                 getApplication<Application>().dataStore.edit { settings ->
                     settings[stringSetPreferencesKey("${ROUTE_SELECTED_DAYS_KEY.name}$routeId")] = dayNames
                 }
-                Log.d(TAG, "Route $routeId selected days saved: $dayNames")
+                Timber.d("Route $routeId selected days saved: $dayNames")
                 updateAllActiveAlarms()
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to save route selected days", e)
+                Timber.e(e, "Failed to save route selected days")
             }
         }
     }
@@ -215,7 +175,7 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
     private fun updateAllActiveAlarms() {
         viewModelScope.launch {
             try {
-                Log.d(TAG, "Updating all active alarms based on notification settings")
+                Timber.d("Updating all active alarms based on notification settings")
                 
                 val database = AppDatabase.getDatabase(getApplication())
                 val favoriteTimeDao = database.favoriteTimeDao()
@@ -224,7 +184,7 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                 
                 val activeFavoriteTimes = favoriteTimeEntities
                     .filter { it.isActive }
-                    .map { entity: com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity ->
+                    .map { entity: FavoriteTimeEntity ->
                         FavoriteTime(
                             id = entity.id,
                             routeId = entity.routeId,
@@ -239,10 +199,10 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
                     }
                 
                 AlarmScheduler.updateAllAlarmsBasedOnSettings(getApplication(), activeFavoriteTimes)
-                Log.d(TAG, "Updated ${activeFavoriteTimes.size} active alarms")
+                Timber.d("Updated ${activeFavoriteTimes.size} active alarms")
                 
             } catch (e: Exception) {
-                Log.e(TAG, "Error updating active alarms", e)
+                Timber.e(e, "Error updating active alarms")
             }
         }
     }

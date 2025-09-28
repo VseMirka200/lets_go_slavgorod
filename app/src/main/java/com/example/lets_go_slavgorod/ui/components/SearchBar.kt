@@ -1,5 +1,6 @@
 package com.example.lets_go_slavgorod.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 
+@SuppressLint("RememberInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(

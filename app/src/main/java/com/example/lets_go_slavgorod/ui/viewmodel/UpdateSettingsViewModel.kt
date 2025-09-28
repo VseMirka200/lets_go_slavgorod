@@ -18,6 +18,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lets_go_slavgorod.data.local.UpdatePreferences
+import timber.log.Timber
 import com.example.lets_go_slavgorod.updates.UpdateManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,19 +120,19 @@ class UpdateSettingsViewModel(@SuppressLint("StaticFieldLeak") private val conte
                             notes = result.update.releaseNotes
                         )
                         _updateCheckStatus.value = "Доступна новая версия ${result.update.versionName}"
-                        android.util.Log.d("UpdateSettingsViewModel", "Найдено обновление: ${result.update.versionName}")
+                        Timber.d("Найдено обновление: ${result.update.versionName}")
                     } else {
                         // Очищаем информацию о доступном обновлении
                         updatePreferences.clearAvailableUpdate()
                         _updateCheckStatus.value = "У вас установлена последняя версия"
-                        android.util.Log.d("UpdateSettingsViewModel", "Обновления не найдены - у пользователя последняя версия")
+                        Timber.d("Обновления не найдены - у пользователя последняя версия")
                     }
                     
                     // Обновляем время последней проверки
                     updatePreferences.setLastUpdateCheckTime(System.currentTimeMillis())
                 } else {
                     _updateCheckError.value = result.error ?: "Ошибка при проверке обновлений"
-                    android.util.Log.e("UpdateSettingsViewModel", "Ошибка при проверке обновлений: ${result.error}")
+                    Timber.e("Ошибка при проверке обновлений: ${result.error}")
                 }
             } catch (e: Exception) {
                 _updateCheckError.value = "Ошибка: ${e.message}"

@@ -3,10 +3,8 @@ package com.example.lets_go_slavgorod.ui.components.schedule
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,7 +50,7 @@ fun ScheduleHeader(
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.Default.ArrowBack, "Назад")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад")
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

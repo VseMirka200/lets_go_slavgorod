@@ -20,6 +20,10 @@
     
     <!-- Восстановление после перезагрузки -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <!-- ЮКасса SDK разрешения -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <!-- ===================================================================================== -->
     <!--                                  ПРИЛОЖЕНИЕ                                          -->

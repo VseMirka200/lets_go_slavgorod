@@ -10,6 +10,11 @@ on:
       - 'v*'  # Запуск при создании тега, начинающегося с 'v'
   workflow_dispatch:  # Возможность запуска вручную из GitHub UI
 
+# Права доступа для работы с GitHub API
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest  # Используем Ubuntu для сборки
@@ -49,7 +54,19 @@ jobs:
     - name: Build APK
       run: ./gradlew assembleRelease
 
-    # Шаг 7: Создание GitHub Release и загрузка APK файла
+    # Шаг 7: Отладка - поиск APK файлов
+    - name: Find APK files
+      run: |
+        echo "=== Поиск APK файлов ==="
+        find . -name "*.apk" -type f
+        echo ""
+        echo "=== Проверка папки release ==="
+        ls -la app/build/outputs/apk/release/ || echo "Папка release не найдена"
+        echo ""
+        echo "=== Проверка папки debug ==="
+        ls -la app/build/outputs/apk/debug/ || echo "Папка debug не найдена"
+
+    # Шаг 8: Создание GitHub Release и загрузка APK файла
     - name: Create Release and Upload APK
       uses: softprops/action-gh-release@v1
       with:
@@ -67,7 +84,8 @@ jobs:
           2. Разрешите установку из неизвестных источников
           3. Установите приложение
         files: |
-          app/build/outputs/apk/release/app-release.apk  # Путь к собранному APK
+          app/build/outputs/apk/release/*.apk  # Любой APK файл в папке release
+          app/build/outputs/apk/debug/*.apk    # Любой APK файл в папке debug
         draft: false      # Не создавать как черновик
         prerelease: false # Не помечать как pre-release
       env:

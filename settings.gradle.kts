@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Lets-go-Slavgorod"
+rootProject.name = "lets_go_slavgorod"
 include (":app")

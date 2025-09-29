@@ -1,92 +1,57 @@
-# GitHub Actions workflow для автоматической сборки и релиза Android приложения
-# Запускается при создании тега версии (например, v1.0.3) или вручную
-
 name: Build and Release
 
-# Триггеры запуска workflow
 on:
   push:
     tags:
-      - 'v*'  # Запуск при создании тега, начинающегося с 'v'
-  workflow_dispatch:  # Возможность запуска вручную из GitHub UI
-
-# Права доступа для работы с GitHub API
-permissions:
-  contents: write
-  packages: write
+      - 'v*'
 
 jobs:
-  build-and-release:
-    runs-on: ubuntu-latest  # Используем Ubuntu для сборки
-
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      packages: write
+    
     steps:
-    # Шаг 1: Получение исходного кода
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    # Шаг 2: Настройка Java Development Kit 17
-    - name: Set up JDK 17
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        distribution: 'temurin'  # Используем Temurin JDK (бывший AdoptOpenJDK)
-
-    # Шаг 3: Настройка Android SDK
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    # Шаг 4: Кэширование Gradle зависимостей для ускорения сборки
-    - name: Cache Gradle packages
+        distribution: 'temurin'
+    
+    - name: Cache Gradle dependencies
       uses: actions/cache@v3
       with:
         path: |
-          ~/.gradle/caches      # Кэш Gradle
-          ~/.gradle/wrapper     # Gradle Wrapper
+          ~/.gradle/caches
+          ~/.gradle/wrapper
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-
-    # Шаг 5: Предоставление прав на выполнение gradlew
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    # Шаг 6: Сборка релизной версии APK
-    - name: Build APK
-      run: ./gradlew assembleRelease
-
-    # Шаг 7: Отладка - поиск APK файлов
+    
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+    
+    - name: Build APK (Debug)
+      run: ./gradlew assembleDebug
+    
     - name: Find APK files
       run: |
         echo "=== Поиск APK файлов ==="
-        find . -name "*.apk" -type f
-        echo ""
-        echo "=== Проверка папки release ==="
-        ls -la app/build/outputs/apk/release/ || echo "Папка release не найдена"
-        echo ""
-        echo "=== Проверка папки debug ==="
-        ls -la app/build/outputs/apk/debug/ || echo "Папка debug не найдена"
-
-    # Шаг 8: Создание GitHub Release и загрузка APK файла
-    - name: Create Release and Upload APK
+        find . -name "*.apk" -type f -exec ls -la {} \;
+        echo "=== Проверка debug директории ==="
+        ls -la app/build/outputs/apk/debug/ || echo "Debug директория не найдена"
+    
+    - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_name }}  # Название тега (например, v1.0.3)
-        name: Release ${{ github.ref_name }}  # Название релиза
-        body: |
-          Автоматический релиз версии ${{ github.ref_name }}
-
-          ## Что нового:
-          - Обновления и улучшения
-          - Исправления ошибок
-
-          ## Установка:
-          1. Скачайте APK файл
-          2. Разрешите установку из неизвестных источников
-          3. Установите приложение
         files: |
-          app/build/outputs/apk/release/*.apk  # Любой APK файл в папке release
-          app/build/outputs/apk/debug/*.apk    # Любой APK файл в папке debug
-        draft: false      # Не создавать как черновик
-        prerelease: false # Не помечать как pre-release
+          app/build/outputs/apk/debug/*.apk
+        generate_release_notes: true
+        draft: false
+        prerelease: false
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Токен для работы с GitHub API
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -39,7 +39,6 @@
         android:theme="@style/Theme.lets_go_slavgorod"
         android:hardwareAccelerated="true"
         android:largeHeap="false"
-        android:extractNativeLibs="false"
         android:requestLegacyExternalStorage="false"
         android:usesCleartextTraffic="false">
 

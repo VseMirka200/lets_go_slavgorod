@@ -22,13 +22,13 @@ plugins {
 
 android {
     namespace = "com.example.lets_go_slavgorod"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.lets_go_slavgorod"
         minSdk = 24
         //noinspection OldTargetApi
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 10005
         versionName = "v1.05"
 

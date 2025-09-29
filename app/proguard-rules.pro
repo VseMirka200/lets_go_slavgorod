@@ -144,36 +144,6 @@
 -dontwarn kotlinx.coroutines.**
 
 # =============================================================================
-# ЮКАССА SDK
-# =============================================================================
-
-# ЮКасса SDK - сохраняем все классы для работы платежей
--keep class ru.yoomoney.sdk.kassa.payments.** { *; }
--dontwarn ru.yoomoney.sdk.kassa.payments.**
-
-# VK SDK для авторизации
--keep class com.vk.** { *; }
--dontwarn com.vk.**
-
-# Jackson для сериализации
--keep class com.fasterxml.jackson.** { *; }
--dontwarn com.fasterxml.jackson.**
-
-# SLF4J для логирования
--keep class org.slf4j.** { *; }
--dontwarn org.slf4j.**
-
-# Сохраняем сериализацию для платежей
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-
-# =============================================================================
 # ДОПОЛНИТЕЛЬНЫЕ ОПТИМИЗАЦИИ
 # =============================================================================
 

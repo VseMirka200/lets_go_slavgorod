@@ -144,24 +144,6 @@
 -dontwarn kotlinx.coroutines.**
 
 # =============================================================================
-# ЮКАССА SDK
-# =============================================================================
-
-# ЮКасса SDK - сохраняем все классы для работы платежей
--keep class ru.yoomoney.sdk.kassa.payments.** { *; }
--dontwarn ru.yoomoney.sdk.kassa.payments.**
-
-# Сохраняем сериализацию для платежей
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-
-# =============================================================================
 # ДОПОЛНИТЕЛЬНЫЕ ОПТИМИЗАЦИИ
 # =============================================================================
 

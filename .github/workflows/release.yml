@@ -45,21 +45,16 @@ jobs:
     - name: Build APK (Release)
       run: ./gradlew assembleRelease --stacktrace
     
-    - name: Find APK files
+    - name: Rename APK
       run: |
-        echo "=== Поиск APK файлов ==="
-        find . -name "*.apk" -type f -exec ls -la {} \;
-        echo "=== Проверка release директории ==="
-        ls -la app/build/outputs/apk/release/ || echo "Release директория не найдена"
-        echo "=== Проверка всех outputs ==="
-        find app/build/outputs -name "*.apk" -type f || echo "APK файлы не найдены"
+        cd app/build/outputs/apk/release
+        mv app-release.apk "Lets_go_Slavgorod_v${{ github.ref_name }}.apk"
+        ls -la
     
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          app/build/outputs/apk/release/*.apk
-          app/build/outputs/apk/**/*.apk
+        files: app/build/outputs/apk/release/*.apk
         generate_release_notes: true
         draft: false
         prerelease: false

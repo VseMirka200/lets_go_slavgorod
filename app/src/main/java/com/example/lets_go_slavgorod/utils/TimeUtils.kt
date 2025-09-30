@@ -7,32 +7,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Утилиты для работы с временем и обратным отсчетом
- * 
- * Основные функции:
- * - Вычисление времени до отправления автобуса
- * - Форматирование времени в читаемый вид
- * - Определение ближайшего рейса
- * - Работа с секундами для точного отсчета
- * 
- * @author VseMirka200
- * @version 1.0
+ * Утилиты для работы со временем
  */
 object TimeUtils {
 
-    /**
-     * Форматирует время в читаемый вид
-     */
     @SuppressLint("ConstantLocale")
     private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     
-    /**
-     * Вычисляет время до ближайшего рейса
-     * 
-     * @param departureTime время отправления в формате HH:mm
-     * @param currentTime текущее время (по умолчанию - сейчас)
-     * @return время до отправления в минутах, или null если рейс уже ушел
-     */
+    // Вычисление времени до отправления (в минутах)
     fun getTimeUntilDeparture(departureTime: String, currentTime: Calendar = Calendar.getInstance()): Int? {
         return try {
             Timber.d("Calculating time until departure: $departureTime")
@@ -69,13 +51,7 @@ object TimeUtils {
         }
     }
     
-    /**
-     * Вычисляет время до ближайшего рейса с секундами
-     * 
-     * @param departureTime время отправления в формате HH:mm
-     * @param currentTime текущее время (по умолчанию - сейчас)
-     * @return Pair<минуты, секунды> до отправления, или null если рейс уже ушел
-     */
+    // Вычисление времени до отправления (с секундами)
     fun getTimeUntilDepartureWithSeconds(departureTime: String, currentTime: Calendar = Calendar.getInstance()): Pair<Int, Int>? {
         return try {
             val departureCalendar = parseTime(departureTime)

@@ -170,6 +170,44 @@ class NotificationSettingsViewModel(application: Application) : AndroidViewModel
     }
 
     /**
+     * Устанавливает глобальный режим уведомлений
+     */
+    fun setGlobalNotificationMode(mode: NotificationMode) {
+        viewModelScope.launch {
+            try {
+                getApplication<Application>().dataStore.edit { settings ->
+                    settings[NOTIFICATION_MODE_KEY] = mode.name
+                    if (mode != NotificationMode.SELECTED_DAYS) {
+                        settings.remove(SELECTED_DAYS_KEY)
+                    }
+                }
+                Timber.d("Global notification mode set to: ${mode.name}")
+                updateAllActiveAlarms()
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to save global notification mode")
+            }
+        }
+    }
+    
+    /**
+     * Устанавливает глобальные выбранные дни для уведомлений
+     */
+    fun setGlobalSelectedDays(days: Set<DayOfWeek>) {
+        viewModelScope.launch {
+            try {
+                val dayNames = days.map { it.name }.toSet()
+                getApplication<Application>().dataStore.edit { settings ->
+                    settings[SELECTED_DAYS_KEY] = dayNames
+                }
+                Timber.d("Global selected days saved: $dayNames")
+                updateAllActiveAlarms()
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to save global selected days")
+            }
+        }
+    }
+    
+    /**
      * Обновляет все активные уведомления в соответствии с текущими настройками
      */
     private fun updateAllActiveAlarms() {

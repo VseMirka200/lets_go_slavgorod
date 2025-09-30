@@ -26,22 +26,25 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -65,6 +68,8 @@ import androidx.navigation.NavController
 import com.example.lets_go_slavgorod.R
 import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
+import com.example.lets_go_slavgorod.ui.viewmodel.QuietMode
+import com.example.lets_go_slavgorod.ui.viewmodel.QuietModeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateMode
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
@@ -100,10 +105,24 @@ fun SettingsScreen(
             }
         }
     )
+    
+    val quietModeViewModel: QuietModeViewModel = viewModel(
+        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return QuietModeViewModel(context) as T
+            }
+        }
+    )
+    
     val currentAppTheme by themeViewModel.currentTheme.collectAsState()
     var showThemeDropdown by remember { mutableStateOf(false) }
     val themeOptions = remember { AppTheme.entries.toTypedArray() }
 
+    // Quiet mode state
+    val currentQuietMode by quietModeViewModel.quietMode.collectAsState()
+    var showQuietModeDropdown by remember { mutableStateOf(false) }
+    val quietModeOptions = remember { QuietMode.entries.toTypedArray() }
     
     // Update settings state
     val currentUpdateMode by updateSettingsVM.currentUpdateMode.collectAsState(initial = UpdateMode.AUTOMATIC)
@@ -193,16 +212,33 @@ fun SettingsScreen(
                     updateSettingsVM.clearUpdateCheckStatus()
                 },
                 onDownloadUpdate = { url ->
-                    if (navController != null) {
-                        // Открываем ссылку в WebView внутри приложения
-                        val route = Screen.WebView.createRoute(url, "Скачать обновление")
-                        navController.navigate(route)
-                    } else {
-                        // Fallback: открываем в браузере
-                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW,
-                            url.toUri())
+                    // Открываем ссылку в браузере
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, url.toUri())
+                    try {
                         context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to open update URL")
                     }
+                }
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            // Раздел "Уведомления"
+            Text(
+                text = stringResource(R.string.settings_section_notifications_quiet_title),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            QuietModeSettingsCard(
+                currentQuietMode = currentQuietMode,
+                showQuietModeDropdown = showQuietModeDropdown,
+                onShowQuietModeDropdownChange = { showQuietModeDropdown = it },
+                quietModeOptions = quietModeOptions,
+                customDays = quietModeViewModel.customDays.collectAsState().value,
+                onQuietModeSelected = { mode, days ->
+                    quietModeViewModel.setQuietMode(mode, days)
                 }
             )
 
@@ -702,6 +738,220 @@ private fun formatLastCheckTime(timestamp: Long): String {
             dateFormat.format(java.util.Date(timestamp))
         }
     }
+}
+
+/**
+ * Карточка настроек уведомлений
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun QuietModeSettingsCard(
+    currentQuietMode: QuietMode,
+    showQuietModeDropdown: Boolean,
+    onShowQuietModeDropdownChange: (Boolean) -> Unit,
+    quietModeOptions: Array<QuietMode>,
+    customDays: Int,
+    onQuietModeSelected: (QuietMode, Int) -> Unit
+) {
+    var showDaysDialog by remember { mutableStateOf(false) }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.NotificationsOff,
+                    contentDescription = stringResource(R.string.settings_quiet_mode_icon_desc),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(16.dp))
+                Text(
+                    text = stringResource(R.string.settings_quiet_mode_label),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            // Dropdown для выбора режима
+            ExposedDropdownMenuBox(
+                expanded = showQuietModeDropdown,
+                onExpandedChange = onShowQuietModeDropdownChange
+            ) {
+                OutlinedTextField(
+                    value = currentQuietMode.displayName,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Выберите режим") },
+                    trailingIcon = { 
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = showQuietModeDropdown
+                        ) 
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(type = androidx.compose.material3.MenuAnchorType.PrimaryNotEditable)
+                )
+                
+                ExposedDropdownMenu(
+                    expanded = showQuietModeDropdown,
+                    onDismissRequest = { onShowQuietModeDropdownChange(false) }
+                ) {
+                    quietModeOptions.forEach { mode ->
+                        DropdownMenuItem(
+                            text = { Text(mode.displayName) },
+                            onClick = {
+                                if (mode == QuietMode.CUSTOM_DAYS) {
+                                    showDaysDialog = true
+                                    onShowQuietModeDropdownChange(false)
+                                } else {
+                                    onQuietModeSelected(mode, 0)
+                                    onShowQuietModeDropdownChange(false)
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+            
+            // Показываем количество дней если выбран режим CUSTOM_DAYS
+            if (currentQuietMode == QuietMode.CUSTOM_DAYS && customDays > 0) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Уведомления отключены на $customDays ${getDaysWord(customDays)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+            
+            // Информация о статусе
+            if (currentQuietMode != QuietMode.ENABLED) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = when (currentQuietMode) {
+                                QuietMode.DISABLED -> "Все уведомления отключены"
+                                QuietMode.CUSTOM_DAYS -> "Уведомления временно отключены"
+                                else -> "Уведомления включены"
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    // Диалог для ввода количества дней
+    if (showDaysDialog) {
+        CustomDaysDialog(
+            onDismiss = { showDaysDialog = false },
+            onConfirm = { days ->
+                onQuietModeSelected(QuietMode.CUSTOM_DAYS, days)
+                showDaysDialog = false
+            }
+        )
+    }
+}
+
+// Склонение слова "день"
+private fun getDaysWord(count: Int): String {
+    return when {
+        count % 10 == 1 && count % 100 != 11 -> "день"
+        count % 10 in 2..4 && (count % 100 < 10 || count % 100 >= 20) -> "дня"
+        else -> "дней"
+    }
+}
+
+/**
+ * Диалог для ввода количества дней
+ */
+@Composable
+private fun CustomDaysDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
+) {
+    var daysInput by remember { mutableStateOf("1") }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Отключить уведомления") },
+        text = {
+            Column {
+                Text(
+                    text = "На сколько дней отключить уведомления?",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = daysInput,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() } && newValue.length <= 3) {
+                            daysInput = newValue
+                        }
+                    },
+                    label = { Text("Количество дней") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val days = daysInput.toIntOrNull() ?: 1
+                    if (days > 0) {
+                        onConfirm(days)
+                    }
+                }
+            ) {
+                Text("ОК")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Отмена")
+            }
+        }
+    )
 }
 
 /**

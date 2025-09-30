@@ -7,11 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.example.lets_go_slavgorod.data.local.dataStore
 import com.example.lets_go_slavgorod.data.model.FavoriteTime
 import com.example.lets_go_slavgorod.ui.viewmodel.NotificationMode
+import com.example.lets_go_slavgorod.ui.viewmodel.QuietMode
 import com.example.lets_go_slavgorod.utils.Constants
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -35,6 +37,10 @@ object AlarmScheduler {
     private const val ALARM_REQUEST_CODE_PREFIX = Constants.ALARM_REQUEST_CODE_PREFIX
     // Время опережения уведомления (5 минут до отправления)
     private const val FIVE_MINUTES_IN_MILLIS = Constants.NOTIFICATION_LEAD_TIME_MINUTES * 60 * 1000L
+    
+    // Ключи для тихого режима
+    private val QUIET_MODE_KEY = stringPreferencesKey("quiet_mode")
+    private val QUIET_UNTIL_KEY = longPreferencesKey("quiet_until_time")
 
     /**
      * Проверяет, должны ли отправляться уведомления в соответствии с настройками пользователя
@@ -52,6 +58,34 @@ object AlarmScheduler {
     private fun shouldSendNotification(context: Context, routeId: String? = null): Boolean {
         return try {
             val preferences = runBlocking { context.dataStore.data.first() }
+            
+            // Проверяем режим уведомлений
+            val quietModeString = preferences[QUIET_MODE_KEY]
+            val quietUntilTime = preferences[QUIET_UNTIL_KEY]
+            
+            if (quietModeString != null) {
+                try {
+                    val quietMode = QuietMode.valueOf(quietModeString)
+                    when (quietMode) {
+                        QuietMode.DISABLED -> {
+                            Timber.d("Notifications are DISABLED - notifications disabled")
+                            return false
+                        }
+                        QuietMode.ENABLED -> {
+                            // Уведомления включены - проверяем дальше
+                        }
+                        QuietMode.CUSTOM_DAYS -> {
+                            // Проверяем временное отключение на N дней
+                            if (quietUntilTime != null && System.currentTimeMillis() < quietUntilTime) {
+                                Timber.d("Notifications disabled until $quietUntilTime")
+                                return false
+                            }
+                        }
+                    }
+                } catch (e: IllegalArgumentException) {
+                    Timber.w("Invalid quiet mode: $quietModeString")
+                }
+            }
             
             // Проверяем индивидуальные настройки маршрута, если указан routeId
             val (notificationModeString, selectedDaysString) = if (routeId != null) {

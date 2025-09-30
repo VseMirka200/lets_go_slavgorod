@@ -36,7 +36,6 @@
         android:hardwareAccelerated="true"
         android:largeHeap="false"
         android:requestLegacyExternalStorage="false"
-        android:extractNativeLibs="false"
         android:usesCleartextTraffic="false">
 
         <!-- ===================================================================================== -->

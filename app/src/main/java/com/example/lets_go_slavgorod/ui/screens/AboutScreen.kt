@@ -1,5 +1,6 @@
 package com.example.lets_go_slavgorod.ui.screens
 
+// import com.example.lets_go_slavgorod.BuildConfig
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.clickable
@@ -20,8 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Feedback
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -45,9 +44,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
-// import com.example.lets_go_slavgorod.BuildConfig
 import com.example.lets_go_slavgorod.R
-import com.example.lets_go_slavgorod.ui.navigation.Screen
 import timber.log.Timber
 
 /**
@@ -70,15 +67,13 @@ fun AboutScreen(
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
 
-    val developerSectionTitleText =
-        stringResource(id = R.string.developer_section_title) // "Разработал: VseMirka200"
-
-    val developerGitHubUrl = stringResource(id = R.string.developer_github_url_value)
-    val developerVkUrl = stringResource(id = R.string.developer_vk_url_value)
+    val developerName = stringResource(id = R.string.developer_name)
+    val developerVkUrl = stringResource(id = R.string.developer_vk_url)
+    val context = LocalContext.current
 
     // Строки для обратной связи через Telegram
 
-    val appVersion = "v1.05" // Временное решение до сборки проекта
+    val appVersion = "v1.06"
 
     Scaffold(
         topBar = {
@@ -123,23 +118,17 @@ fun AboutScreen(
 
             AppInfoCard(
                 appName = stringResource(id = R.string.app_name),
-                developer = developerSectionTitleText,
-                version = appVersion
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // Раздел Ссылки
-            Text(
-                text = "Ссылки",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 6.dp)
-            )
-
-            LinksCard(
-                navController = navController,
-                githubUrl = developerGitHubUrl,
-                vkUrl = developerVkUrl
+                developer = developerName,
+                developerVkUrl = developerVkUrl,
+                version = appVersion,
+                onDeveloperClick = {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, developerVkUrl.toUri())
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Could not open VK profile")
+                    }
+                }
             )
 
             Spacer(Modifier.height(16.dp))
@@ -174,7 +163,9 @@ fun AboutScreen(
 private fun AppInfoCard(
     appName: String,
     developer: String,
-    version: String
+    developerVkUrl: String,
+    version: String,
+    onDeveloperClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -182,119 +173,39 @@ private fun AppInfoCard(
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(3.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Text(
+                text = appName,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+            )
+            
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "Информация о приложении",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                Text(
+                    text = "Разработал:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = appName,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = developer,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "Версия: $version",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = developer,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { onDeveloperClick() }
+                )
             }
-        }
-    }
-}
-
-/**
- * Карточка со ссылками
- */
-@Composable
-private fun LinksCard(
-    navController: NavController?,
-    githubUrl: String,
-    vkUrl: String
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(3.dp)
-        ) {
-            LinkItem(
-                navController = navController,
-                text = "GitHub",
-                url = githubUrl,
-                icon = Icons.Default.Link
-            )
-            Spacer(Modifier.height(12.dp))
-            LinkItem(
-                navController = navController,
-                text = "Вконтакте",
-                url = vkUrl,
-                icon = Icons.Default.Link
+            
+            Text(
+                text = "Версия: $version",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-/**
- * Элемент ссылки в карточке
- */
-@Composable
-private fun LinkItem(
-    navController: NavController?,
-    text: String,
-    url: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector
-) {
-    val context = LocalContext.current
-    
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                if (navController != null) {
-                    // Открываем ссылку в WebView внутри приложения
-                    val route = Screen.WebView.createRoute(url, text)
-                    navController.navigate(route)
-                } else {
-                    // Fallback: открываем в браузере
-                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                    try {
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        Timber.e(e, "Could not open URL: $url")
-                    }
-                }
-            }
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(Modifier.width(12.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary,
-            textDecoration = TextDecoration.Underline
-        )
     }
 }
 
@@ -321,28 +232,22 @@ private fun SupportCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
             
             // Кнопки поддержки
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 // Кнопка "Донат"
                 OutlinedButton(
                     onClick = {
-                        if (navController != null) {
-                            // Открываем ссылку в WebView внутри приложения
-                            val route = Screen.WebView.createRoute("https://pay.cloudtips.ru/p/9bc2de2e", "Поддержать разработчика")
-                            navController.navigate(route)
-                        } else {
-                            // Fallback: открываем в браузере
-                            val intent = Intent(Intent.ACTION_VIEW, "https://pay.cloudtips.ru/p/9bc2de2e".toUri())
-                            try {
-                                context.startActivity(intent)
-                            } catch (e: Exception) {
-                                Timber.e(e, "Could not open CloudTips")
-                            }
+                        // Открываем ссылку в браузере
+                        val intent = Intent(Intent.ACTION_VIEW, "https://pay.cloudtips.ru/p/9bc2de2e".toUri())
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Could not open CloudTips")
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -359,18 +264,12 @@ private fun SupportCard(
                 // Кнопка "Оценить"
                 OutlinedButton(
                     onClick = {
-                        if (navController != null) {
-                            // Открываем ссылку в WebView внутри приложения
-                            val route = Screen.WebView.createRoute("https://github.com/VseMirka200/lets_go_slavgorod", "GitHub")
-                            navController.navigate(route)
-                        } else {
-                            // Fallback: открываем в браузере
-                            val intent = Intent(Intent.ACTION_VIEW, "https://github.com/VseMirka200/lets_go_slavgorod".toUri())
-                            try {
-                                context.startActivity(intent)
-                            } catch (e: Exception) {
-                                Timber.e(e, "Could not open GitHub")
-                            }
+                        // Открываем ссылку в браузере
+                        val intent = Intent(Intent.ACTION_VIEW, "https://github.com/VseMirka200/lets_go_slavgorod".toUri())
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Could not open GitHub")
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -385,7 +284,7 @@ private fun SupportCard(
                 }
             }
             
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -420,8 +319,7 @@ private fun SupportCard(
 @Composable
 private fun FeedbackCard() {
     val context = LocalContext.current
-    val feedbackTelegramBotUsername = stringResource(id = R.string.feedback_telegram_bot_username)
-    val telegramBotUrl = "https://t.me/$feedbackTelegramBotUsername"
+    val telegramUrl = stringResource(id = R.string.feedback_telegram_url)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -432,7 +330,7 @@ private fun FeedbackCard() {
             verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             Text(
-                text = "Есть вопросы или предложения? Напишите нам в Telegram!",
+                text = "Присоединяйтесь к нашему Telegram каналу! Новости, обновления и общение.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -444,16 +342,16 @@ private fun FeedbackCard() {
                 onClick = {
                     try {
                         // Пытаемся открыть в приложении Telegram
-                        val telegramIntent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
+                        val telegramIntent = Intent(Intent.ACTION_VIEW, telegramUrl.toUri())
                         telegramIntent.setPackage("org.telegram.messenger")
                         context.startActivity(telegramIntent)
                     } catch (_: Exception) {
                         try {
                             // Fallback: открываем в браузере
-                            val intent = Intent(Intent.ACTION_VIEW, telegramBotUrl.toUri())
+                            val intent = Intent(Intent.ACTION_VIEW, telegramUrl.toUri())
                             context.startActivity(intent)
                         } catch (e2: Exception) {
-                            Timber.e(e2, "Could not open Telegram bot")
+                            Timber.e(e2, "Could not open Telegram channel")
                             // Показываем сообщение пользователю
                             android.widget.Toast.makeText(
                                 context,
@@ -504,3 +402,4 @@ private fun FeedbackCard() {
         }
     }
 }
+

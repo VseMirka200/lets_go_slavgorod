@@ -10,21 +10,7 @@ import com.example.lets_go_slavgorod.data.local.entity.FavoriteTimeEntity
 import com.example.lets_go_slavgorod.utils.Constants
 
 /**
- * База данных приложения на основе Room
- * 
- * Основные функции:
- * - Хранение избранных времен отправления автобусов
- * - Обеспечение потокобезопасного доступа к данным
- * - Автоматическое управление миграциями
- * 
- * Оптимизации:
- * - Singleton паттерн для единого экземпляра базы данных
- * - Fallback к деструктивной миграции для упрощения
- * - Отключение экспорта схемы для уменьшения размера APK
- * 
- * @author VseMirka200
- * @version 1.1
- * @since 1.0
+ * База данных приложения (Room)
  */
 @Database(
     entities = [FavoriteTimeEntity::class],
@@ -35,26 +21,14 @@ import com.example.lets_go_slavgorod.utils.Constants
 @TypeConverters()
 abstract class AppDatabase : RoomDatabase() {
 
-    /**
-     * DAO для работы с избранными временами отправления
-     * 
-     * @return экземпляр FavoriteTimeDao для доступа к данным
-     */
+    // DAO для избранных времен
     abstract fun favoriteTimeDao(): FavoriteTimeDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        /**
-         * Получает экземпляр базы данных (Singleton)
-         * 
-         * Обеспечивает потокобезопасное создание единого экземпляра базы данных.
-         * Использует двойную проверку блокировки для оптимизации производительности.
-         * 
-         * @param context контекст приложения для инициализации базы данных
-         * @return экземпляр AppDatabase
-         */
+        // Получение экземпляра базы данных (Singleton)
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(

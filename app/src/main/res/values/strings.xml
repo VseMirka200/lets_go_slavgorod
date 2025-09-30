@@ -77,6 +77,11 @@
     <string name="dialog_select_days_title">Выберите дни для уведомлений</string>
     <string name="dialog_button_confirm">ОК</string>
     <string name="dialog_button_cancel">Отмена</string>
+    <!-- Секция "Уведомления" (в Настройках) -->
+    <string name="settings_section_notifications_quiet_title">Уведомления</string>
+    <string name="settings_quiet_mode_label">Управление уведомлениями:</string>
+    <string name="settings_quiet_mode_icon_desc">Иконка настроек уведомлений</string>
+    
     <!-- Секция "О приложении" (в Настройках) -->
     <string name="settings_section_about_title">О приложении</string> <!-- Используется как заголовок секции -->
     <string name="settings_about_icon_desc">Иконка информации о приложении</string>
@@ -86,15 +91,11 @@
     <!--                                    ЭКРАН "О ПРОГРАММЕ"                                -->
     <!-- ===================================================================================== -->
     <string name="about_screen_title">О программе</string> <!-- Используется как заголовок секции -->
-    <string name="developer_section_title">Разработал: VseMirka200</string>
-    <string name="links_section_title">Ссылки:</string>
-    <string name="link_text_github">GitHub</string>
-    <string name="developer_github_url_value">https://github.com/VseMirka200/lets_go_slavgorod</string>
-    <string name="developer_vk_url_value">https://vk.com/vsemirka200</string>
-    <string name="error_no_browser">Не удалось открыть ссылку. Проверьте, установлен ли браузер.</string>
+    <string name="developer_name">Олюшин Владислав Викторович</string>
+    <string name="developer_vk_url">https://vk.com/vsemirka200</string>
     <string name="feedback_section_title">Обратная связь</string>
-    <string name="feedback_link_text">Написать в Telegram</string>
-    <string name="feedback_telegram_bot_username">lets_go_slavgorod_bot</string>
+    <string name="feedback_link_text">Открыть Telegram канал</string>
+    <string name="feedback_telegram_url">https://t.me/lets_go_slavgorod/3</string>
     <string name="error_no_telegram_app">Приложение Telegram не установлено.</string>
     <string name="error_cant_open_link">Не удалось открыть ссылку.</string>
     <string name="app_version_label">Версия: %1$s</string>

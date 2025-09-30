@@ -1,45 +1,42 @@
 [versions]
-agp = "8.2.2"
-kotlin = "1.9.10"
-ksp = "1.9.10-1.0.13"
-composeCompilerVersion = "1.5.4"
+agp = "8.13.0"
+kotlin = "2.0.20"
+ksp = "2.0.20-1.0.25"
 
 # Core Android
-coreKtx = "1.10.1"
-lifecycleRuntimeKtx = "2.6.2"
-lifecycleViewmodelCompose = "2.6.2"
-activityCompose = "1.7.2"
+coreKtx = "1.13.1"
+lifecycleRuntimeKtx = "2.8.6"
+lifecycleViewmodelCompose = "2.8.6"
+activityCompose = "1.9.2"
 
 # Compose
-composeBom = "2023.10.01"
+composeBom = "2024.09.03"
 
 # Navigation
-navigationCompose = "2.6.0"
+navigationCompose = "2.8.2"
 
 # Room
-roomRuntime = "2.5.0"
-roomCompiler = "2.5.0"
+roomRuntime = "2.6.1"
 
 # DataStore
-datastorePreferences = "1.1.0"
+datastorePreferences = "1.1.1"
 
 # Coroutines
-kotlinxCoroutines = "1.10.2"
+kotlinxCoroutines = "1.9.0"
 
 # Testing
 junit = "4.13.2"
-androidxJunit = "1.1.5"
-espressoCore = "3.5.1"
+androidxJunit = "1.2.1"
+espressoCore = "3.6.1"
 
 # Desugaring
-desugarJdkLibs = "2.1.5"
-foundationLayout = "1.9.2"
+desugarJdkLibs = "2.1.2"
 
 # Logging
 timber = "5.0.1"
 
-# WebView
-webkit = "1.14.0"
+# Multidex
+multidex = "2.0.1"
 
 [libraries]
 # Core Android
@@ -65,7 +62,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 # Room
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomRuntime" }
-androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomRuntime" }
 
 # DataStore
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
@@ -81,16 +78,15 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 
 # Desugaring
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
-androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 # Logging
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
-# WebView
-androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
+# Multidex
+androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinSymbolProcessingKsp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

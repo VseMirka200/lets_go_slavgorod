@@ -40,9 +40,6 @@ import timber.log.Timber
 
 /**
  * Состояние загрузки данных
- * 
- * Отображается во время инициализации приложения и загрузки маршрутов.
- * Использует Material Design 3 компоненты для консистентности.
  */
 @Composable
 fun LoadingState() {
@@ -50,7 +47,20 @@ fun LoadingState() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Загрузка маршрутов...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 

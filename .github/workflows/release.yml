@@ -19,7 +19,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
     
     - name: Cache Gradle dependencies
@@ -35,8 +35,15 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     
+    - name: Create debug keystore
+      run: |
+        mkdir -p ~/.android
+        keytool -genkey -v -keystore ~/.android/debug.keystore -alias androiddebugkey \
+          -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android \
+          -dname "CN=Android Debug,O=Android,C=US"
+    
     - name: Build APK (Release)
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleRelease --stacktrace
     
     - name: Find APK files
       run: |

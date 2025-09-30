@@ -3,24 +3,25 @@ package com.example.lets_go_slavgorod.data.model
 import com.example.lets_go_slavgorod.utils.ValidationUtils
 import com.example.lets_go_slavgorod.utils.loge
 
+/**
+ * Модель автобусного маршрута
+ */
 data class BusRoute(
-    val id: String,
-    val routeNumber: String,
-    val name: String,
-    val description: String,
-    val isActive: Boolean = true,
-    val isFavorite: Boolean = false,
-    val color: String = "#1976D2",
-    val pricePrimary: String? = null,
-    val priceSecondary: String? = null,
-    val directionDetails: String? = null,
-    val travelTime: String?,
-    val paymentMethods: String?
+    val id: String,                        // Уникальный ID маршрута
+    val routeNumber: String,               // Номер маршрута (например, "1", "2А")
+    val name: String,                      // Название маршрута
+    val description: String,               // Описание маршрута
+    val isActive: Boolean = true,          // Активен ли маршрут
+    val isFavorite: Boolean = false,       // Добавлен ли в избранное
+    val color: String = "#1976D2",         // Цвет маршрута в интерфейсе
+    val pricePrimary: String? = null,      // Основная цена
+    val priceSecondary: String? = null,    // Дополнительная цена
+    val directionDetails: String? = null,  // Детали направления
+    val travelTime: String?,               // Время в пути
+    val paymentMethods: String?            // Способы оплаты
 ) {
     
-    /**
-     * Проверяет валидность данных маршрута
-     */
+    // Валидация данных маршрута
     fun isValid(): Boolean {
         return try {
             val validations = listOf(
@@ -45,9 +46,7 @@ data class BusRoute(
         }
     }
     
-    /**
-     * Создает безопасную копию с валидированными данными
-     */
+    // Очистка и санитизация данных
     fun sanitized(): BusRoute {
         return copy(
             id = ValidationUtils.sanitizeString(id),

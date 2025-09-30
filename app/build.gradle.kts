@@ -16,21 +16,20 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.kotlinSymbolProcessingKsp)
+    alias(libs.plugins.composeCompiler)
 }
 
 android {
     namespace = "com.example.lets_go_slavgorod"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.lets_go_slavgorod"
         minSdk = 24
-        //noinspection OldTargetApi
-        targetSdk = 34
-        versionCode = 10005
-        versionName = "v1.05"
+        targetSdk = 35
+        versionCode = 10006
+        versionName = "v1.06"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -48,17 +47,36 @@ android {
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
-        
+        resourceConfigurations += setOf("ru", "en")
+
         // Оптимизация ресурсов
-        resConfigs("ru", "en") // Только необходимые языки
+        // Только необходимые языки
     }
 
+    // =====================================================================================
+    //                              ПОДПИСЬ ПРИЛОЖЕНИЯ
+    // =====================================================================================
+    
+    signingConfigs {
+        // Debug signing config (для CI/CD и тестовых сборок)
+        create("release") {
+            // Используем стандартный debug keystore для автоматической сборки
+            // Для production релиза замените на ваш собственный keystore
+            storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+    
     // =====================================================================================
     //                              КОНФИГУРАЦИЯ СБОРКИ
     // =====================================================================================
     
     buildTypes {
         release {
+            // Используем debug подпись для CI/CD (замените на production keystore для релиза)
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             isDebuggable = false
@@ -96,10 +114,6 @@ android {
         buildConfig = true
     }
     
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompilerVersion.get()
-    }
-    
     // =====================================================================================
     //                              УПАКОВКА И РЕСУРСЫ
     // =====================================================================================
@@ -129,55 +143,51 @@ dependencies {
     // =====================================================================================
     
     // Multidex для поддержки core library desugaring
-    implementation("androidx.multidex:multidex:2.0.1")
+    implementation(libs.androidx.multidex)
     
     // Kotlin Coroutines для асинхронного программирования
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
     
     // AndroidX Core
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-    implementation("androidx.activity:activity-compose:1.6.1")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.activity.compose)
 
     // =====================================================================================
     //                              БАЗА ДАННЫХ И ХРАНЕНИЕ
     // =====================================================================================
     
     // Room для локальной базы данных
-    implementation("androidx.room:room-runtime:2.4.3")
-    implementation("androidx.room:room-ktx:2.4.3")
-    ksp("androidx.room:room-compiler:2.4.3")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     
     // DataStore для настроек
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.androidx.datastore.preferences)
     
     // =====================================================================================
     //                              UI И НАВИГАЦИЯ
     // =====================================================================================
     
     // Jetpack Compose
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.compose.foundation:foundation-layout")
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     
     // Навигация
-    implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation(libs.androidx.navigation.compose)
     
     // =====================================================================================
     //                              УТИЛИТЫ И ИНСТРУМЕНТЫ
     // =====================================================================================
     
     // Timber для улучшенного логирования
-    implementation("com.jakewharton.timber:timber:5.0.1")
-    
-    // WebView для открытия ссылок внутри приложения
-    implementation("androidx.webkit:webkit:1.6.1")
+    implementation(libs.timber)
     
     // =====================================================================================
     //                              ТЕСТИРОВАНИЕ

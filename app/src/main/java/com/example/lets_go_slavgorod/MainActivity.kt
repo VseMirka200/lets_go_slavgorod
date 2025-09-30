@@ -1,16 +1,14 @@
 package com.example.lets_go_slavgorod
 
 // Android системные импорты
-
-// Compose импорты
-
-// ViewModel импорты
 import android.Manifest
 import android.app.AlarmManager
 import android.app.Application
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import androidx.core.net.toUri
 import timber.log.Timber
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -57,7 +55,6 @@ import com.example.lets_go_slavgorod.ui.screens.HomeScreen
 import com.example.lets_go_slavgorod.ui.screens.RouteNotificationSettingsScreen
 import com.example.lets_go_slavgorod.ui.screens.ScheduleScreen
 import com.example.lets_go_slavgorod.ui.screens.SettingsScreen
-import com.example.lets_go_slavgorod.ui.screens.WebViewScreen
 import com.example.lets_go_slavgorod.ui.theme.lets_go_slavgorodTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
@@ -69,35 +66,11 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 /**
- * Главная активность приложения "Поехали! Славгород"
- * 
- * Оптимизированная активность для максимальной производительности:
- * - Быстрая инициализация без блокировок
- * - Оптимизированное управление жизненным циклом
- * - Эффективная обработка разрешений
- * - Плавная навигация между экранами
- * 
- * Основные функции:
- * - Управление разрешениями для уведомлений
- * - Инициализация темы приложения
- * - Настройка навигации между экранами
- * - Обработка точных будильников для уведомлений
- * 
- * Оптимизации производительности:
- * - Асинхронная инициализация тяжелых компонентов
- * - Кэширование ViewModels
- * - Минимизация перекомпозиций
- * - Оптимизированная обработка жизненного цикла
- * 
- * @author VseMirka200
- * @version 1.2
- * @since 1.0
+ * Главная активность приложения
  */
 class MainActivity : ComponentActivity() {
 
-    // =====================================================================================
-    //                              VIEWMODELS И СОСТОЯНИЕ
-    // =====================================================================================
+    // ViewModels
     
     /** ViewModel для управления темой приложения */
     private val themeViewModel: ThemeViewModel by viewModels {
@@ -367,14 +340,19 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
             )
             
             // Глобальный диалог обновления
+            val context = LocalContext.current
             UpdateDialogManager(
                 availableUpdateVersion = availableUpdateVersion,
                 availableUpdateUrl = availableUpdateUrl,
                 availableUpdateNotes = availableUpdateNotes,
                 onDownloadUpdate = { url ->
-                    // Открываем ссылку в WebView внутри приложения
-                    val route = Screen.WebView.createRoute(url, "Скачать обновление")
-                    navController.navigate(route)
+                    // Открываем ссылку в браузере
+                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                    try {
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to open update URL in browser")
+                    }
                 },
                 onClearAvailableUpdate = {
                     updateSettingsViewModel.clearAvailableUpdate()
@@ -429,9 +407,7 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable(
-            route = Screen.Home.route,
-            enterTransition = { NavigationAnimations.slideInFromRight },
-            exitTransition = { NavigationAnimations.slideOutToLeft }
+            route = Screen.Home.route
         ) {
             HomeScreen(
                 navController = navController,
@@ -440,9 +416,7 @@ fun AppNavHost(
         }
 
         composable(
-            route = Screen.FavoriteTimes.route,
-            enterTransition = { NavigationAnimations.slideInFromRight },
-            exitTransition = { NavigationAnimations.slideOutToLeft }
+            route = Screen.FavoriteTimes.route
         ) {
             FavoriteTimesScreen(
                 viewModel = busViewModel,
@@ -455,8 +429,6 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument("routeId") { type = NavType.StringType }
             ),
-            enterTransition = { NavigationAnimations.slideInFromBottomSchedule },
-            exitTransition = { NavigationAnimations.slideOutToBottomSchedule }
         ) { backStackEntry ->
             val routeId = backStackEntry.arguments?.getString("routeId") ?: ""
             Timber.d("Navigating to schedule for routeId: $routeId")
@@ -472,8 +444,6 @@ fun AppNavHost(
 
         composable(
             route = Screen.Settings.route,
-            enterTransition = { NavigationAnimations.slideInFromRight },
-            exitTransition = { NavigationAnimations.slideOutToLeft }
         ) {
             SettingsScreen(
                 navController = navController,
@@ -483,8 +453,6 @@ fun AppNavHost(
 
         composable(
             route = Screen.About.route,
-            enterTransition = { NavigationAnimations.slideInFromRight },
-            exitTransition = { NavigationAnimations.slideOutToLeft }
         ) {
             AboutScreen(
                 navController = navController,
@@ -497,8 +465,6 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument("routeId") { type = NavType.StringType }
             ),
-            enterTransition = { NavigationAnimations.slideInFromRight },
-            exitTransition = { NavigationAnimations.slideOutToLeft }
         ) { backStackEntry ->
             val routeId = backStackEntry.arguments?.getString("routeId") ?: ""
             val route = busViewModel.getRouteById(routeId)
@@ -511,45 +477,5 @@ fun AppNavHost(
             }
         }
 
-        composable(
-            route = "webview/{url}/{title}",
-            arguments = listOf(
-                navArgument("url") { type = NavType.StringType },
-                navArgument("title") { type = NavType.StringType }
-            ),
-            enterTransition = { NavigationAnimations.slideInFromRight },
-            exitTransition = { NavigationAnimations.slideOutToLeft }
-        ) { backStackEntry ->
-            val url = backStackEntry.arguments?.getString("url")?.decodeUrl() ?: ""
-            val title = backStackEntry.arguments?.getString("title")?.decodeUrl() ?: "Веб-страница"
-            
-            // Определяем, нужен ли полноэкранный режим для страниц поддержки и платежей
-            val isFullScreen = url.contains("cloudtips.ru") || 
-                              url.contains("pay.") || 
-                              url.contains("donate") || 
-                              url.contains("support") ||
-                              url.contains("payment")
-            
-            WebViewScreen(
-                navController = navController,
-                url = url,
-                title = title,
-                isFullScreen = isFullScreen
-            )
-        }
-        
     }
-}
-
-/**
- * Декодирует URL из навигации
- */
-private fun String.decodeUrl(): String {
-    return this.replace("%2F", "/")
-        .replace("%3A", ":")
-        .replace("%3F", "?")
-        .replace("%26", "&")
-        .replace("%3D", "=")
-        .replace("%23", "#")
-        .replace("%20", " ")
 }

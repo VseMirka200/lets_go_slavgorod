@@ -3,20 +3,21 @@ package com.example.lets_go_slavgorod.data.model
 import com.example.lets_go_slavgorod.utils.ValidationUtils
 import com.example.lets_go_slavgorod.utils.loge
 
+/**
+ * Модель расписания автобуса
+ */
 data class BusSchedule(
-    val id: String,
-    val routeId: String,
-    val stopName: String,
-    val departureTime: String,
-    val dayOfWeek: Int,
-    val isWeekend: Boolean = false,
-    val notes: String? = null,
-    val departurePoint: String
+    val id: String,                     // Уникальный ID расписания
+    val routeId: String,                // ID маршрута
+    val stopName: String,               // Название остановки
+    val departureTime: String,          // Время отправления (HH:mm)
+    val dayOfWeek: Int,                 // День недели (1-7)
+    val isWeekend: Boolean = false,     // Выходной день
+    val notes: String? = null,          // Дополнительные заметки
+    val departurePoint: String          // Пункт отправления
 ) {
     
-    /**
-     * Проверяет валидность данных расписания
-     */
+    // Валидация данных расписания
     fun isValid(): Boolean {
         return try {
             val validations = listOf(
@@ -43,9 +44,7 @@ data class BusSchedule(
         }
     }
     
-    /**
-     * Создает безопасную копию с валидированными данными
-     */
+    // Очистка и санитизация данных
     fun sanitized(): BusSchedule {
         return copy(
             id = ValidationUtils.sanitizeString(id),

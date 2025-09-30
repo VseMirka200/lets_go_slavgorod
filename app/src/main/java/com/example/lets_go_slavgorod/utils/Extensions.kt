@@ -6,27 +6,7 @@ import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.data.repository.BusRouteRepository
 import timber.log.Timber
 
-/**
- * Утилиты и расширения для работы с данными и логированием
- * 
- * Основные функции:
- * - Удобное логирование через Timber
- * - Преобразование Entity в модели данных
- * - Поиск и фильтрация маршрутов
- * - Создание объектов BusRoute
- * 
- * @author VseMirka200
- * @version 1.1
- * @since 1.0
- */
-
-/**
- * Логирует ошибку с тегом и сообщением (Timber)
- * 
- * @param tag тег для логирования
- * @param message сообщение об ошибке
- * @param throwable исключение (опционально)
- */
+// Логирование ошибок с тегом
 fun loge(tag: String, message: String, throwable: Throwable? = null) {
     if (throwable != null) {
         Timber.tag(tag).e(throwable, message)
@@ -35,12 +15,7 @@ fun loge(tag: String, message: String, throwable: Throwable? = null) {
     }
 }
 
-/**
- * Логирует ошибку с сообщением (Timber, перегрузка для удобства)
- * 
- * @param message сообщение об ошибке
- * @param throwable исключение (опционально)
- */
+// Логирование ошибок
 fun loge(message: String, throwable: Throwable? = null) {
     if (throwable != null) {
         Timber.e(throwable, message)
@@ -49,22 +24,13 @@ fun loge(message: String, throwable: Throwable? = null) {
     }
 }
 
-/**
- * Логирует отладочную информацию (Timber)
- * 
- * @param message сообщение для отладки
- */
+// Логирование отладочной информации
 fun logd(message: String) {
     Timber.d(message)
 }
 
 
-/**
- * Преобразует FavoriteTimeEntity в FavoriteTime
- * 
- * @param routeRepository репозиторий маршрутов (не используется, но требуется для совместимости)
- * @return модель данных FavoriteTime
- */
+// Преобразование Entity в модель данных
 fun FavoriteTimeEntity.toFavoriteTime(routeRepository: Any? = null): FavoriteTime {
     // Получаем данные о маршруте из репозитория
     var routeNumber = ""
@@ -105,19 +71,7 @@ fun FavoriteTimeEntity.toFavoriteTime(routeRepository: Any? = null): FavoriteTim
     )
 }
 
-/**
- * Создает объект BusRoute с заданными параметрами
- * 
- * @param id уникальный идентификатор маршрута
- * @param routeNumber номер маршрута
- * @param name название маршрута
- * @param description описание маршрута
- * @param travelTime время в пути
- * @param pricePrimary стоимость проезда
- * @param paymentMethods способы оплаты
- * @param color цвет маршрута
- * @return объект BusRoute
- */
+// Создание объекта маршрута
 fun createBusRoute(
     id: String,
     routeNumber: String,
@@ -140,12 +94,7 @@ fun createBusRoute(
     )
 }
 
-/**
- * Расширение для поиска маршрутов по запросу
- * 
- * @param query поисковый запрос
- * @return отфильтрованный список маршрутов
- */
+// Поиск маршрутов по запросу
 fun List<BusRoute>.search(query: String): List<BusRoute> {
     if (query.isBlank()) return this
     

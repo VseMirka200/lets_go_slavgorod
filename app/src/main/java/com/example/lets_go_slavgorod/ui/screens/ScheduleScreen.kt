@@ -2,20 +2,28 @@
 
 package com.example.lets_go_slavgorod.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.data.model.BusSchedule
 import com.example.lets_go_slavgorod.ui.components.schedule.RouteDetailsSummaryCard
@@ -49,63 +57,68 @@ fun ScheduleScreen(
     onBackClick: () -> Unit,
     viewModel: BusViewModel
 ) {
-    val allSchedulesForRoute = remember(route) {
+    // Состояние загрузки и данных
+    var isLoading by remember(route) { mutableStateOf(true) }
+    var schedulesSlavgorod by remember { mutableStateOf<List<BusSchedule>>(emptyList()) }
+    var schedulesYarovoe by remember { mutableStateOf<List<BusSchedule>>(emptyList()) }
+    var schedulesVokzal by remember { mutableStateOf<List<BusSchedule>>(emptyList()) }
+    var schedulesSovhoz by remember { mutableStateOf<List<BusSchedule>>(emptyList()) }
+    var nextUpcomingSlavgorodId by remember { mutableStateOf<String?>(null) }
+    var nextUpcomingYarovoeId by remember { mutableStateOf<String?>(null) }
+    var nextUpcomingVokzalId by remember { mutableStateOf<String?>(null) }
+    var nextUpcomingSovhozId by remember { mutableStateOf<String?>(null) }
+    
+    // Динамическая загрузка данных
+    LaunchedEffect(route) {
         if (route != null) {
-            val schedules = ScheduleUtils.generateSchedules(route.id)
-            Timber.d("Generated ${schedules.size} schedules for route ${route.id}")
-            schedules
+            isLoading = true
+            Timber.d("Starting schedule generation for route ${route.id}")
+            
+            val startTime = System.currentTimeMillis()
+            
+            // Генерируем расписание в фоне
+            val allSchedules = ScheduleUtils.generateSchedules(route.id)
+            Timber.d("Generated ${allSchedules.size} schedules for route ${route.id}")
+            
+            // Фильтруем по точкам отправления
+            schedulesSlavgorod = allSchedules
+                .filter { it.departurePoint == STOP_SLAVGORD_RYNOK }
+                .sortedBy { it.departureTime }
+            Timber.d("Slavgorod schedules: ${schedulesSlavgorod.size}")
+            
+            schedulesYarovoe = allSchedules
+                .filter { it.departurePoint == STOP_YAROVOE_MCHS }
+                .sortedBy { it.departureTime }
+            Timber.d("Yarovoe schedules: ${schedulesYarovoe.size}")
+            
+            schedulesVokzal = allSchedules
+                .filter { it.departurePoint == STOP_VOKZAL }
+                .sortedBy { it.departureTime }
+            Timber.d("Vokzal schedules: ${schedulesVokzal.size}")
+            
+            schedulesSovhoz = allSchedules
+                .filter { it.departurePoint == STOP_SOVHOZ }
+                .sortedBy { it.departureTime }
+            Timber.d("Sovhoz schedules: ${schedulesSovhoz.size}")
+            
+            // Определяем ближайшие рейсы
+            nextUpcomingSlavgorodId = getNextUpcomingScheduleId(schedulesSlavgorod)
+            nextUpcomingYarovoeId = getNextUpcomingScheduleId(schedulesYarovoe)
+            nextUpcomingVokzalId = getNextUpcomingScheduleId(schedulesVokzal)
+            nextUpcomingSovhozId = getNextUpcomingScheduleId(schedulesSovhoz)
+            
+            val elapsedTime = System.currentTimeMillis() - startTime
+            Timber.d("Schedule data fully loaded in ${elapsedTime}ms")
+            
+            // Гарантируем показ анимации минимум 1 секунду
+            if (elapsedTime < 1000) {
+                delay(1000 - elapsedTime)
+            }
+            
+            isLoading = false
         } else {
-            emptyList()
+            isLoading = false
         }
-    }
-
-    val schedulesSlavgorod = remember(allSchedulesForRoute) {
-        val filtered = allSchedulesForRoute
-            .filter { it.departurePoint == STOP_SLAVGORD_RYNOK }
-            .sortedBy { it.departureTime }
-        Timber.d("Slavgorod schedules: ${filtered.size}")
-        filtered
-    }
-
-    val schedulesYarovoe = remember(allSchedulesForRoute) {
-        val filtered = allSchedulesForRoute
-            .filter { it.departurePoint == STOP_YAROVOE_MCHS }
-            .sortedBy { it.departureTime }
-        Timber.d("Yarovoe schedules: ${filtered.size}")
-        filtered
-    }
-
-    val schedulesVokzal = remember(allSchedulesForRoute) {
-        val filtered = allSchedulesForRoute
-            .filter { it.departurePoint == STOP_VOKZAL }
-            .sortedBy { it.departureTime }
-        Timber.d("Vokzal schedules: ${filtered.size}")
-        filtered
-    }
-
-    val schedulesSovhoz = remember(allSchedulesForRoute) {
-        val filtered = allSchedulesForRoute
-            .filter { it.departurePoint == STOP_SOVHOZ }
-            .sortedBy { it.departureTime }
-        Timber.d("Sovhoz schedules: ${filtered.size}")
-        filtered
-    }
-
-    // Определяем ближайшие рейсы для каждой точки отправления
-    val nextUpcomingSlavgorodId = remember(schedulesSlavgorod) {
-        getNextUpcomingScheduleId(schedulesSlavgorod)
-    }
-
-    val nextUpcomingYarovoeId = remember(schedulesYarovoe) {
-        getNextUpcomingScheduleId(schedulesYarovoe)
-    }
-
-    val nextUpcomingVokzalId = remember(schedulesVokzal) {
-        getNextUpcomingScheduleId(schedulesVokzal)
-    }
-
-    val nextUpcomingSovhozId = remember(schedulesSovhoz) {
-        getNextUpcomingScheduleId(schedulesSovhoz)
     }
 
         Scaffold(
@@ -121,6 +134,29 @@ fun ScheduleScreen(
                 NoRouteSelectedMessage(Modifier
                     .padding(paddingValues)
                     .fillMaxSize())
+            } else if (isLoading) {
+                // Анимация загрузки расписания
+                Box(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Загрузка расписания...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             } else {
                 Column(modifier = Modifier.padding(paddingValues)) {
                     RouteDetailsSummaryCard(

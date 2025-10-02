@@ -28,8 +28,8 @@ android {
         applicationId = "com.example.lets_go_slavgorod"
         minSdk = 24
         targetSdk = 35
-        versionCode = 10006
-        versionName = "v1.06"
+        versionCode = 10061
+        versionName = "v1.6.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

@@ -197,12 +197,18 @@ object AlarmScheduler {
 
         // Улучшенная обработка номера маршрута для уведомления
         val routeNumber = favoriteTime.routeNumber.trim()
-        val routeInfoForNotification = if (routeNumber.isNotBlank()) {
-            "Автобус №$routeNumber"
-        } else {
-            // Fallback: используем routeId или общее название
-            val fallbackNumber = favoriteTime.routeId ?: "Неизвестный"
-            "Маршрут $fallbackNumber"
+        val routeInfoForNotification = when {
+            routeNumber.isNotBlank() && routeNumber != "N/A" -> {
+                "Автобус №$routeNumber"
+            }
+            favoriteTime.routeName.isNotBlank() && favoriteTime.routeName != "Маршрут" -> {
+                favoriteTime.routeName
+            }
+            else -> {
+                // Fallback: используем routeId или общее название
+                val fallbackNumber = favoriteTime.routeId ?: "Неизвестный"
+                "Маршрут $fallbackNumber"
+            }
         }
         val departureTimeInfoForNotification = "в ${favoriteTime.departureTime.trim()}"
         

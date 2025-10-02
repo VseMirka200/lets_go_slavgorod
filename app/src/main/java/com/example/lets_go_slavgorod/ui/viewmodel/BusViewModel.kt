@@ -262,9 +262,12 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                     return@launch
                 }
                 
+                val route = getRouteById(sanitizedSchedule.routeId)
                 val favoriteTimeEntity = FavoriteTimeEntity(
                     id = sanitizedSchedule.id,
                     routeId = sanitizedSchedule.routeId,
+                    routeNumber = route?.routeNumber ?: "N/A",
+                    routeName = route?.name ?: "Маршрут",
                     departureTime = sanitizedSchedule.departureTime,
                     stopName = sanitizedSchedule.stopName,
                     departurePoint = sanitizedSchedule.departurePoint,
@@ -273,7 +276,6 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 favoriteTimeDao.addFavoriteTime(favoriteTimeEntity)
 
-                val route = getRouteById(sanitizedSchedule.routeId)
                 val favoriteForScheduler = FavoriteTime(
                     id = sanitizedSchedule.id,
                     routeId = sanitizedSchedule.routeId,

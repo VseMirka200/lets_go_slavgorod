@@ -32,7 +32,7 @@ object Constants {
     
     // База данных
     const val DATABASE_NAME = "bus_app_database"  // Имя файла базы данных
-    const val DATABASE_VERSION = 4               // Версия схемы базы данных
+    const val DATABASE_VERSION = 5               // Версия схемы базы данных
     
     // Поиск и производительность
     const val SEARCH_DEBOUNCE_DELAY = 300L       // Задержка перед поиском (мс)

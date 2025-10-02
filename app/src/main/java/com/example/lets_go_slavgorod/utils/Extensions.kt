@@ -32,18 +32,19 @@ fun logd(message: String) {
 
 // Преобразование Entity в модель данных
 fun FavoriteTimeEntity.toFavoriteTime(routeRepository: Any? = null): FavoriteTime {
-    // Получаем данные о маршруте из репозитория
-    var routeNumber = ""
-    var routeName = ""
+    // Используем сохраненные в Entity данные о маршруте
+    var routeNumber = this.routeNumber
+    var routeName = this.routeName
     
-    if (routeRepository != null) {
+    // Если данные в Entity пустые, пытаемся получить их из репозитория
+    if (routeNumber.isBlank() && routeRepository != null) {
         try {
             val routes = (routeRepository as BusRouteRepository).getAllRoutes()
             val route = routes.find { it.id == this.routeId }
             route?.let {
                 routeNumber = it.routeNumber
                 routeName = it.name
-                Timber.d("Found route info: number='$routeNumber', name='$routeName'")
+                Timber.d("Found route info from repository: number='$routeNumber', name='$routeName'")
             } ?: run {
                 Timber.w("Route not found for routeId: ${this.routeId}")
             }
@@ -52,10 +53,14 @@ fun FavoriteTimeEntity.toFavoriteTime(routeRepository: Any? = null): FavoriteTim
         }
     }
     
-    // Fallback: если routeNumber пустой, используем routeId как номер маршрута
+    // Fallback: если routeNumber все еще пустой, используем routeId
     if (routeNumber.isBlank()) {
         routeNumber = this.routeId ?: "Неизвестный"
         Timber.w("Using routeId as fallback routeNumber: '$routeNumber'")
+    }
+    
+    if (routeName.isBlank()) {
+        routeName = "Маршрут"
     }
     
     return FavoriteTime(

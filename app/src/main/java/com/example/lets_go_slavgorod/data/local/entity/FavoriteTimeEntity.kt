@@ -12,6 +12,12 @@ data class FavoriteTimeEntity(
     @ColumnInfo(name = "route_id")
     val routeId: String,
 
+    @ColumnInfo(name = "route_number")
+    val routeNumber: String,
+
+    @ColumnInfo(name = "route_name")
+    val routeName: String,
+
     @ColumnInfo(name = "stop_name")
     val stopName: String,
 

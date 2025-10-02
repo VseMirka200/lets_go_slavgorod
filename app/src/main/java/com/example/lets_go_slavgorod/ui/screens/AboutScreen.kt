@@ -330,7 +330,7 @@ private fun FeedbackCard() {
             verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             Text(
-                text = "Присоединяйтесь к нашему Telegram каналу! Новости, обновления и общение.",
+                text = "Есть вопросы или предложения? Напишите нам через Telegram бота!",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

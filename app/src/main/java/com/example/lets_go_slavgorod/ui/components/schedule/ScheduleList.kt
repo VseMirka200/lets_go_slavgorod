@@ -82,6 +82,37 @@ fun ScheduleList(
             }
         }
 
+        // Секции для маршрута №102Б (Славгород — Яровое)
+        if (route.id == "102B") {
+            // Славгород (Рынок)
+            if (schedulesSlavgorod.isNotEmpty()) {
+                ExpandableScheduleSection(
+                    title = "Отправление из Рынок (Славгород)",
+                    schedules = schedulesSlavgorod,
+                    nextUpcomingScheduleId = nextUpcomingSlavgorodId,
+                    isExpanded = isSlavgorodSectionExpanded,
+                    onToggleExpand = { isSlavgorodSectionExpanded = !isSlavgorodSectionExpanded },
+                    viewModel = viewModel,
+                    route = route,
+                    departurePointForCheck = "Рынок (Славгород)"
+                )
+            }
+
+            // Яровое (Ст. Зори)
+            if (schedulesYarovoe.isNotEmpty()) {
+                ExpandableScheduleSection(
+                    title = "Отправление из Ст. Зори (Яровое)",
+                    schedules = schedulesYarovoe,
+                    nextUpcomingScheduleId = nextUpcomingYarovoeId,
+                    isExpanded = isYarovoeSectionExpanded,
+                    onToggleExpand = { isYarovoeSectionExpanded = !isYarovoeSectionExpanded },
+                    viewModel = viewModel,
+                    route = route,
+                    departurePointForCheck = "Ст. Зори (Яровое)"
+                )
+            }
+        }
+
         // Секции для маршрута №1 (Вокзал — Совхоз)
         if (route.id == "1") {
             // Вокзал
@@ -240,6 +271,7 @@ private fun NoScheduleMessage(
 private fun shouldShowNoScheduleMessage(route: BusRoute): Boolean {
     return when (route.id) {
         "102" -> false // Маршрут 102 всегда имеет расписание
+        "102B" -> false // Маршрут 102Б всегда имеет расписание
         "1" -> false  // Маршрут 1 всегда имеет расписание
         else -> true
     }

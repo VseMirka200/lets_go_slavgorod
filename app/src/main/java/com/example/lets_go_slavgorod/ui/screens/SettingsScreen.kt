@@ -1,7 +1,6 @@
 package com.example.lets_go_slavgorod.ui.screens
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
@@ -28,7 +27,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Update
@@ -47,8 +45,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -73,13 +69,14 @@ import com.example.lets_go_slavgorod.ui.navigation.Screen
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.DataManagementViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.DisplaySettingsViewModel
+import com.example.lets_go_slavgorod.ui.components.StyledDropdownMenu
+import com.example.lets_go_slavgorod.ui.components.StyledDropdownMenuItem
 import com.example.lets_go_slavgorod.ui.viewmodel.QuietMode
 import com.example.lets_go_slavgorod.ui.viewmodel.QuietModeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.RouteDisplayMode
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateMode
 import com.example.lets_go_slavgorod.ui.viewmodel.UpdateSettingsViewModel
-import com.example.lets_go_slavgorod.ui.viewmodel.VibrationSettingsViewModel
 import com.example.lets_go_slavgorod.utils.CacheUtils
 import timber.log.Timber
 
@@ -100,7 +97,7 @@ import timber.log.Timber
 @Composable
 fun SettingsScreen(
     navController: NavController? = null,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     themeViewModel: ThemeViewModel = viewModel(),
     updateSettingsViewModel: UpdateSettingsViewModel? = null,
 ) {
@@ -171,9 +168,16 @@ fun SettingsScreen(
     val currentDisplayMode by displaySettingsViewModel.displayMode.collectAsState(initial = RouteDisplayMode.GRID)
     val currentGridColumns by displaySettingsViewModel.gridColumns.collectAsState(initial = 2)
     var showDisplayModeDropdown by remember { mutableStateOf(false) }
+    var showColumnsDropdown by remember { mutableStateOf(false) }
     val displayModeOptions = listOf(
         RouteDisplayMode.GRID to "Клетка",
         RouteDisplayMode.LIST to "Список"
+    )
+    val columnsOptions = listOf(
+        1 to "1 колонка",
+        2 to "2 колонки", 
+        3 to "3 колонки",
+        4 to "4 колонки"
     )
 
     var showResetSettingsDialog by remember { mutableStateOf(false) }
@@ -252,10 +256,13 @@ fun SettingsScreen(
                 },
                 onColumnsSelected = { columns ->
                     displaySettingsViewModel.setGridColumns(columns)
-                }
+                },
+                showColumnsDropdown = showColumnsDropdown,
+                onShowColumnsDropdownChange = { showColumnsDropdown = it },
+                columnsOptions = columnsOptions
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
             
             // Заголовок секции "Обновления"
             Text(
@@ -327,11 +334,6 @@ fun SettingsScreen(
                 }
             )
             
-            Spacer(Modifier.height(12.dp))
-            
-            // Настройки вибрации
-            VibrationSettingsCard(context)
-
             Spacer(Modifier.height(24.dp))
 
             // Заголовок секции "Сброс настроек"
@@ -539,48 +541,55 @@ private fun DisplaySettingsCard(
     onShowDisplayModeDropdownChange: (Boolean) -> Unit,
     displayModeOptions: List<Pair<RouteDisplayMode, String>>,
     onDisplayModeSelected: (RouteDisplayMode) -> Unit,
-    onColumnsSelected: (Int) -> Unit
+    onColumnsSelected: (Int) -> Unit,
+    showColumnsDropdown: Boolean,
+    onShowColumnsDropdownChange: (Boolean) -> Unit,
+    columnsOptions: List<Pair<Int, String>>
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             // Режим отображения
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Palette,
-                    contentDescription = "Иконка настроек отображения",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Text(
-                    text = "Режим отображения",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Palette,
+                        contentDescription = "Иконка настроек отображения",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    
+                    Spacer(Modifier.width(16.dp))
+                    
+                    Text(
+                        text = "Режим отображения",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
 
                 Box {
                     Row(
-                        modifier = Modifier.clickable { onShowDisplayModeDropdownChange(true) },
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .clickable { onShowDisplayModeDropdownChange(true) }
                     ) {
                         Text(
-                            text = displayModeOptions.find { it.first == currentDisplayMode }?.second ?: "Клетки",
+                            text = displayModeOptions.find { it.first == currentDisplayMode }?.second ?: "Клетка",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -591,31 +600,17 @@ private fun DisplaySettingsCard(
                         )
                     }
                     
-                    DropdownMenu(
+                    StyledDropdownMenu(
                         expanded = showDisplayModeDropdown,
                         onDismissRequest = { onShowDisplayModeDropdownChange(false) }
                     ) {
                         displayModeOptions.forEach { (mode, label) ->
-                            DropdownMenuItem(
-                                text = { 
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    ) 
-                                },
+                            StyledDropdownMenuItem(
+                                text = label,
+                                selected = mode == currentDisplayMode,
                                 onClick = {
                                     onDisplayModeSelected(mode)
                                     onShowDisplayModeDropdownChange(false)
-                                },
-                                leadingIcon = {
-                                    if (mode == currentDisplayMode) {
-                                        Icon(
-                                            imageVector = Icons.Filled.CheckCircle,
-                                            contentDescription = "Выбрано",
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
                                 }
                             )
                         }
@@ -625,76 +620,60 @@ private fun DisplaySettingsCard(
             
             // Настройка колонок (только для режима клетка)
             if (currentDisplayMode == RouteDisplayMode.GRID) {
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Минималистичный разделитель
+                // Разделитель
                 HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                    thickness = 0.5.dp
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Минималистичная настройка колонок
-                Column(
-                    modifier = Modifier.fillMaxWidth()
+                // Выпадающее меню для выбора количества колонок
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Колонок в строке",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "$currentGridColumns",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    Text(
+                        text = "Колонок в строке",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                     
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Slider(
-                        value = currentGridColumns.toFloat(),
-                        onValueChange = { value ->
-                            onColumnsSelected(value.toInt())
-                        },
-                        valueRange = 2f..4f,
-                        steps = 1,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 4.dp),
-                        colors = androidx.compose.material3.SliderDefaults.colors(
-                            thumbColor = MaterialTheme.colorScheme.primary,
-                            activeTrackColor = MaterialTheme.colorScheme.primary,
-                            inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                        thumb = {
-                            androidx.compose.material3.SliderDefaults.Thumb(
-                                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                colors = androidx.compose.material3.SliderDefaults.colors(
-                                    thumbColor = MaterialTheme.colorScheme.primary
-                                ),
-                                thumbSize = androidx.compose.ui.unit.DpSize(12.dp, 12.dp)
+                    Box {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .clickable { onShowColumnsDropdownChange(true) }
+                        ) {
+                            Text(
+                                text = columnsOptions.find { it.first == currentGridColumns }?.second ?: "2 колонки",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
-                        },
-                        track = { sliderState ->
-                            androidx.compose.material3.SliderDefaults.Track(
-                                sliderState = sliderState,
-                                colors = androidx.compose.material3.SliderDefaults.colors(
-                                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                                    inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
-                                ),
-                                thumbTrackGapSize = 0.dp,
-                                trackInsideCornerSize = 0.dp,
-                                drawStopIndicator = null
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Выбрать количество колонок",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                    )
+
+                        StyledDropdownMenu(
+                            expanded = showColumnsDropdown,
+                            onDismissRequest = { onShowColumnsDropdownChange(false) }
+                        ) {
+                            columnsOptions.forEach { (columns, label) ->
+                                StyledDropdownMenuItem(
+                                    text = label,
+                                    selected = columns == currentGridColumns,
+                                    onClick = {
+                                        onColumnsSelected(columns)
+                                        onShowColumnsDropdownChange(false)
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -715,18 +694,18 @@ fun ThemeSettingsCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.weight(1f)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
-                ) {
                     Icon(
                         imageVector = Icons.Filled.Palette,
                         contentDescription = stringResource(R.string.settings_appearance_icon_desc),
@@ -759,35 +738,21 @@ fun ThemeSettingsCard(
                     )
             }
 
-            DropdownMenu(
+            StyledDropdownMenu(
                 expanded = showThemeDropdown,
-                    onDismissRequest = { onShowThemeDropdownChange(false) }
+                onDismissRequest = { onShowThemeDropdownChange(false) }
             ) {
-                    themeOptions.forEach { (theme, label) ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                    text = label,
-                                    style = MaterialTheme.typography.bodyMedium
-                            )
-                        },
+                themeOptions.forEach { (theme, label) ->
+                    StyledDropdownMenuItem(
+                        text = label,
+                        selected = theme == currentAppTheme,
                         onClick = {
                             onThemeSelected(theme)
                             onShowThemeDropdownChange(false)
-                            },
-                            leadingIcon = {
-                                if (theme == currentAppTheme) {
-                                    Icon(
-                                        imageVector = Icons.Filled.CheckCircle,
-                                        contentDescription = "Выбрано",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                            }
-                        )
-                    }
+                        }
+                    )
                 }
+            }
             }
         }
     }
@@ -893,38 +858,23 @@ fun UpdateSettingsCard(
                         )
                 }
 
-                    DropdownMenu(
+                    StyledDropdownMenu(
                         expanded = showUpdateModeDropdown,
                         onDismissRequest = { onShowUpdateModeDropdownChange(false) }
                     ) {
                         updateModeOptions.forEach { mode ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = when (mode) {
-                                            UpdateMode.AUTOMATIC -> "Автоматическая проверка"
-                                            UpdateMode.MANUAL -> "Только ручная проверка"
-                                            UpdateMode.DISABLED -> "Отключено"
-                                            },
-                                            style = MaterialTheme.typography.bodyMedium
-                                    )
+                            StyledDropdownMenuItem(
+                                text = when (mode) {
+                                    UpdateMode.AUTOMATIC -> "Автоматическая проверка"
+                                    UpdateMode.MANUAL -> "Только ручная проверка"
+                                    UpdateMode.DISABLED -> "Отключено"
                                 },
+                                selected = mode == currentUpdateMode,
                                 onClick = {
                                     onUpdateModeSelected(mode)
                                     onShowUpdateModeDropdownChange(false)
-                                    },
-                                    leadingIcon = {
-                                        if (mode == currentUpdateMode) {
-                                            Icon(
-                                                imageVector = Icons.Filled.CheckCircle,
-                                                contentDescription = "Выбрано",
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                    }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 }
@@ -1145,6 +1095,7 @@ fun UpdateSettingsCard(
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Text("Позже")
+                                }
                             }
                         }
                     }
@@ -1215,56 +1166,42 @@ private fun QuietModeSettingsCard(
                     )
                 }
                 Box {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         modifier = Modifier.clickable { onShowQuietModeDropdownChange(true) }
-                ) {
-                    Text(
-                        text = when (currentQuietMode) {
+                    ) {
+                        Text(
+                            text = when (currentQuietMode) {
                                 QuietMode.DISABLED -> "Отключены"
                                 QuietMode.ENABLED -> "Включены"
                                 QuietMode.CUSTOM_DAYS -> "Временно: $customDays ${getDaysWord(customDays)}"
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Icon(
-                        imageVector = Icons.Filled.ArrowDropDown,
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
                             contentDescription = "Выбрать тему",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-            }
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
 
-            DropdownMenu(
-                expanded = showQuietModeDropdown,
+                    StyledDropdownMenu(
+                        expanded = showQuietModeDropdown,
                         onDismissRequest = { onShowQuietModeDropdownChange(false) }
-            ) {
-                quietModeOptions.forEach { mode ->
-                    DropdownMenuItem(
-                                text = { 
-                                    Text(
-                                        text = mode.displayName,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    ) 
-                                },
-                        onClick = {
-                            if (mode == QuietMode.CUSTOM_DAYS) {
-                                showDaysDialog = true
-                                onShowQuietModeDropdownChange(false)
-                            } else {
-                                onQuietModeSelected(mode, 0)
-                                onShowQuietModeDropdownChange(false)
-                            }
-                                },
-                                leadingIcon = {
-                                    if (mode == currentQuietMode) {
-                                        Icon(
-                                            imageVector = Icons.Filled.CheckCircle,
-                                            contentDescription = "Выбрано",
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(20.dp)
-                                        )
+                    ) {
+                        quietModeOptions.forEach { mode ->
+                            StyledDropdownMenuItem(
+                                text = mode.displayName,
+                                selected = mode == currentQuietMode,
+                                onClick = {
+                                    if (mode == QuietMode.CUSTOM_DAYS) {
+                                        showDaysDialog = true
+                                        onShowQuietModeDropdownChange(false)
+                                    } else {
+                                        onQuietModeSelected(mode, 0)
+                                        onShowQuietModeDropdownChange(false)
                                     }
                                 }
                             )
@@ -1453,59 +1390,6 @@ private fun ResetSettingsCard(
     }
 }
 
-/**
- * Карточка настроек вибрации
- */
-@Composable
-private fun VibrationSettingsCard(context: Context) {
-    val vibrationViewModel: VibrationSettingsViewModel = viewModel(
-        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                return VibrationSettingsViewModel(context) as T
-            }
-        }
-    )
-    
-    val vibrationEnabled by vibrationViewModel.vibrationEnabled.collectAsState()
-    
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Вибрация",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(Modifier.width(16.dp))
-                Text(
-                    text = "Вибрация",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            
-            Switch(
-                checked = vibrationEnabled,
-                onCheckedChange = { enabled ->
-                    vibrationViewModel.setVibrationEnabled(enabled)
-                }
-            )
-        }
-    }
-}
 
 /**
  * Карточка очистки кэша

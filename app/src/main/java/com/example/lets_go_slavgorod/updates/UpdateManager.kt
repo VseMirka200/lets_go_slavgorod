@@ -41,7 +41,7 @@ import com.example.lets_go_slavgorod.utils.ValidationUtils
 class UpdateManager(private val context: Context) {
     
     companion object {
-        private const val GITHUB_API_URL = "https://api.github.com/repos/VseMirka200/lets_go_slavgorod/releases/latest"
+        private val GITHUB_API_URL = BuildConfig.GITHUB_API_URL
         private const val TIMEOUT_MS = 10000L
         private const val MAX_RETRIES = 3
         private const val INITIAL_RETRY_DELAY_MS = 1000L

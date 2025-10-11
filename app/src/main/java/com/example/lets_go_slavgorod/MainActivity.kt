@@ -57,7 +57,9 @@ import com.example.lets_go_slavgorod.ui.screens.ScheduleScreen
 import com.example.lets_go_slavgorod.ui.screens.SettingsScreen
 import com.example.lets_go_slavgorod.ui.theme.lets_go_slavgorodTheme
 import com.example.lets_go_slavgorod.ui.viewmodel.AppTheme
+import com.example.lets_go_slavgorod.ui.viewmodel.AndroidViewModelFactory
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
+import com.example.lets_go_slavgorod.ui.viewmodel.ContextViewModelFactory
 import com.example.lets_go_slavgorod.ui.viewmodel.NotificationSettingsViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.ThemeViewModelFactory
@@ -303,32 +305,19 @@ fun BusScheduleApp(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val localContext = LocalContext.current
     var showDisclaimer by remember { mutableStateOf(false) }
+    val application = localContext.applicationContext as Application
+    
+    // ViewModels с generic фабриками
     val busViewModel: BusViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return BusViewModel(localContext.applicationContext as Application) as T
-            }
-        }
+        factory = AndroidViewModelFactory.create(application) { BusViewModel(it) }
     )
     
     val notificationSettingsViewModel: NotificationSettingsViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return NotificationSettingsViewModel(localContext.applicationContext as Application) as T
-            }
-        }
+        factory = AndroidViewModelFactory.create(application) { NotificationSettingsViewModel(it) }
     )
     
-    // ViewModel для управления обновлениями
     val updateSettingsViewModel: UpdateSettingsViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return UpdateSettingsViewModel(localContext) as T
-            }
-        }
+        factory = ContextViewModelFactory.create(localContext) { UpdateSettingsViewModel(it) }
     )
     
     val currentAppTheme by themeViewModel.currentTheme.collectAsState()
@@ -452,7 +441,7 @@ fun AppNavHost(
             route = "schedule/{routeId}",
             arguments = listOf(
                 navArgument("routeId") { type = NavType.StringType }
-            ),
+            )
         ) { backStackEntry ->
             val routeId = backStackEntry.arguments?.getString("routeId") ?: ""
             Timber.d("Navigating to schedule for routeId: $routeId")
@@ -467,7 +456,7 @@ fun AppNavHost(
 
 
         composable(
-            route = Screen.Settings.route,
+            route = Screen.Settings.route
         ) {
             SettingsScreen(
                 navController = navController,
@@ -476,7 +465,7 @@ fun AppNavHost(
         }
 
         composable(
-            route = Screen.About.route,
+            route = Screen.About.route
         ) {
             AboutScreen(
                 navController = navController,

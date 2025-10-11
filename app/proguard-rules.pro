@@ -126,7 +126,12 @@
     public static *** v(...);
     public static *** i(...);
     public static *** w(...);
-    public static *** e(...);
+}
+
+# Удаляем ConditionalLogging в релизе
+-assumenosideeffects class com.example.lets_go_slavgorod.utils.ConditionalLogging {
+    public static *** debug(...);
+    public static *** info(...);
 }
 
 # =============================================================================
@@ -159,3 +164,19 @@
 
 # Удаляем неиспользуемые атрибуты
 -keepattributes !LocalVariableTable,!LocalVariableTypeTable
+
+# =============================================================================
+# НОВЫЕ КОМПОНЕНТЫ (v2.0)
+# =============================================================================
+
+# Error Handling система
+-keep class com.example.lets_go_slavgorod.data.model.AppError { *; }
+-keep class com.example.lets_go_slavgorod.data.model.AppError$* { *; }
+-keep class com.example.lets_go_slavgorod.utils.ErrorHandler { *; }
+
+# Update Cache
+-keep class com.example.lets_go_slavgorod.updates.UpdateCache { *; }
+
+# ViewModelFactory
+-keep class com.example.lets_go_slavgorod.ui.viewmodel.AndroidViewModelFactory { *; }
+-keep class com.example.lets_go_slavgorod.ui.viewmodel.ContextViewModelFactory { *; }

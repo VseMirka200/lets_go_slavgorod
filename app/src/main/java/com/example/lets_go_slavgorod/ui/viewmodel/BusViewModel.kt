@@ -1,8 +1,8 @@
 package com.example.lets_go_slavgorod.ui.viewmodel
 
 // Android системные импорты
-import android.annotation.SuppressLint
 import android.app.Application
+import android.annotation.SuppressLint
 import timber.log.Timber
 
 // ViewModel импорты
@@ -92,7 +92,18 @@ data class BusUiState(
  * @version 2.0
  * @since 1.0
  */
+@SuppressLint("StaticFieldLeak")
 class BusViewModel(application: Application) : AndroidViewModel(application) {
+
+    // =====================================================================================
+    //                              РЕПОЗИТОРИИ И DAO
+    // =====================================================================================
+    
+    /** DAO для работы с избранными временами */
+    private val favoriteTimeDao = AppDatabase.getDatabase(application).favoriteTimeDao()
+    
+    /** Репозиторий для работы с маршрутами */
+    private val routeRepository = BusRouteRepository(application)
 
     // =====================================================================================
     //                              СОСТОЯНИЕ UI
@@ -101,6 +112,10 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     /** Текущее состояние UI с маршрутами */
     private val _uiState = MutableStateFlow(BusUiState(isLoading = true))
     val uiState: StateFlow<BusUiState> = _uiState.asStateFlow()
+    
+    /** Состояние Pull-to-Refresh */
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
     
     /** Поисковый запрос пользователя */
     private val _searchQuery = MutableStateFlow("")
@@ -115,17 +130,7 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     
     /** Кэш избранных времен для оптимизации */
     private var cachedFavoriteTimes: List<FavoriteTime> = emptyList()
-
-    // =====================================================================================
-    //                              РЕПОЗИТОРИИ И DAO
-    // =====================================================================================
     
-    /** DAO для работы с избранными временами */
-    private val favoriteTimeDao = AppDatabase.getDatabase(application).favoriteTimeDao()
-    
-    /** Репозиторий для работы с маршрутами */
-    private val routeRepository = BusRouteRepository(application)
-
     val favoriteTimes: StateFlow<List<FavoriteTime>> =
         favoriteTimeDao.getAllFavoriteTimes()
             .map { entities ->
@@ -245,46 +250,21 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     }
     
     /**
-     * Принудительно обновляет список маршрутов
-     * Очищает кэш и загружает свежие данные
+     * Обновляет данные маршрутов (для Pull-to-Refresh)
      */
-    fun refreshRoutes() {
-        Timber.d("Force refreshing routes...")
-        cachedRoutes = emptyList() // Очищаем кэш
-        _uiState.update { currentState ->
-            currentState.copy(isLoading = true)
-        }
-        // Используем принудительное обновление репозитория
-        routeRepository.forceRefreshRoutes()
-        // Загружаем обновленные данные
-        val routes = routeRepository.getAllRoutes()
-        Timber.d("Refreshed routes: ${routes.size} routes found")
-        cachedRoutes = routes
-        _uiState.update { currentState ->
-            currentState.copy(
-                routes = routes,
-                isLoading = false,
-                error = if (routes.isEmpty()) "Маршруты не найдены" else null
-            )
+    fun refresh() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                // Перезагружаем маршруты
+                loadInitialRoutes()
+                kotlinx.coroutines.delay(500) // Минимальная задержка для плавности
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
-
-    /**
-     * Добавляет время отправления в избранное
-     * 
-     * Создает новую запись в избранном на основе переданного расписания.
-     * Включает валидацию данных, сохранение в базе данных и планирование уведомления.
-     * 
-     * Процесс добавления:
-     * 1. Валидация входных данных
-     * 2. Создание FavoriteTimeEntity с текущим timestamp
-     * 3. Сохранение в локальную базу данных
-     * 4. Планирование уведомления через AlarmScheduler
-     * 5. Обновление UI состояния
-     * 
-     * @param schedule расписание для добавления в избранное (должно быть валидным)
-     * @throws IllegalArgumentException если данные расписания невалидны
-     */
+    
     @SuppressLint("TimberArgCount")
     fun addFavoriteTime(schedule: BusSchedule) {
         viewModelScope.launch {
@@ -293,16 +273,10 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                     currentState.copy(isAddingFavorite = true, error = null)
                 }
                 
-                // Валидация данных перед добавлением
                 val sanitizedSchedule = schedule.sanitized()
                 if (!sanitizedSchedule.isValid()) {
-                    Timber.e("BusViewModel", "Invalid schedule data, cannot add to favorites: ${schedule.id}")
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isAddingFavorite = false,
-                            error = "Некорректные данные расписания"
-                        )
-                    }
+                    Timber.e("BusViewModel", "Invalid schedule data")
+                    _uiState.update { it.copy(isAddingFavorite = false, error = "Некорректные данные") }
                     return@launch
                 }
                 
@@ -335,20 +309,10 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 
                 AlarmScheduler.checkAndUpdateNotifications(getApplication(), favoriteForScheduler)
-                Timber.d("Successfully added favorite time: ${sanitizedSchedule.id}")
-                
-                _uiState.update { currentState ->
-                    currentState.copy(isAddingFavorite = false, error = null)
-                }
-                
+                _uiState.update { it.copy(isAddingFavorite = false, error = null) }
             } catch (e: Exception) {
-                Timber.e(e, "BusViewModel: Error adding favorite time: ${schedule.id}")
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isAddingFavorite = false,
-                        error = "Ошибка при добавлении в избранное: ${e.message}"
-                    )
-                }
+                Timber.e(e, "Error adding favorite time")
+                _uiState.update { it.copy(isAddingFavorite = false, error = e.message) }
             }
         }
     }
@@ -356,27 +320,13 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     fun removeFavoriteTime(scheduleId: String) {
         viewModelScope.launch {
             try {
-                _uiState.update { currentState ->
-                    currentState.copy(isRemovingFavorite = true, error = null)
-                }
-                
+                _uiState.update { it.copy(isRemovingFavorite = true, error = null) }
                 favoriteTimeDao.removeFavoriteTime(scheduleId)
                 AlarmScheduler.cancelAlarm(getApplication(), scheduleId)
-                
-                Timber.d("Successfully removed favorite time: $scheduleId")
-                
-                _uiState.update { currentState ->
-                    currentState.copy(isRemovingFavorite = false, error = null)
-                }
-                
+                _uiState.update { it.copy(isRemovingFavorite = false, error = null) }
             } catch (e: Exception) {
-                Timber.e(e, "BusViewModel: Error removing favorite time: $scheduleId")
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isRemovingFavorite = false,
-                        error = "Ошибка при удалении из избранного: ${e.message}"
-                    )
-                }
+                Timber.e(e, "Error removing favorite time")
+                _uiState.update { it.copy(isRemovingFavorite = false, error = e.message) }
             }
         }
     }
@@ -385,35 +335,26 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
     fun updateFavoriteActiveState(favoriteTime: FavoriteTime, newActiveState: Boolean) {
         viewModelScope.launch {
             val entityInDb = favoriteTimeDao.getFavoriteTimeById(favoriteTime.id).firstOrNull()
-            if (entityInDb == null) {
-                Timber.e("BusViewModel", "FavoriteTime with id ${favoriteTime.id} not found for update/removal.")
-                return@launch
-            }
+            if (entityInDb == null) return@launch
 
             if (!newActiveState) {
                 favoriteTimeDao.removeFavoriteTime(favoriteTime.id)
-                Timber.d("FavoriteTime ${favoriteTime.id} removed due to newActiveState=false.")
                 try {
                     AlarmScheduler.cancelAlarm(getApplication(), favoriteTime.id)
                 } catch (e: Exception) {
-                    Timber.e(e, "BusViewModel: Error cancelling alarm for favorite: ${favoriteTime.id}")
+                    Timber.e(e, "Error cancelling alarm")
                 }
             } else {
                 if (!entityInDb.isActive) {
                     favoriteTimeDao.updateFavoriteTime(entityInDb.copy(isActive = true))
-                    Timber.d("FavoriteTime ${favoriteTime.id} activated.")
-                    val updatedFavoriteForScheduler = favoriteTime.copy(isActive = true)
+                    val updatedFavorite = favoriteTime.copy(isActive = true)
                     try {
-                        AlarmScheduler.checkAndUpdateNotifications(getApplication(), updatedFavoriteForScheduler)
+                        AlarmScheduler.checkAndUpdateNotifications(getApplication(), updatedFavorite)
                     } catch (e: Exception) {
-                        Timber.e(e, "BusViewModel: Error rescheduling alarm for favorite: ${favoriteTime.id}")
+                        Timber.e(e, "Error rescheduling alarm")
                     }
-                } else {
-                    Timber.d("FavoriteTime ${favoriteTime.id} is already active.")
                 }
             }
         }
     }
-    
-
 }

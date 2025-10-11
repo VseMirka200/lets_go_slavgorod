@@ -23,6 +23,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lets_go_slavgorod.data.model.BusSchedule
 
+/**
+ * Переиспользуемый компонент карточки расписания автобуса
+ * 
+ * Отображает информацию о времени отправления автобуса с остановки
+ * в виде интерактивной карточки с возможностью добавления в избранное.
+ * 
+ * Компонент включает в себя:
+ * - Информацию о маршруте (номер и название)
+ * - Время отправления
+ * - Название остановки
+ * - Обратный отсчет времени до отправления
+ * - Кнопку добавления в избранное
+ * - Специальное отображение для ближайшего рейса
+ * 
+ * @param schedule расписание для отображения
+ * @param isFavorite флаг, добавлено ли время в избранное
+ * @param onFavoriteClick callback-функция при клике на кнопку избранного
+ * @param routeNumber номер маршрута для отображения (опционально)
+ * @param routeName название маршрута для отображения (опционально)
+ * @param isNextUpcoming флаг, является ли это расписание ближайшим рейсом
+ * @param allSchedules все расписания для расчета времени до отправления
+ * @param hideRouteInfo скрыть информацию о маршруте
+ * @param modifier модификатор для настройки внешнего вида
+ * 
+ * @author VseMirka200
+ * @version 1.0
+ */
 @Composable
 fun ScheduleCard(
     schedule: BusSchedule,
@@ -33,7 +60,7 @@ fun ScheduleCard(
     isNextUpcoming: Boolean = false,
     allSchedules: List<BusSchedule> = emptyList(),
     hideRouteInfo: Boolean = false,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),

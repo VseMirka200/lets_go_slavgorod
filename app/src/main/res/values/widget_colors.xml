@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Цвета для виджета -->
+    <color name="widget_background">#FFFFFF</color>
+    <color name="widget_background_dark">#1E1E1E</color>
+    <color name="widget_text_primary">#212121</color>
+    <color name="widget_text_primary_dark">#FFFFFF</color>
+    <color name="widget_text_secondary">#757575</color>
+    <color name="widget_text_secondary_dark">#BDBDBD</color>
+    <color name="widget_divider">#E0E0E0</color>
+    <color name="widget_divider_dark">#424242</color>
+</resources>
+

@@ -31,12 +31,14 @@ import com.example.lets_go_slavgorod.ui.components.schedule.ScheduleHeader
 import com.example.lets_go_slavgorod.ui.components.schedule.ScheduleList
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 import com.example.lets_go_slavgorod.utils.ScheduleUtils
+import com.example.lets_go_slavgorod.utils.ConditionalLogging
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
 const val STOP_SLAVGORD_RYNOK = "Рынок (Славгород)"
 const val STOP_YAROVOE_MCHS = "МСЧ-128 (Яровое)"
+const val STOP_YAROVOE_ZORI = "Ст. Зори (Яровое)"
 const val STOP_VOKZAL = "вокзал"
 const val STOP_SOVHOZ = "совхоз"
 
@@ -72,34 +74,46 @@ fun ScheduleScreen(
     LaunchedEffect(route) {
         if (route != null) {
             isLoading = true
-            Timber.d("Starting schedule generation for route ${route.id}")
+            ConditionalLogging.debug("Schedule") { "Starting schedule generation for route ${route.id}" }
             
             val startTime = System.currentTimeMillis()
             
             // Генерируем расписание в фоне
             val allSchedules = ScheduleUtils.generateSchedules(route.id)
-            Timber.d("Generated ${allSchedules.size} schedules for route ${route.id}")
+            ConditionalLogging.debug("Schedule") { "Generated ${allSchedules.size} schedules for route ${route.id}" }
+            if (route.id == "102B") {
+                ConditionalLogging.debug("Schedule") { "102B schedules: ${allSchedules.map { "${it.departurePoint} - ${it.departureTime}" }}" }
+            }
             
             // Фильтруем по точкам отправления
             schedulesSlavgorod = allSchedules
                 .filter { it.departurePoint == STOP_SLAVGORD_RYNOK }
                 .sortedBy { it.departureTime }
-            Timber.d("Slavgorod schedules: ${schedulesSlavgorod.size}")
+            ConditionalLogging.debug("Schedule") { "Slavgorod schedules: ${schedulesSlavgorod.size}" }
             
             schedulesYarovoe = allSchedules
-                .filter { it.departurePoint == STOP_YAROVOE_MCHS }
+                .filter { 
+                    if (route.id == "102B") {
+                        it.departurePoint == STOP_YAROVOE_ZORI
+                    } else {
+                        it.departurePoint == STOP_YAROVOE_MCHS
+                    }
+                }
                 .sortedBy { it.departureTime }
-            Timber.d("Yarovoe schedules: ${schedulesYarovoe.size}")
+            ConditionalLogging.debug("Schedule") { "Yarovoe schedules: ${schedulesYarovoe.size}" }
+            if (route.id == "102B") {
+                ConditionalLogging.debug("Schedule") { "102B Yarovoe schedules: ${schedulesYarovoe.map { "${it.departureTime}" }}" }
+            }
             
             schedulesVokzal = allSchedules
                 .filter { it.departurePoint == STOP_VOKZAL }
                 .sortedBy { it.departureTime }
-            Timber.d("Vokzal schedules: ${schedulesVokzal.size}")
+            ConditionalLogging.debug("Schedule") { "Vokzal schedules: ${schedulesVokzal.size}" }
             
             schedulesSovhoz = allSchedules
                 .filter { it.departurePoint == STOP_SOVHOZ }
                 .sortedBy { it.departureTime }
-            Timber.d("Sovhoz schedules: ${schedulesSovhoz.size}")
+            ConditionalLogging.debug("Schedule") { "Sovhoz schedules: ${schedulesSovhoz.size}" }
             
             // Определяем ближайшие рейсы
             nextUpcomingSlavgorodId = getNextUpcomingScheduleId(schedulesSlavgorod)
@@ -108,7 +122,7 @@ fun ScheduleScreen(
             nextUpcomingSovhozId = getNextUpcomingScheduleId(schedulesSovhoz)
             
             val elapsedTime = System.currentTimeMillis() - startTime
-            Timber.d("Schedule data fully loaded in ${elapsedTime}ms")
+            ConditionalLogging.debug("Schedule") { "Schedule data fully loaded in ${elapsedTime}ms" }
             
             // Гарантируем показ анимации минимум 1 секунду
             if (elapsedTime < 1000) {
@@ -212,13 +226,13 @@ private fun getNextUpcomingScheduleId(schedules: List<BusSchedule>): String? {
     
     // Если есть рейсы сегодня, возвращаем ближайший
     if (upcomingToday.isNotEmpty()) {
-        Timber.d("Found ${upcomingToday.size} upcoming departures today. Next: ${upcomingToday.first().departureTime}")
+        ConditionalLogging.debug("Schedule") { "Found ${upcomingToday.size} upcoming departures today. Next: ${upcomingToday.first().departureTime}" }
         return upcomingToday.first().id
     }
     
     // Если рейсов сегодня больше нет, возвращаем первый рейс завтра
     val firstTomorrow = schedules.firstOrNull()
-    Timber.d("No departures today. First tomorrow: ${firstTomorrow?.departureTime}")
+    ConditionalLogging.debug("Schedule") { "No departures today. First tomorrow: ${firstTomorrow?.departureTime}" }
     return firstTomorrow?.id
 }
 

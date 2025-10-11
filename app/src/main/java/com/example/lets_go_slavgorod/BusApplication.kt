@@ -26,10 +26,11 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 /**
- * Главный класс приложения "Let's Go Slavgorod"
+ * Главный класс приложения "Let's Go Slavgorod" с Hilt DI
  * 
  * Управляет глобальным состоянием приложения и инициализацией компонентов.
  * Наследуется от MultiDexApplication для поддержки большого количества методов.
+ * Использует Hilt для Dependency Injection.
  * 
  * Основные функции:
  * - Инициализация Timber для логирования
@@ -105,14 +106,7 @@ class BusApplication : MultiDexApplication() {
             // Восстанавливаем запланированные уведомления
             rescheduleAlarmsOnStartup()
             
-            // Принудительное обновление маршрутов при запуске
-            try {
-                Timber.d("Force updating routes on startup...")
-                busRouteRepository.forceRefreshRoutes()
-                Timber.d("Routes updated successfully on startup")
-            } catch (e: Exception) {
-                Timber.e(e, "Error updating routes on startup")
-            }
+            // Маршруты загружаются автоматически при инициализации репозитория
             
             // Запускаем автоматическую проверку обновлений
             startAutomaticUpdateCheck()

@@ -14,8 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.lets_go_slavgorod.R
 
 /**
  * Переиспользуемый компонент поисковой строки
@@ -40,7 +44,6 @@ import androidx.compose.ui.unit.dp
  * @version 2.0
  * @since 1.0
  */
-@SuppressLint("RememberInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
@@ -52,6 +55,7 @@ fun SearchBar(
     leadingIcon: ImageVector = Icons.Default.Search
 ) {
     val focusRequester = FocusRequester()
+    val searchHint = stringResource(R.string.accessibility_search_hint)
 
     OutlinedTextField(
         value = query,
@@ -59,21 +63,29 @@ fun SearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
-            .focusRequester(focusRequester),
+            .focusRequester(focusRequester)
+            .semantics {
+                contentDescription = searchHint
+            },
         placeholder = { Text(placeholder) },
         leadingIcon = {
             Icon(
                 imageVector = leadingIcon,
-                contentDescription = "Search",
+                contentDescription = searchHint,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
         trailingIcon = {
             if (query.isNotEmpty()) {
-                IconButton(onClick = { onQueryChange("") }) {
+                IconButton(
+                    onClick = { onQueryChange("") },
+                    modifier = Modifier.semantics {
+                        contentDescription = "Очистить поиск"
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear search",
+                        contentDescription = "Очистить поиск",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

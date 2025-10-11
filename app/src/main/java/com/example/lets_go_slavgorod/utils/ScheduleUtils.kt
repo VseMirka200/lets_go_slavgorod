@@ -20,14 +20,19 @@ object ScheduleUtils {
     /**
      * Генерирует стандартные расписания для всех маршрутов
      * 
-     * @param routeId ID маршрута
+     * @param routeId ID маршрута (не может быть null или пустым)
      * @return список расписаний для маршрута
+     * @throws IllegalArgumentException если routeId некорректный
      */
     fun generateSchedules(routeId: String): List<BusSchedule> {
+        // Валидация входных данных
+        require(routeId.isNotBlank()) { "Route ID cannot be blank" }
+        require(routeId.isNotEmpty()) { "Route ID cannot be empty" }
         val currentDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
         
         return when (routeId) {
             "102" -> generateRoute102Schedules(currentDayOfWeek)
+            "102B" -> generateRoute102BSchedules(currentDayOfWeek)
             "1" -> generateRoute1Schedules(currentDayOfWeek)
             else -> emptyList()
         }
@@ -116,6 +121,28 @@ object ScheduleUtils {
             BusSchedule("102_yar_34", "102", "МСЧ-128 (Яровое)", "20:00", dayOfWeek, notes = null, departurePoint = "МСЧ-128 (Яровое)"),
             BusSchedule("102_yar_35", "102", "МСЧ-128 (Яровое)", "20:30", dayOfWeek, notes = null, departurePoint = "МСЧ-128 (Яровое)"),
             BusSchedule("102_yar_36", "102", "МСЧ-128 (Яровое)", "21:00", dayOfWeek, notes = null, departurePoint = "МСЧ-128 (Яровое)")
+        )
+    }
+    
+    /**
+     * Генерирует упрощенное расписание для маршрута №102Б (Славгород — Яровое)
+     * Согласно изображению расписания
+     */
+    private fun generateRoute102BSchedules(dayOfWeek: Int): List<BusSchedule> {
+        return listOf(
+            // Отправление из Рынка (Славгород)
+            BusSchedule("102B_slav_1", "102B", "Рынок (Славгород)", "06:30", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
+            BusSchedule("102B_slav_2", "102B", "Рынок (Славгород)", "07:50", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
+            BusSchedule("102B_slav_3", "102B", "Рынок (Славгород)", "14:40", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
+            BusSchedule("102B_slav_4", "102B", "Рынок (Славгород)", "16:00", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
+            BusSchedule("102B_slav_5", "102B", "Рынок (Славгород)", "17:20", dayOfWeek, notes = null, departurePoint = "Рынок (Славгород)"),
+
+            // Отправление из Ст. Зори (Яровое)
+            BusSchedule("102B_yar_1", "102B", "Ст. Зори (Яровое)", "07:10", dayOfWeek, notes = null, departurePoint = "Ст. Зори (Яровое)"),
+            BusSchedule("102B_yar_2", "102B", "Ст. Зори (Яровое)", "08:30", dayOfWeek, notes = null, departurePoint = "Ст. Зори (Яровое)"),
+            BusSchedule("102B_yar_3", "102B", "Ст. Зори (Яровое)", "15:20", dayOfWeek, notes = null, departurePoint = "Ст. Зори (Яровое)"),
+            BusSchedule("102B_yar_4", "102B", "Ст. Зори (Яровое)", "16:40", dayOfWeek, notes = null, departurePoint = "Ст. Зори (Яровое)"),
+            BusSchedule("102B_yar_5", "102B", "Ст. Зори (Яровое)", "18:00", dayOfWeek, notes = null, departurePoint = "Ст. Зори (Яровое)")
         )
     }
     

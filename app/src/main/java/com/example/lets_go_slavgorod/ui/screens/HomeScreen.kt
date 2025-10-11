@@ -3,11 +3,13 @@ package com.example.lets_go_slavgorod.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,20 +18,24 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsBus
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -41,12 +47,22 @@ import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.ui.components.SearchBar
 import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.DisplaySettingsViewModel
+import com.example.lets_go_slavgorod.utils.ConditionalLogging
 import com.example.lets_go_slavgorod.ui.viewmodel.RouteDisplayMode
 import com.example.lets_go_slavgorod.ui.components.BusRouteCard
 import timber.log.Timber
+import androidx.compose.runtime.LaunchedEffect
 
 /**
- * Состояние загрузки данных
+ * Компонент состояния загрузки данных
+ * 
+ * Отображает индикатор загрузки с центрированием на экране
+ * и информативным текстом для пользователя.
+ * 
+ * Показывается во время:
+ * - Первоначальной загрузки маршрутов
+ * - Обновления данных
+ * - Любых асинхронных операций
  */
 @Composable
 fun LoadingState() {
@@ -72,10 +88,15 @@ fun LoadingState() {
 }
 
 /**
- * Состояние ошибки при загрузке данных
+ * Компонент состояния ошибки при загрузке данных
  * 
  * Отображается при возникновении ошибок при загрузке маршрутов.
  * Показывает пользователю понятное сообщение об ошибке с иконкой.
+ * 
+ * Используется для:
+ * - Ошибок сети
+ * - Ошибок базы данных
+ * - Неожиданных исключений
  * 
  * @param errorMessage сообщение об ошибке для отображения пользователю
  */
@@ -120,34 +141,71 @@ fun ErrorState(errorMessage: String) {
 @Composable
 fun EmptyState(searchQuery: String) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.DirectionsBus,
-                contentDescription = stringResource(R.string.empty_state_icon_description),
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Большая иконка с фоном
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (searchQuery.isNotEmpty()) Icons.Filled.SearchOff else Icons.Default.DirectionsBus,
+                    contentDescription = stringResource(R.string.empty_state_icon_description),
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                )
+            }
+            
+            // Заголовок
             Text(
                 text = if (searchQuery.isNotEmpty()) {
-                    "По запросу \"$searchQuery\" ничего не найдено"
+                    "Ничего не найдено"
                 } else {
                     "Маршруты не найдены"
                 },
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
             )
-            if (searchQuery.isNotEmpty()) {
-                Text(
-                    text = "Попробуйте изменить поисковый запрос",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            
+            // Описание
+            Text(
+                text = if (searchQuery.isNotEmpty()) {
+                    "По запросу \"$searchQuery\" не найдено маршрутов.\nПопробуйте изменить поисковый запрос."
+                } else {
+                    "В данный момент маршруты недоступны.\nПотяните вниз для обновления."
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            
+            // Иконка-подсказка
+            if (searchQuery.isEmpty()) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = "Потяните экран вниз для обновления",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
         }
     }
@@ -165,6 +223,7 @@ fun EmptyState(searchQuery: String) {
  * @param routes список маршрутов для отображения
  * @param navController контроллер навигации для перехода к деталям маршрута
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutesListState(
     routes: List<BusRoute>,
@@ -207,12 +266,12 @@ fun RoutesListState(
                     BusRouteCard(
                         route = route,
                         isGridMode = true,
+                        gridColumns = gridColumns,
                         onClick = {
                             // Быстрая навигация без задержек
                             try {
-                                Timber.d("Route clicked: ${route.id} - ${route.name}")
+                                ConditionalLogging.debug("Navigation") { "Route clicked: ${route.id} - ${route.name}" }
                                 navController.navigate("schedule/${route.id}") {
-                                    // Оптимизированные флаги навигации
                                     launchSingleTop = true
                                     restoreState = true
                                     popUpTo("home") {
@@ -220,7 +279,7 @@ fun RoutesListState(
                                     }
                                 }
                             } catch (e: Exception) {
-                                Timber.e(e, "Navigation error for route: ${route.id}")
+                                ConditionalLogging.error("Navigation", e) { "Navigation error for route: ${route.id}" }
                             }
                         }
                     )
@@ -292,9 +351,26 @@ fun HomeScreen(
     Timber.d("HomeScreen is being displayed")
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    
+    // Snackbar state
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    
+    // Показываем Snackbar при ошибке
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { errorMessage ->
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    message = errorMessage,
+                    actionLabel = "Закрыть"
+                )
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -304,17 +380,7 @@ fun HomeScreen(
                     )
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            viewModel.refreshRoutes()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Refresh,
-                            contentDescription = "Обновить маршруты",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
+                    // Убрана кнопка обновления маршрутов
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,

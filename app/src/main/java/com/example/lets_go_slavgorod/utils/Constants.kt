@@ -24,13 +24,12 @@ package com.example.lets_go_slavgorod.utils
 object Constants {
     
     // Информация о приложении
-    const val APP_VERSION = "v1.7"  // Версия приложения
+    const val APP_VERSION = "v1.8"  // Версия приложения
     
     // Анимации (в миллисекундах)
     const val ANIMATION_DURATION_SHORT = 100  // Быстрые анимации (кнопки, переключатели)
     const val ANIMATION_DURATION_MEDIUM = 300 // Стандартные анимации (переходы между экранами)
-    const val ANIMATION_DURATION_LONG = 500  // Долгие анимации (сложные переходы)
-    
+
     // Размеры UI (в dp)
     const val CARD_ELEVATION = 2                    // Тень карточек
     const val CARD_CORNER_RADIUS = 12              // Скругление углов карточек

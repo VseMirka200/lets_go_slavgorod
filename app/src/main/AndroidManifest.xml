@@ -82,5 +82,22 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+        
+        <!-- ===================================================================================== -->
+        <!--                                  WIDGET                                              -->
+        <!-- ===================================================================================== -->
+        
+        <!-- Виджет расписания автобусов -->
+        <receiver
+            android:name=".widget.BusScheduleWidget"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/bus_schedule_widget_info" />
+        </receiver>
     </application>
 </manifest>

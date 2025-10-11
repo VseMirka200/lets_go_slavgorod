@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import com.example.lets_go_slavgorod.data.model.BusRoute
 import com.example.lets_go_slavgorod.ui.viewmodel.NotificationMode
 import com.example.lets_go_slavgorod.ui.viewmodel.NotificationSettingsViewModel
+import com.example.lets_go_slavgorod.ui.components.StyledDropdownMenu
+import com.example.lets_go_slavgorod.ui.components.StyledDropdownMenuItem
 import java.time.DayOfWeek
 
 /**
@@ -138,17 +140,14 @@ fun RouteNotificationSettingsScreen(
                             onDismissRequest = { showModeDropdown = false }
                         ) {
                             notificationModeOptions.forEach { mode ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            when (mode) {
-                                                NotificationMode.ALL_DAYS -> "Все дни"
-                                                NotificationMode.WEEKDAYS -> "Только будни"
-                                                NotificationMode.SELECTED_DAYS -> "Выбранные дни"
-                                                NotificationMode.DISABLED -> "Отключено"
-                                            }
-                                        )
+                                StyledDropdownMenuItem(
+                                    text = when (mode) {
+                                        NotificationMode.ALL_DAYS -> "Все дни"
+                                        NotificationMode.WEEKDAYS -> "Только будни"
+                                        NotificationMode.SELECTED_DAYS -> "Выбранные дни"
+                                        NotificationMode.DISABLED -> "Отключено"
                                     },
+                                    selected = mode == currentNotificationMode,
                                     onClick = {
                                         notificationSettingsViewModel.setRouteNotificationMode(route.id, mode)
                                         showModeDropdown = false

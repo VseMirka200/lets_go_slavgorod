@@ -15,8 +15,8 @@ android {
         applicationId = "com.example.lets_go_slavgorod"
         minSdk = 24
         targetSdk = 35
-        versionCode = 10071
-        versionName = "1.7"
+        versionCode = 10081
+        versionName = "1.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -26,6 +26,13 @@ android {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
         resourceConfigurations += setOf("ru", "en")
+        
+        // BuildConfig поля для конфигурации
+        buildConfigField("String", "GITHUB_REPO_OWNER", "\"VseMirka200\"")
+        buildConfigField("String", "GITHUB_REPO_NAME", "\"lets_go_slavgorod\"")
+        buildConfigField("String", "GITHUB_API_URL", "\"https://api.github.com/repos/VseMirka200/lets_go_slavgorod/releases/latest\"")
+        buildConfigField("long", "UPDATE_CHECK_INTERVAL_HOURS", "1L")
+        buildConfigField("long", "UPDATE_CACHE_TTL_HOURS", "24L")
     }
 
     signingConfigs {
@@ -42,13 +49,22 @@ android {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
+            isDebuggable = false
+            isJniDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Дополнительные оптимизации для размера APK
+            ndk {
+                debugSymbolLevel = "none"
+            }
         }
         debug {
             applicationIdSuffix = ".debug"
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
     
@@ -109,8 +125,15 @@ dependencies {
     // Utilities
     implementation(libs.timber)
     
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.androidx.arch.core.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -42,7 +42,7 @@ fun CountdownTimer(
     schedule: BusSchedule,
     allSchedules: List<BusSchedule>,
     showLabel: Boolean = false,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
     var currentTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
     

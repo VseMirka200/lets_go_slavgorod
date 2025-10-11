@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/widget_background">
+
+    <!-- Заголовок виджета -->
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Поехали! Славгород"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/widget_text_primary"
+        android:paddingBottom="4dp" />
+
+    <!-- Время обновления -->
+    <TextView
+        android:id="@+id/widget_update_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Обновлено: 12:00"
+        android:textSize="12sp"
+        android:textColor="@color/widget_text_secondary"
+        android:paddingBottom="12dp" />
+
+    <!-- Разделитель -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/widget_divider"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Контент с расписанием -->
+    <TextView
+        android:id="@+id/widget_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Загрузка..."
+        android:textSize="14sp"
+        android:textColor="@color/widget_text_primary"
+        android:lineSpacingMultiplier="1.2"
+        android:gravity="top" />
+
+</LinearLayout>
+

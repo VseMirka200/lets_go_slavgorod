@@ -29,7 +29,7 @@ fun FavoriteRouteDetailsScreen(
     routeId: String,
     viewModel: BusViewModel,
     navController: NavController? = null,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
     val favoriteTimesList by viewModel.favoriteTimes.collectAsState()
     

@@ -1,6 +1,5 @@
 package com.example.lets_go_slavgorod.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -74,9 +76,10 @@ fun BusRouteCardGrid(
     onRouteClick: () -> Unit,
     modifier: Modifier = Modifier,
     showNotificationButton: Boolean = false,
-    onNotificationClick: (() -> Unit)? = null
+    onNotificationClick: (() -> Unit)? = null,
+    gridColumns: Int = 2
 ) {
-    // Агрессивная оптимизация: кэшируем все вычисления
+    // Получаем цвет фона карточки
     val primaryColor = MaterialTheme.colorScheme.primary
     val boxBackgroundColor = remember(route.color, primaryColor) {
         try {
@@ -90,7 +93,7 @@ fun BusRouteCardGrid(
     val interactionSource = remember { MutableInteractionSource() }
     
     // Кэшируем модификаторы для избежания пересоздания
-    val cardModifier = remember(route.id) {
+    val cardModifier = remember(modifier, route.id) {
         modifier
             .fillMaxWidth()
             .clickable(
@@ -100,58 +103,129 @@ fun BusRouteCardGrid(
                 onRouteClick()
             }
     }
-
+    
+    // Адаптивные размеры в зависимости от количества колонок - кэшируем
+    val (cardHeight, cardPadding, spacerHeight) = remember(gridColumns) {
+        when (gridColumns) {
+            1 -> Triple(220.dp, 24.dp, 20.dp)
+            2 -> Triple(180.dp, 20.dp, 16.dp)
+            3 -> Triple(160.dp, 16.dp, 12.dp)
+            else -> Triple(140.dp, 12.dp, 8.dp) // 4 колонки
+        }
+    }
+    
     Card(
         modifier = cardModifier
-            .height(Constants.ROUTE_CARD_HEIGHT_GRID.dp),
+            .height(cardHeight)
+            .semantics {
+                role = Role.Button
+                contentDescription = "Маршрут ${route.routeNumber}: ${route.name}. Нажмите для просмотра расписания"
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = boxBackgroundColor.copy(alpha = 0.15f)
+            containerColor = boxBackgroundColor
         )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(Constants.ROUTE_CARD_HEIGHT_GRID.dp)
+                .height(cardHeight)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Constants.ROUTE_CARD_HEIGHT_GRID.dp)
-                    .padding(Constants.ROUTE_CARD_PADDING_GRID.dp),
+                    .height(cardHeight)
+                    .padding(cardPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Название автобуса сверху
-                Text(
-                    text = "АВТОБУС",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Номер маршрута с цветным фоном
-                Box(
-                    modifier = Modifier
-                        .size(Constants.ROUTE_NUMBER_BOX_SIZE_GRID.dp)
-                        .clip(RoundedCornerShape(Constants.ROUTE_NUMBER_BOX_CORNER_RADIUS_GRID.dp))
-                        .background(boxBackgroundColor),
-                    contentAlignment = Alignment.Center
-                ) {
+                // Для 4 колонок используем более компактный дизайн
+                if (gridColumns >= 4) {
+                    // Компактный дизайн с единым стилем
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        // Надпись "АВТОБУС" сверху
+                        Text(
+                            text = "АВТОБУС",
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.9f),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        
+                        Spacer(modifier = Modifier.height(4.dp))
+                        
+                        // Номер маршрута с адаптивным размером
+                        Text(
+                            text = route.routeNumber,
+                            color = androidx.compose.ui.graphics.Color.White,
+                            style = if (route.routeNumber.length > 3 || route.routeNumber.any { it.isLetter() }) {
+                                MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    lineHeight = MaterialTheme.typography.titleLarge.lineHeight * 0.9
+                                )
+                            } else {
+                                MaterialTheme.typography.headlineLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    lineHeight = MaterialTheme.typography.headlineLarge.lineHeight * 0.9
+                                )
+                            },
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Visible
+                        )
+                        
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                } else {
+                    // Обычный дизайн для 1-3 колонок
+                    Text(
+                        text = "АВТОБУС",
+                        style = when (gridColumns) {
+                            1 -> MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                            2 -> MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            3 -> MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                            else -> MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                        },
+                        color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.9f),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
+                    )
+                    
+                    Spacer(modifier = Modifier.height(spacerHeight))
+                    
+                    // Номер маршрута с адаптивным размером
                     Text(
                         text = route.routeNumber,
                         color = androidx.compose.ui.graphics.Color.White,
-                        style = MaterialTheme.typography.displaySmall.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        ),
+                        style = when (gridColumns) {
+                            1 -> MaterialTheme.typography.displayLarge.copy(
+                                fontSize = MaterialTheme.typography.displayLarge.fontSize * 1.2f,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                            2 -> MaterialTheme.typography.displayMedium.copy(
+                                fontSize = MaterialTheme.typography.displayMedium.fontSize * 1.15f,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                            3 -> {
+                                // Для 3 колонок: уменьшаем размер для номеров с буквами или длинных номеров
+                                if (route.routeNumber.length > 3 || route.routeNumber.any { it.isLetter() }) {
+                                    MaterialTheme.typography.headlineLarge.copy(
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = MaterialTheme.typography.headlineLarge.fontSize * 0.95f
+                                    )
+                                } else {
+                                    MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.ExtraBold)
+                                }
+                            }
+                            else -> MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.ExtraBold)
+                        },
                         textAlign = TextAlign.Center,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = TextOverflow.Visible
                     )
                 }
             }
@@ -163,10 +237,14 @@ fun BusRouteCardGrid(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(4.dp)
+                        .semantics {
+                            role = Role.Button
+                            contentDescription = "Настройки уведомлений для маршрута ${route.routeNumber}"
+                        }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Notifications,
-                        contentDescription = "Настройки уведомлений",
+                        contentDescription = null, // Уже указано в semantics
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -198,7 +276,7 @@ fun BusRouteCardList(
     showNotificationButton: Boolean = false,
     onNotificationClick: (() -> Unit)? = null
 ) {
-    // Кэшируем все вычисления
+    // Получаем цвет фона карточки
     val primaryColor = MaterialTheme.colorScheme.primary
     val boxBackgroundColor = remember(route.color, primaryColor) {
         try {
@@ -210,7 +288,7 @@ fun BusRouteCardList(
     
     val interactionSource = remember { MutableInteractionSource() }
     
-    val cardModifier = remember(route.id) {
+    val cardModifier = remember(modifier, route.id) {
         modifier
             .fillMaxWidth()
             .padding(
@@ -228,20 +306,24 @@ fun BusRouteCardList(
     }
 
     Card(
-        modifier = cardModifier,
+        modifier = cardModifier
+            .semantics {
+                role = Role.Button
+                contentDescription = "Маршрут ${route.routeNumber}: ${route.name}. Нажмите для просмотра расписания"
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = Constants.CARD_ELEVATION.dp),
         shape = RoundedCornerShape(Constants.CARD_CORNER_RADIUS.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = boxBackgroundColor
         )
     ) {
         Row(
             modifier = Modifier
                 .padding(
-                    start = Constants.PADDING_MEDIUM.dp,
-                    end = Constants.PADDING_SMALL.dp,
-                    top = Constants.PADDING_MEDIUM.dp,
-                    bottom = Constants.PADDING_MEDIUM.dp
+                    start = 20.dp,  // Увеличенные отступы
+                    end = 20.dp,
+                    top = 20.dp,
+                    bottom = 20.dp
                 )
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -251,28 +333,29 @@ fun BusRouteCardList(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(Constants.ROUTE_NUMBER_BOX_SIZE.dp)
-                        .clip(RoundedCornerShape(Constants.ROUTE_NUMBER_BOX_CORNER_RADIUS.dp))
-                        .background(boxBackgroundColor),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = route.routeNumber,
-                        color = androidx.compose.ui.graphics.Color.White,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
+                // Номер маршрута - одинаковая высота с названием
+                Text(
+                    text = route.routeNumber,
+                    color = androidx.compose.ui.graphics.Color.White,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    ),
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                
+                // Разделитель
+                Text(
+                    text = "|",
+                    color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(end = 6.dp)
+                )
 
-                Spacer(modifier = Modifier.width(Constants.PADDING_MEDIUM.dp))
-
+                // Название маршрута - одинаковая высота с номером
                 Text(
                     text = route.name,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = androidx.compose.ui.graphics.Color.White,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(end = Constants.PADDING_SMALL.dp)
@@ -287,7 +370,7 @@ fun BusRouteCardList(
                     Icon(
                         imageVector = Icons.Default.Notifications,
                         contentDescription = "Настройки уведомлений",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = androidx.compose.ui.graphics.Color.White
                     )
                 }
             }
@@ -313,7 +396,8 @@ fun BusRouteCard(
     modifier: Modifier = Modifier,
     isGridMode: Boolean = true,
     showNotificationButton: Boolean = false,
-    onNotificationClick: (() -> Unit)? = null
+    onNotificationClick: (() -> Unit)? = null,
+    gridColumns: Int = 2
 ) {
     if (isGridMode) {
         BusRouteCardGrid(
@@ -321,7 +405,8 @@ fun BusRouteCard(
             onRouteClick = { onClick() },
             modifier = modifier,
             showNotificationButton = showNotificationButton,
-            onNotificationClick = onNotificationClick
+            onNotificationClick = onNotificationClick,
+            gridColumns = gridColumns
         )
     } else {
         BusRouteCardList(

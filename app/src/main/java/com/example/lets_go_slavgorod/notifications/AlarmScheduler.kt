@@ -48,13 +48,23 @@ import java.util.Calendar
  */
 object AlarmScheduler {
 
-    // Префикс для кодов запросов будильников
+    // =====================================================================================
+    //                              КОНСТАНТЫ И КЛЮЧИ
+    // =====================================================================================
+    
+    /** Префикс для генерации уникальных request codes для каждого будильника */
     private const val ALARM_REQUEST_CODE_PREFIX = Constants.ALARM_REQUEST_CODE_PREFIX
-    // Время опережения уведомления (5 минут до отправления)
+    
+    /** 
+     * Время опережения уведомления перед отправлением автобуса
+     * По умолчанию 5 минут = 300 000 миллисекунд
+     */
     private const val FIVE_MINUTES_IN_MILLIS = Constants.NOTIFICATION_LEAD_TIME_MINUTES * 60 * 1000L
     
-    // Ключи для тихого режима
+    /** Ключ DataStore для хранения текущего тихого режима */
     private val QUIET_MODE_KEY = stringPreferencesKey("quiet_mode")
+    
+    /** Ключ DataStore для хранения времени окончания временного отключения */
     private val QUIET_UNTIL_KEY = longPreferencesKey("quiet_until_time")
 
     /**

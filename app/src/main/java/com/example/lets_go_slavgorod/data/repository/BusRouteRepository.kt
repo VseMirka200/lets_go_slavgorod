@@ -111,7 +111,7 @@ class BusRouteRepository(private val context: Context? = null) {
                     id = "102",
                     routeNumber = "102",
                     name = "Автобус №102",
-                    description = "Рынок (Славгород) — СТ. ЗОРИ (Яровое)",
+                    description = "Рынок (Славгород) — Ст. Зори (Яровое)",
                     travelTime = "~40 минут",
                     pricePrimary = "38₽ город / 55₽ межгород",
                     paymentMethods = "Нал. / Безнал.",
@@ -121,7 +121,7 @@ class BusRouteRepository(private val context: Context? = null) {
                     id = "102B",
                     routeNumber = "102Б",
                     name = "Автобус 102Б",
-                    description = "Рынок (Славгород) — СТ. ЗОРИ (Яровое)",
+                    description = "Рынок (Славгород) — Ст. Зори (Яровое)",
                     travelTime = "~40 минут",
                     pricePrimary = "38₽ город / 55₽ межгород",
                     paymentMethods = "Нал. / Безнал.",
@@ -142,6 +142,9 @@ class BusRouteRepository(private val context: Context? = null) {
             Timber.d("Created sample routes: ${sampleRoutes.size} routes")
             sampleRoutes.forEach { route ->
                 Timber.d("Sample route: ${route.id} - ${route.name}")
+                if (route.id == "102B") {
+                    Timber.d("102B route details: id=${route.id}, routeNumber=${route.routeNumber}, name=${route.name}, isValid=${route.isValid()}")
+                }
             }
             
             // Валидируем и кэшируем маршруты
@@ -156,12 +159,18 @@ class BusRouteRepository(private val context: Context? = null) {
             // Кэшируем валидные маршруты для быстрого доступа
             validRoutes.forEach { route ->
                 routesCache[route.id] = route
+                if (route.id == "102B") {
+                    Timber.d("102B route cached successfully")
+                }
             }
             
             _routes.value = validRoutes
             Timber.d("Routes set to _routes: ${validRoutes.size} routes")
             validRoutes.forEach { route ->
                 Timber.d("Route in _routes: ${route.id} - ${route.name}")
+                if (route.id == "102B") {
+                    Timber.d("102B route in final _routes list!")
+                }
             }
             
             // Сохраняем в кэш, если есть контекст
@@ -186,8 +195,13 @@ class BusRouteRepository(private val context: Context? = null) {
      * @return объект BusRoute или null если не найден
      */
     fun getRouteById(routeId: String?): BusRoute? {
+        // Валидация входных данных
         if (routeId == null) {
             Timber.w("getRouteById called with null routeId")
+            return null
+        }
+        if (routeId.isBlank()) {
+            Timber.w("getRouteById called with blank routeId")
             return null
         }
         
@@ -207,6 +221,14 @@ class BusRouteRepository(private val context: Context? = null) {
      * @return список найденных маршрутов
      */
     fun searchRoutes(query: String): List<BusRoute> {
+        // Валидация входных данных
+        requireNotNull(query) { "Search query cannot be null" }
+        
+        // Если запрос пустой, возвращаем все маршруты
+        if (query.isBlank()) {
+            return getAllRoutes()
+        }
+        
         return _routes.value.search(query)
     }
     
@@ -217,19 +239,6 @@ class BusRouteRepository(private val context: Context? = null) {
      */
     fun getAllRoutes(): List<BusRoute> = _routes.value
     
-    /**
-     * Принудительно обновляет маршруты, игнорируя кэш
-     */
-    fun forceRefreshRoutes() {
-        Timber.d("Force refreshing routes, ignoring cache")
-        // Очищаем кэш
-        routesCache.clear()
-        // Очищаем кэш на диске
-        if (context != null) {
-            CacheUtils.clearCache(context)
-        }
-        // Перезагружаем маршруты
-        loadInitialRoutes()
-    }
+    // Функция forceRefreshRoutes удалена - обновление маршрутов больше не требуется
 
 }

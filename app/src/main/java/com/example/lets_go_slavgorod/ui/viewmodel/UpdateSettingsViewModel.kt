@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
  * 
  * @param context Контекст приложения для доступа к UpdatePreferences
  */
-class UpdateSettingsViewModel(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel() {
+class UpdateSettingsViewModel(private val context: Context) : ViewModel() {
     
     // Экземпляр для работы с настройками обновлений
     private val updatePreferences = UpdatePreferences(context)

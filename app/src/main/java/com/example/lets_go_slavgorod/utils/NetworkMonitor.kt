@@ -105,11 +105,11 @@ object NetworkMonitor {
      * 
      * Синхронная проверка текущего состояния сети.
      * Для реактивного наблюдения используйте observeConnectivity().
+     * Использует современные API для Android 6.0+.
      * 
      * @param context контекст приложения
      * @return true если есть соединение, false иначе
      */
-    @Suppress("DEPRECATION")
     fun isConnected(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         
@@ -120,8 +120,10 @@ object NetworkMonitor {
             capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
         } else {
-            // Используем устаревший API для Android < 6.0
+            // Fallback для Android < 6.0
+            @Suppress("DEPRECATION")
             val networkInfo = connectivityManager.activeNetworkInfo
+            @Suppress("DEPRECATION")
             networkInfo?.isConnected == true
         }
     }
@@ -129,10 +131,11 @@ object NetworkMonitor {
     /**
      * Определяет тип текущего подключения
      * 
+     * Использует современные API для Android 6.0+.
+     * 
      * @param context контекст приложения
-     * @return тип подключения (WiFi, Cellular, Unknown, None)
+     * @return тип подключения (WiFi, Cellular, Ethernet, Unknown, None)
      */
-    @Suppress("DEPRECATION")
     fun getConnectionType(context: Context): ConnectionType {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         
@@ -147,13 +150,18 @@ object NetworkMonitor {
                 else -> ConnectionType.UNKNOWN
             }
         } else {
-            // Используем устаревший API для Android < 6.0
+            // Fallback для Android < 6.0
+            @Suppress("DEPRECATION")
             val networkInfo = connectivityManager.activeNetworkInfo
+            @Suppress("DEPRECATION")
             return when (networkInfo?.type) {
                 ConnectivityManager.TYPE_WIFI -> ConnectionType.WIFI
                 ConnectivityManager.TYPE_MOBILE -> ConnectionType.CELLULAR
                 ConnectivityManager.TYPE_ETHERNET -> ConnectionType.ETHERNET
-                else -> if (networkInfo?.isConnected == true) ConnectionType.UNKNOWN else ConnectionType.NONE
+                else -> {
+                    @Suppress("DEPRECATION")
+                    if (networkInfo?.isConnected == true) ConnectionType.UNKNOWN else ConnectionType.NONE
+                }
             }
         }
     }

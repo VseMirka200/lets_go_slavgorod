@@ -44,16 +44,13 @@ fun loge(tag: String, message: String, throwable: Throwable? = null) {
  * Логирование ошибок без тега
  * 
  * Упрощенный способ логирования ошибок для общего использования.
+ * Timber автоматически обрабатывает null значения throwable.
  * 
  * @param message сообщение об ошибке
  * @param throwable исключение (опционально)
  */
 fun loge(message: String, throwable: Throwable? = null) {
-    if (throwable != null) {
-        Timber.e(throwable, message)
-    } else {
-        Timber.e(message)
-    }
+    Timber.e(throwable, message)
 }
 
 /**

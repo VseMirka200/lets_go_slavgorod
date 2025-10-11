@@ -42,7 +42,7 @@ class DisplaySettingsViewModel(
                 _displayMode.value = if (isGridMode) RouteDisplayMode.GRID else RouteDisplayMode.LIST
                 
                 val columns = preferences[GRID_COLUMNS] ?: 2
-                _gridColumns.value = columns.coerceIn(2, 4) // Ограничиваем от 2 до 4 колонок
+                _gridColumns.value = columns.coerceIn(1, 4) // Ограничиваем от 1 до 4 колонок
             }
         }
     }
@@ -58,7 +58,7 @@ class DisplaySettingsViewModel(
     
     fun setGridColumns(columns: Int) {
         viewModelScope.launch {
-            val validColumns = columns.coerceIn(2, 4)
+            val validColumns = columns.coerceIn(1, 4)
             _gridColumns.value = validColumns
             context.displayDataStore.edit { preferences ->
                 preferences[GRID_COLUMNS] = validColumns

@@ -30,13 +30,33 @@ import com.example.lets_go_slavgorod.ui.viewmodel.BusViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.DisplaySettingsViewModel
 import com.example.lets_go_slavgorod.ui.viewmodel.RouteDisplayMode
 
-@SuppressLint("LogNotTimber")
+/**
+ * Экран избранных времен отправления автобусов
+ * 
+ * Отображает все маршруты, для которых пользователь добавил
+ * избранные времена отправления. Каждый маршрут показывается
+ * в виде карточки с информацией о количестве избранных времен.
+ * 
+ * Основные функции:
+ * - Отображение маршрутов с избранными временами
+ * - Поддержка режимов отображения (сетка/список)
+ * - Навигация к детальной информации маршрута
+ * - Отображение пустого состояния при отсутствии избранного
+ * - Группировка и сортировка маршрутов
+ * 
+ * @param viewModel ViewModel для управления данными избранного
+ * @param navController контроллер навигации для перехода между экранами
+ * @param modifier модификатор для настройки внешнего вида экрана
+ * 
+ * @author VseMirka200
+ * @version 1.0
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteTimesScreen(
     viewModel: BusViewModel,
     navController: NavController? = null,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val favoriteTimesList by viewModel.favoriteTimes.collectAsState()
@@ -52,33 +72,42 @@ fun FavoriteTimesScreen(
         }
     )
     val displayMode by displaySettingsViewModel.displayMode.collectAsState(initial = RouteDisplayMode.GRID)
+    val gridColumns by displaySettingsViewModel.gridColumns.collectAsState(initial = 2)
     
     // Группируем избранные времена по маршрутам и сортируем по дате добавления
     val favoriteRoutes = remember(favoriteTimesList) {
         favoriteTimesList
             .groupBy { it.routeId }
             .map { (routeId, times) ->
-                // Берем самое последнее добавленное время для определения даты
-                val latestTime = times.maxByOrNull { it.addedDate } ?: times.first()
+                // Берем первое время для получения информации о маршруте
+                val firstTime = times.first()
                 // Получаем цвет для маршрута (используем те же цвета, что в BusRouteRepository)
                 val routeColor = when (routeId) {
                     "102" -> "#FF6200EE"  // Фиолетовый
+                    "102B" -> "#FF4CAF50" // Зелёный
                     "1" -> "#FF1976D2"    // Синий
                     else -> "#1976D2"     // По умолчанию синий
                 }
                 // Создаем виртуальный BusRoute для отображения
                 BusRoute(
                     id = routeId,
-                    routeNumber = latestTime.routeNumber,
-                    name = latestTime.routeName,
+                    routeNumber = firstTime.routeNumber,
+                    name = firstTime.routeName,
                     description = "${times.size} избранных времен",
                     travelTime = null,
                     paymentMethods = null,
                     color = routeColor
-                ) to latestTime.addedDate
+                )
             }
-            .sortedByDescending { it.second } // Сортируем по дате добавления (новые сначала)
-            .map { it.first } // Убираем временную метку, оставляем только BusRoute
+            .sortedWith(compareBy<BusRoute> { route ->
+                // Сортируем в том же порядке, что и основные маршруты: 102, 102B, 1, остальные
+                when (route.id) {
+                    "102" -> 1
+                    "102B" -> 2
+                    "1" -> 3
+                    else -> 999 // Остальные маршруты в конце
+                }
+            }.thenBy { it.routeNumber }) // Если есть несколько маршрутов с одинаковым приоритетом, сортируем по номеру
     }
 
     Scaffold(
@@ -115,7 +144,7 @@ fun FavoriteTimesScreen(
                     if (isGridMode) {
                     // Режим сетки
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
+                        columns = GridCells.Fixed(gridColumns),
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
                             start = 16.dp,
@@ -136,7 +165,8 @@ fun FavoriteTimesScreen(
                                     navController?.navigate("favorite_route_details/${route.id}")
                                 },
                                 isGridMode = true,
-                                showNotificationButton = false
+                                showNotificationButton = false,
+                                gridColumns = gridColumns
                             )
                         }
                     }

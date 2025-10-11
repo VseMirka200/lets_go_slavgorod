@@ -65,7 +65,7 @@ import timber.log.Timber
 fun AboutScreen(
     navController: NavController? = null,
     onBackClick: () -> Unit = {},
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
 
     val developerName = stringResource(id = R.string.developer_name)
@@ -74,7 +74,7 @@ fun AboutScreen(
 
     // Строки для обратной связи через Telegram
 
-    val appVersion = "v1.07"
+    val appVersion = "v1.8"
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -365,7 +365,7 @@ private fun FeedbackCard() {
                         // Показываем сообщение пользователю
                         android.widget.Toast.makeText(
                             context,
-                            "Не удалось открыть форму обратной связи",
+                            context.getString(R.string.error_open_feedback_form),
                             android.widget.Toast.LENGTH_LONG
                         ).show()
                     }

@@ -1,0 +1,69 @@
+<resources>
+
+    <!-- ===================================================================================== -->
+    <!--                                      О ПРИЛОЖЕНИИ                                     -->
+    <!-- ===================================================================================== -->
+    <string name="app_name">Поехали! Славгород</string>
+    <string name="error_icon_description">Иконка ошибки загрузки</string>
+    <string name="empty_state_icon_description">Иконка пустого состояния или отсутствия результатов</string>
+    <string name="unknown_error">Произошла неизвестная ошибка.</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                        МАРШРУТЫ                                       -->
+    <!-- ===================================================================================== -->
+    <string name="app_name_actual">Маршруты</string>
+    <string name="error_loading_routes">Ошибка загрузки маршрутов</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                       ИЗБРАННОЕ                                       -->
+    <!-- ===================================================================================== -->
+    <string name="favorite_times_screen_title">Избранное</string>
+    <string name="empty_state_icon_description_favorites">Иконка пустого списка избранного</string>
+    <string name="no_favorite_times_title_updated">Избранное пока пусто</string>
+    <string name="no_favorite_times_description">Добавляйте расписания автобусов в избранное, чтобы они всегда были под рукой.</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                       НАСТРОЙКИ                                       -->
+    <!-- ===================================================================================== -->
+    <string name="settings_screen_title">Настройки</string>
+
+    <!-- Секция "Тема приложения" -->
+    <string name="settings_appearance_icon_desc">Иконка настроек внешнего вида</string>
+    <string name="theme_system">Как в системе</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+
+    <!-- Секция "Уведомления" -->
+    <string name="settings_select_notification_mode_desc">Выбрать режим уведомлений</string>
+    <string name="settings_quiet_mode_icon_desc">Иконка настроек уведомлений</string>
+    
+    <!-- Секция "О приложении" -->
+    <string name="settings_about_icon_desc">Иконка информации о приложении</string>
+
+
+    <!-- ===================================================================================== -->
+    <!--                                      О ПРОГРАММЕ                                      -->
+    <!-- ===================================================================================== -->
+    <string name="about_screen_title">О программе</string>
+    <string name="developer_name">Олюшин Владислав Викторович</string>
+    <string name="developer_vk_url">https://vk.com/vsemirka200</string>
+    <string name="feedback_telegram_url">https://forms.yandex.ru/u/68e942eb49363935b496e9dc/</string>
+
+    <!-- ===================================================================================== -->
+    <!--                                    ДИАЛОГ ПРЕДУПРЕЖДЕНИЯ                              -->
+    <!-- ===================================================================================== -->
+    <string name="disclaimer_title">Важное уведомление</string>
+    <string name="disclaimer_warning_icon">Предупреждение</string>
+    <string name="disclaimer_info_icon">Информация</string>
+    <string name="disclaimer_main_text">Это приложение НЕ является официальным приложением ООО \"Транспорт\".</string>
+    <string name="disclaimer_description_text">Данное приложение было разработано командой энтузиастов для удобного просмотра расписания автобусов в городе Славгороде.</string>
+    <string name="disclaimer_purpose_text">Приложение создано исключительно в информационных целях и не имеет официального отношения к транспортной компании.</string>
+    <string name="disclaimer_accuracy_text">За актуальностью расписания и точностью информации обращайтесь к официальным источникам ООО \"Транспорт\".</string>
+    <string name="disclaimer_dont_show_again">Не показывать это сообщение снова</string>
+    <string name="disclaimer_button_understand">Понятно</string>
+    <string name="disclaimer_button_close">Закрыть</string>
+
+</resources>
